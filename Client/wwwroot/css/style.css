@@ -1,0 +1,51 @@
+html {
+    scroll-behavior: smooth;
+}
+
+.card col-md-3
+{
+    width: 500px;
+    height: 500px;
+
+}
+
+.card-body{
+    transition: background-color ease-in-out 300ms;
+}
+.card-body:hover{
+    background-color: #e9ecef;
+}
+
+li:hover {
+    background: #212529;
+    color: white
+}
+
+.info {
+    margin-top: 15px;
+    animation: showMe 1s forwards;
+    display: none;
+}
+@keyframes showMe{
+    0%{
+        opacity: 0;
+    }
+    100%{
+        opacity: 1;
+    }
+}
+
+
+
+
+.img-thumbnail { transition: all .2s ease-in-out; }
+.img-thumbnail:hover { transform: scale(1.1); }
+
+.col-md-3, .jumbotron {
+    animation: showMe 2s forwards;
+}
+
+#down {
+    margin-top: 100%;
+    padding-bottom: 25%;
+} 
