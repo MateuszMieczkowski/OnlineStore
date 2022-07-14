@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WebApplication1.Entities
+namespace SneakerBase.Entities
 {
     public class Product
     {

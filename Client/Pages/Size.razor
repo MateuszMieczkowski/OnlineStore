@@ -1,0 +1,144 @@
+﻿@page "/size"
+@inject HttpClient Http;
+@inject ToastService Toast
+@inject IJSRuntime JsRuntime;
+@inject ISizeService SizeService
+@using SneakerBase.Shared.Dtos
+@using SneakersBase.Shared.Dtos
+
+
+<div class="container">
+
+    <div class="w-25 m-auto ">
+        @if (createdSize != null)
+        {
+            <h5>Adding new size:</h5>
+            <div class="form-group border p-2">
+                <EditForm Model="createdSize" OnValidSubmit="() => AddSize(createdSize)">
+                    <DataAnnotationsValidator />
+                    <label class="d-block" for="InputSizeName">Size name</label>
+                    <InputText class="form-control" id="InputSizeName" placeholder="Enter size name" @bind-Value=createdSize.Name />
+                    <ValidationMessage For="@(() => createdSize.Name)" />
+                    <button type="submit" class="btn btn-dark mt-1">Add new</button>
+                </EditForm>
+            </div>
+
+        }
+        @if (editedSize != null)
+        {
+            <h5>Update size:</h5>
+            <div class="form-group border p-2">
+                <EditForm Model="editedSize" OnValidSubmit="SaveEdit">
+                    <DataAnnotationsValidator />
+                    <label class="d-block" for="InputSizeName">Size name</label>
+                    <InputText class="form-control" id="InputSizeName" placeholder="Enter size name" @bind-Value=editedSize.Name />
+                    <ValidationMessage For="@(() => editedSize.Name)" />
+                    <div class="mt-1">
+                        <button type="button" @onclick="CancelEdit" class="btn btn-outline-dark">Cancel</button>
+                        <button type="submit" class="btn btn-dark">Save update</button>
+                    </div>
+
+                </EditForm>
+            </div>
+        }
+        @if (sizes == null)
+        {
+            <div class="spinner"></div>
+        }
+        else
+        {
+            <table class="table table-bordered table-hover d-sm-table">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">Size</th>
+                        <th scope="col">Options</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var size in sizes)
+                    {
+                        <tr>
+                            <td>@size.Name</td>
+                            <td>
+                                <button type="submit" class="btn btn-dark" @onclick="(e) => EditBtn_Click(size)">Edit</button>
+                                <button type="button" class="btn btn-dark" @onclick="(e) => RemoveSize(size)">Remove</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+
+</div>
+
+
+@code
+{
+    private List<SizeDto>? sizes;
+    private UpdateSizeDto? editedSize;
+    private SizeDto? confirmedSize;
+    private CreateSizeDto? createdSize;
+    protected override async Task OnInitializedAsync()
+    {
+        sizes = await SizeService.GetAllAsync();
+        createdSize = new CreateSizeDto();
+    }
+
+    private async void EditBtn_Click(SizeDto sizeDto)
+    {
+        if (sizeDto == null)
+        {
+            Toast.ShowToast("Something went wrong", ToastLevel.Error);
+            return;
+        }
+        confirmedSize = sizeDto;
+        editedSize = new UpdateSizeDto()
+            {
+                Name = sizeDto.Name
+            };
+        await JsRuntime.InvokeVoidAsync("ScrollTop");
+    }
+    private void SaveEdit()
+    {
+        confirmedSize.Name = editedSize.Name;
+        Toast.ShowToast("Size updated!", ToastLevel.Success);
+        CancelEdit();
+    }
+
+    private void RemoveSize(SizeDto sizeDto)
+    {
+        if (sizeDto == null)
+        {
+            Toast.ShowToast("Something went wrong", ToastLevel.Error);
+            return;
+        }
+        sizes?.Remove(sizeDto);
+        Toast.ShowToast("Size removed!", ToastLevel.Success);
+
+    }
+
+    private void CancelEdit()
+    {
+        editedSize = null;
+        confirmedSize = null;
+    }
+
+    private void AddSize(CreateSizeDto sizeDto)
+    {
+        if (sizeDto == null)
+        {
+            Toast.ShowToast("Something went wrong", ToastLevel.Error);
+            return;
+        }
+        var newSize = new SizeDto()
+            {
+                Id = 100,
+                Name = sizeDto.Name
+            };
+        sizeDto.Name = string.Empty; ;
+
+        sizes?.Add(newSize);
+        Toast.ShowToast("Size added!", ToastLevel.Success);
+    }
+}

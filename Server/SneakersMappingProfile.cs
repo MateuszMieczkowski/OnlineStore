@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
+using SneakerBase.Entities;
 using SneakerBase.Shared.Dtos;
-using WebApplication1.Entities;
+using SneakersBase.Shared.Dtos;
 
 namespace SneakersBase.Server
 {
@@ -8,11 +9,15 @@ namespace SneakersBase.Server
     {
         public SneakersMappingProfile()
         {
+            CreateMap<CreateProductSizeDto, ProductSize>();
+            CreateMap<CreateProductDto, Product>();
+
             CreateMap<Size, SizeDto>();
             CreateMap<ProductSize, ProductSizeDto>()
                 .ForMember(m => m.Size, c => c.MapFrom(s => s.Size.Name));
             CreateMap<Product, ProductDto>()
-                .ForMember(m => m.Quantity, c => c.MapFrom(s => s.AvailableSizes.Count));
+                .ForMember(m => m.Quantity, c => c.MapFrom(s => s.AvailableSizes.Sum(e => e.Quantity)));
+
         }
     }
 }
