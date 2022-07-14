@@ -23,7 +23,11 @@ builder.Services.AddScoped<SneakersSeeder>();
 
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
+
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<ISizeService, SizeService>();
+
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
@@ -31,6 +35,8 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseWebAssemblyDebugging();
+    app.UseSwagger();
+    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sneakers API"));
 }
 else
 {
@@ -44,6 +50,8 @@ var seeder = scope.ServiceProvider.GetRequiredService<SneakersSeeder>();
 seeder.Seed();
 
 app.UseHttpsRedirection();
+
+
 
 app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();

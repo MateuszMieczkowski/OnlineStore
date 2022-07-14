@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using WebApplication1.Entities;
+using SneakerBase.Entities;
 
 namespace SneakersBase.Server
 {
@@ -39,7 +39,7 @@ namespace SneakersBase.Server
 
         public static IEnumerable<Product> GetProducts()
         {
-            var list = Enumerable.Range(1, 10).Select(index => new Product()
+            var list = Enumerable.Range(1, 20).Select(index => new Product()
             {
                 Name = $"Jordan 1 Mid Triple White 2.0 ({Random.Shared.Next(2012, 2022)})",
                 ReferenceNumber = $"{Random.Shared.Next(111111, 9999999)}-{Random.Shared.Next(100, 999)}",

@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using WebApplication1.Entities;
+using SneakerBase.Entities;
 
 namespace SneakersBase.Server
 {

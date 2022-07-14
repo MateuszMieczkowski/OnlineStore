@@ -1,29 +1,29 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@*<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">SneakersBase</a>
         <button title="" class="navbar-toggler-icon" @onclick="ToggleNavMenu">
-            @*<span class="navbar-toggler-icon"></span>*@
+            <span class="navbar-toggler-icon"></span>
         </button>
     </div>
-</div>
+</div>*@
 
-<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
-            </NavLink>
+@*<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">*@
+
+<nav class="navbar navbar-light bg-light border-bottom">
+    <div class="container-fluid">
+        <div class="nav">
+            <NavLink class="nav-item nav-link" href="">Home <span class="sr-only">(current)</span></NavLink>
+            <NavLink class="nav-item nav-link" href="create">Add</NavLink>
+            <NavLink class="nav-item nav-link" href="overview">Overview panel</NavLink>
+            <NavLink class="nav-item nav-link" href="size">Sizes</NavLink>
         </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="creator">
-                <span class="oi oi-plus" aria-hidden="true"></span> Creator
-            </NavLink>
-        </div>
-    </nav>
-</div>
+        <button class="btn btn-dark my-2 my-sm-0" type="submit">Login</button>
+    </div>
+</nav>
+@*</div>*@
 
 @code {
-    private bool collapseNavMenu = true;
+    private bool collapseNavMenu = false;
 
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 

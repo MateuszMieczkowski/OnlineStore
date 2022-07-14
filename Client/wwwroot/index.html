@@ -8,8 +8,9 @@
     <base href="/" />
     <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
     <link href="css/app.css" rel="stylesheet" />
-    <link href="SneakersBase.Client.styles.css" rel="stylesheet" />
     <link href="css/style.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" integrity="sha384-gfdkjb5BdAXd+lj+gudLWI+BXq4IuLW5IT+brZEZsLFm++aCMlF1V92rMkPaX4PP" crossorigin="anonymous">
+    <link href="css/utilities/toast.css" rel="stylesheet">
 
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="js/utils.js"></script>
@@ -19,6 +20,11 @@
             window.scrollTo(0, document.body.scrollHeight);
         }
 
+    </script>
+    <script>
+        function ScrollTop() {
+            window.scrollTo(0, 0);
+        }
     </script>
     <script>
         function SubmitByFormId(id) {
@@ -32,7 +38,9 @@
 </head>
 
 <body>
-    <div id="app">Loading...</div>
+<div id="app">
+    <div class="spinner"></div>
+</div>
 
     <div id="blazor-error-ui">
         An unhandled error has occurred.

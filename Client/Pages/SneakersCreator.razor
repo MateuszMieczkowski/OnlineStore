@@ -1,23 +1,28 @@
-﻿@page "/creator"
+﻿@page "/create"
 @inject IJSRuntime JsRuntime
 @inject HttpClient Http
+@inject ToastService Toast
+@inject NavigationManager NavManager
+@inject ISizeService SizeService
+@inject ILogger<SneakersCreator> Logger
+
 @using System.IO
 @using Microsoft.AspNetCore.Components
 @using SneakerBase.Shared.Dtos
-<section class="ProductCreator">
+<section role="main">
     <div class="container mt-5">
         <h2>Add new products...</h2>
         <form>
-
-            @foreach (var product in createdProductDtos)
+            @foreach (var product in _createdProductDtos)
             {
                 <div class="border p-3 mb-3">
-                    <EditForm @ref="editForm" Model="@product" Context="test" OnValidSubmit="HandleValidSubmit">
-                        @AddEditForm(editForm)
+                    <EditForm Model="@product" Context="productContext">
+                        <DataAnnotationsValidator />
+
+                        @AddEditForm(productContext)
 
                         <div class="form-group ">
 
-                            <DataAnnotationsValidator/>
                             <label class="d-block">Model image</label>
                             <img class="d-block" src="@product.ThumbnailPath"/>
                             <InputFile OnChange="(e) => OnInputFileChange(e, product)" accept=".png"/>
@@ -42,22 +47,22 @@
                     <div class="d-block">
                         @foreach (var productSize in product.AvailableSizes)
                         {
-                            <EditForm @ref="editSizeForm" Model="@productSize" OnValidSubmit="HandleValidSubmit">
-
+                            <EditForm Model="@productSize" Context="editSize">
                                 <DataAnnotationsValidator />
-                                @AddEditForm(editSizeForm)
+                                @AddEditForm(editSize)
                                 <div class="border p-3 mb-3">
                                     <label class="mr-2" for="sizes">Choose size:</label>
-                                    <select id="sizes" name="cars" @bind="productSize.SizeId">
-                                        @foreach (var size in sizes)
+                                    <select id="sizes" name="sizes" @bind="productSize.SizeId">
+                                        @foreach (var size in _sizes)
                                         {
                                             <option value="@size.Id">@size.Name</option>
                                         }
                                     </select>
                                     <label class="ml-2 mr-2" for="quantity">Quantity:</label>
-                                    <InputNumber id="quantity" min="0" max="100" @bind-Value="productSize.Quantity" />
+                                    <InputNumber id="quantity" min="0" max="1000" @bind-Value="productSize.Quantity" />
                                     <button type="button" class="btn btn-dark ml-2" @onclick="() => RemoveSize(product, productSize)">Remove size</button>
                                     <ValidationMessage For="@(() => productSize.Quantity)" />
+                                    <ValidationMessage For="@(() => productSize.SizeId)" />
 
 
                                 </div>
@@ -69,73 +74,49 @@
 
                     </div>
                 </div>
-                i++;
             }
         </form>
 
         <div class="mt-3 mb-5">
             <button type="button" class="btn btn-dark" @onclick="OnButtonClick">Add next product</button>
-            <button type="button" @onclick="Submit" class="btn btn-dark fixed-bottom w-25">Save new products</button>
+            <button type="button" @onclick="Submit" class="btn btn-dark btn-lg btn-save-changes">Save new products</button>
+
         </div>
     </div>
 
 </section>
+<div class="position-absolute bottom-0 end-0">
+</div>
 
 
 @code
 {
-    private List<CreateProductDto> createdProductDtos;
-    private List<SizeDto> sizes;
-    private int counter;
-    private EditForm editForm;
-    private EditForm editSizeForm;
-    private List<EditForm> editForms;
-    private int i = 0;
-    protected override void OnInitialized()
+    private List<CreateProductDto> _createdProductDtos;
+    private List<SizeDto> _sizes;
+    private EditForm _editForm;
+    private EditForm _editSizeForm;
+    private List<EditContext> _editContexts;
+
+    protected override async Task OnInitializedAsync()
     {
-        sizes = new List<SizeDto>()
-        {
-            new SizeDto()
-            {
-                Id = 0,
-                Name = "41",
-            },
-            new SizeDto()
-            {
-                Id = 1,
-                Name = "42"
-            },
-            new SizeDto()
-            {
-                Id = 2,
-                Name = "43.5"
-            },
-            new SizeDto()
-            {
-                Id = 3,
-                Name = "44"
-            },
-            new SizeDto()
-            {
-                Id = 4,
-                Name = "44.5"
-            }
-        };
-        createdProductDtos = new List<CreateProductDto>();
-        editForms = new List<EditForm>();
-        AddNewProduct();
+        _createdProductDtos = new List<CreateProductDto>();
+        _editContexts = new List<EditContext>();
+        _sizes = await SizeService.GetAllAsync();
+        await AddNewProduct();
     }
+
+
 
     private async Task AddNewProduct()
     {
-        if (createdProductDtos.Count == 10)
+        if (_createdProductDtos.Count == 10)
         {
             await JsRuntime.InvokeVoidAsync("alert", "Maximum number of added products up to 10!"); // Alert
             return;
         }
         var newProduct = new CreateProductDto();
         AddNewSize(newProduct);
-        createdProductDtos.Add(newProduct);
+        _createdProductDtos.Add(newProduct);
         await InvokeAsync(StateHasChanged);
     }
 
@@ -153,12 +134,12 @@
 
     private async void Remove(CreateProductDto product)
     {
-        if (createdProductDtos.Count == 1)
+        if (_createdProductDtos.Count == 1)
         {
-            await JsRuntime.InvokeVoidAsync("alert", "There must be at least one product!"); // Alert
+            Toast.ShowToast("There must be at least one product!", ToastLevel.Warning);
             return;
         }
-        await Task.Run(() => createdProductDtos.Remove(product));
+        await Task.Run(() => _createdProductDtos.Remove(product));
         await InvokeAsync(StateHasChanged);
     }
 
@@ -166,7 +147,7 @@
     {
         if (product.AvailableSizes.Count == 1)
         {
-            await JsRuntime.InvokeVoidAsync("alert", "There must be at least one size!"); // Alert
+            Toast.ShowToast("There must be at least one size!", ToastLevel.Warning);
             return;
         }
         await Task.Run(() => product.AvailableSizes.Remove(size));
@@ -184,16 +165,13 @@
 
         this.StateHasChanged();
     }
-    private async Task HandleValidSubmit()
-    {
-        await JsRuntime.InvokeVoidAsync("alert", "Validation passed succesed!"); // Alert
-    }
-    private void Submit()
+  
+    private async Task Submit()
     {
         bool isValidate = true;
-        foreach (var editForm in editForms)
+        foreach (var editContext in _editContexts)
         {
-            if (!editForm.EditContext.Validate())
+            if (!editContext.Validate())
             {
                 isValidate = false;
             }
@@ -201,13 +179,21 @@
 
         if (isValidate)
         {
-            HandleValidSubmit();
+            using var response = await Http.PostAsJsonAsync("api/products", _createdProductDtos);
+            if (!response.IsSuccessStatusCode)
+            {
+
+                Toast.ShowToast($"There was an error: {response.ReasonPhrase}", ToastLevel.Error);
+                return;
+            }
+            Toast.ShowToast("Products created successfully!", ToastLevel.Success);
+            NavManager.NavigateTo("/");
         }
     }
 
-    private string AddEditForm(EditForm? editForm)
+    private string AddEditForm(EditContext? editContext)
     {
-        if (editForm != null) editForms.Add(editForm);
+        if (editContext != null) _editContexts.Add(editContext);
         return string.Empty;
     }
 }
