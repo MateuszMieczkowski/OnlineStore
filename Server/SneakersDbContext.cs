@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SneakerBase.Entities;
+using SneakersBase.Server.Entities;
 
 namespace SneakersBase.Server
 {
@@ -8,6 +8,8 @@ namespace SneakersBase.Server
         public DbSet<Product> Products { get; set; }
         public DbSet<Size> Sizes { get; set; }
         public DbSet<ProductSize> ProductSizes { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Role> Roles { get; set; }
 
         public SneakersDbContext(DbContextOptions<SneakersDbContext> options) : base(options)
         {
@@ -34,6 +36,14 @@ namespace SneakersBase.Server
 
             modelBuilder.Entity<ProductSize>()
                 .Property(p => p.Quantity)
+                .IsRequired();
+
+            modelBuilder.Entity<User>()
+                .Property(u => u.Login)
+                .IsRequired();
+
+            modelBuilder.Entity<Role>()
+                .Property(r => r.Name)
                 .IsRequired();
         }
     }

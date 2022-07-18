@@ -1,16 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
-using SneakerBase.Shared.Dtos;
+﻿using Microsoft.AspNetCore.Mvc;
 using SneakersBase.Server.Services;
-using SneakerBase.Entities;
-using SneakersBase.Shared.Dtos;
+using SneakersBase.Shared.Models;
 
-namespace SneakerBase.Controllers
+namespace SneakersBase.Server.Controllers
 {
     [ApiController]
     [Route("api/products")]
@@ -26,7 +18,7 @@ namespace SneakerBase.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<ProductDto>> GetAll() => Ok(_productService.GetAll());
 
-        [HttpGet("/api/products/search")]
+        [HttpGet("search")]
         public ActionResult<IEnumerable<ProductDto>> GetBySerach([FromQuery] string filter) =>
             Ok(_productService.GetBySerach(filter));
 
@@ -37,14 +29,14 @@ namespace SneakerBase.Controllers
             return Created("api/products", null);
         }
 
-        [HttpDelete("/api/products/{id}")]
+        [HttpDelete("{id:int}")]
         public ActionResult RemoveById([FromRoute] int id)
         {
             _productService.RemoveById(id);
             return NoContent();
         }
 
-        [HttpPut("/api/products/{id}")]
+        [HttpPut("{id:int}")]
         public ActionResult<ProductDto> Update([FromRoute] int id, [FromBody] UpdateProductDto dto)
         {
             return Ok(_productService.Update(id, dto));

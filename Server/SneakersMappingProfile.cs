@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
-using SneakerBase.Entities;
-using SneakerBase.Shared.Dtos;
-using SneakersBase.Shared.Dtos;
+using SneakersBase.Server.Entities;
+using SneakersBase.Shared.Models;
 
 namespace SneakersBase.Server
 {
@@ -18,6 +17,10 @@ namespace SneakersBase.Server
             CreateMap<Product, ProductDto>()
                 .ForMember(m => m.Quantity, c => c.MapFrom(s => s.AvailableSizes.Sum(e => e.Quantity)));
 
+            CreateMap<CreateSizeDto, Size>();
+            CreateMap<UpdateSizeDto, Size>();
+
+            CreateMap<User, AuthResponse>();
         }
     }
 }

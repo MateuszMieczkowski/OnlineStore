@@ -1,34 +1,22 @@
-﻿@*<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">SneakersBase</a>
-        <button title="" class="navbar-toggler-icon" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </div>
-</div>*@
-
-@*<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">*@
-
-<nav class="navbar navbar-light bg-light border-bottom">
+﻿<nav class="navbar navbar-light bg-light border-bottom">
     <div class="container-fluid">
         <div class="nav">
             <NavLink class="nav-item nav-link" href="">Home <span class="sr-only">(current)</span></NavLink>
-            <NavLink class="nav-item nav-link" href="create">Add</NavLink>
-            <NavLink class="nav-item nav-link" href="overview">Overview panel</NavLink>
-            <NavLink class="nav-item nav-link" href="size">Sizes</NavLink>
         </div>
-        <button class="btn btn-dark my-2 my-sm-0" type="submit">Login</button>
+
+        <AuthorizeView>
+            <Authorized>
+                <div class="nav" style="margin-right: auto;">
+                    <NavLink class="nav-item nav-link" href="create">Add</NavLink>
+                    <NavLink class="nav-item nav-link" href="overview">Overview panel</NavLink>
+                    <NavLink class="nav-item nav-link" href="size">Sizes</NavLink>
+                </div>
+                <NavLink class="btn btn-outline-dark my-2 my-sm-0" href="users/logout">Logout</NavLink>
+            </Authorized>
+            <NotAuthorized>
+                <NavLink class="btn btn-outline-dark my-2 my-sm-0" href="users/login">Login</NavLink>
+            </NotAuthorized>
+        </AuthorizeView>
+
     </div>
 </nav>
-@*</div>*@
-
-@code {
-    private bool collapseNavMenu = false;
-
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
-}

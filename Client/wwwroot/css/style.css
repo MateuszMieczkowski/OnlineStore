@@ -91,3 +91,8 @@ li:hover {
     .nav-link.nav-item:hover, .nav-link.nav-item:focus {
         color: rgba(0,0,0,.7);
     }
+
+.selectize-input {
+    max-width: 200px;
+    display: inline-flex;
+}

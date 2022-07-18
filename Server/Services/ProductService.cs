@@ -7,10 +7,9 @@ using AutoMapper;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SneakerBase.Entities;
-using SneakerBase.Shared.Dtos;
-using SneakersBase.Server.Exceptions;
-using SneakersBase.Shared.Dtos;
+using SneakersBase.Server.Entities;
+using SneakersBase.Server.Services.Exceptions;
+using SneakersBase.Shared.Models;
 
 namespace SneakersBase.Server.Services
 {
@@ -101,6 +100,7 @@ namespace SneakersBase.Server.Services
         public ProductDto Update(int id, UpdateProductDto dto)
         {
             var product = GetById(id, true);
+
             product.Name = dto.Name;
             product.ReferenceNumber = dto.ReferenceNumber;
             product.ThumbnailPath = dto.ThumbnailPath;
@@ -110,13 +110,15 @@ namespace SneakersBase.Server.Services
                 SizeId = s.SizeId,
                 ProductId = product.Id
             }).ToList();
-        
+
             _dbContext.Products.Update(product);
             _dbContext.SaveChanges();
 
             var productDto = _mapper.Map<ProductDto>(GetById(id, true));
             return productDto;
         }
+
+       
     }
     
 }

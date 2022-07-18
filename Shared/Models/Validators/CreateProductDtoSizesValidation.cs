@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace SneakersBase.Shared.Dtos.Validators
+namespace SneakersBase.Shared.Models.Validators
 {
-    public class UpdateProductDtoSizeValidation : ValidationAttribute
+    public class CreateProductDtoSizesValidation : ValidationAttribute
     {
         public override bool IsValid(object value)
         {
-            var sizes = (List<UpdateProductSizeDto>)value;
+            var sizes = (List<CreateProductSizeDto>)value;
             var hs = new HashSet<int>();
             bool areSizesUnique = sizes.All(x => hs.Add(x.SizeId));
 

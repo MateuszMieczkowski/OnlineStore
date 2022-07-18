@@ -21,7 +21,7 @@ namespace SneakersBase.Server.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("WebApplication1.Entities.Product", b =>
+            modelBuilder.Entity("SneakerBase.Entities.Product", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -47,7 +47,7 @@ namespace SneakersBase.Server.Migrations
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("WebApplication1.Entities.ProductSize", b =>
+            modelBuilder.Entity("SneakerBase.Entities.ProductSize", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -73,7 +73,7 @@ namespace SneakersBase.Server.Migrations
                     b.ToTable("ProductSizes");
                 });
 
-            modelBuilder.Entity("WebApplication1.Entities.Size", b =>
+            modelBuilder.Entity("SneakerBase.Entities.Size", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -91,15 +91,58 @@ namespace SneakersBase.Server.Migrations
                     b.ToTable("Sizes");
                 });
 
-            modelBuilder.Entity("WebApplication1.Entities.ProductSize", b =>
+            modelBuilder.Entity("SneakersBase.Server.Entities.Role", b =>
                 {
-                    b.HasOne("WebApplication1.Entities.Product", "Product")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Roles");
+                });
+
+            modelBuilder.Entity("SneakersBase.Server.Entities.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Login")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("SneakerBase.Entities.ProductSize", b =>
+                {
+                    b.HasOne("SneakerBase.Entities.Product", "Product")
                         .WithMany("AvailableSizes")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("WebApplication1.Entities.Size", "Size")
+                    b.HasOne("SneakerBase.Entities.Size", "Size")
                         .WithMany()
                         .HasForeignKey("SizeId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -110,7 +153,18 @@ namespace SneakersBase.Server.Migrations
                     b.Navigation("Size");
                 });
 
-            modelBuilder.Entity("WebApplication1.Entities.Product", b =>
+            modelBuilder.Entity("SneakersBase.Server.Entities.User", b =>
+                {
+                    b.HasOne("SneakersBase.Server.Entities.Role", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("SneakerBase.Entities.Product", b =>
                 {
                     b.Navigation("AvailableSizes");
                 });

@@ -1,16 +1,16 @@
 ﻿@page "/create"
+@attribute [Authorize]
 @inject IJSRuntime JsRuntime
 @inject HttpClient Http
 @inject ToastService Toast
 @inject NavigationManager NavManager
 @inject ISizeService SizeService
 @inject ILogger<SneakersCreator> Logger
-
-@using System.IO
 @using Microsoft.AspNetCore.Components
-@using SneakerBase.Shared.Dtos
+@using SneakersBase.Shared.Models
 <section role="main">
     <div class="container mt-5">
+
         <h2>Add new products...</h2>
         <form>
             @foreach (var product in _createdProductDtos)
@@ -24,21 +24,21 @@
                         <div class="form-group ">
 
                             <label class="d-block">Model image</label>
-                            <img class="d-block" src="@product.ThumbnailPath"/>
-                            <InputFile OnChange="(e) => OnInputFileChange(e, product)" accept=".png"/>
-                            <ValidationMessage For="@(() => product.ThumbnailPath)"/>
-                            <br><br/>
+                            <img class="d-block" src="@product.ThumbnailPath" />
+                            <InputFile OnChange="(e) => OnInputFileChange(e, product)" accept=".png" />
+                            <ValidationMessage For="@(() => product.ThumbnailPath)" />
+                            <br><br />
                             <label class="d-block" for="InputProductName">Model</label>
-                            <InputText class="form-control" id="InputProductName" placeholder="Enter model" @bind-Value=product.Name/>
-                            <ValidationMessage For="@(() => product.Name)"/>
+                            <InputText class="form-control" id="InputProductName" placeholder="Enter model" @bind-Value=product.Name />
+                            <ValidationMessage For="@(() => product.Name)" />
 
                         </div>
                         <div class="form-group">
                             <label for="InputReferenceNumber">Reference number</label>
-                            <InputText class="form-control" id="InputReferenceNumber" placeholder="Enter reference number" @bind-Value="product.ReferenceNumber"/>
-                            <ValidationMessage For="@(() => product.ReferenceNumber)"/>
+                            <InputText class="form-control" id="InputReferenceNumber" placeholder="Enter reference number" @bind-Value="product.ReferenceNumber" />
+                            <ValidationMessage For="@(() => product.ReferenceNumber)" />
                         </div>
-                        <ValidationMessage For="@(() => product.AvailableSizes)"/>
+                        <ValidationMessage For="@(() => product.AvailableSizes)" />
 
                     </EditForm>
 
@@ -47,29 +47,31 @@
                     <div class="d-block">
                         @foreach (var productSize in product.AvailableSizes)
                         {
+
                             <EditForm Model="@productSize" Context="editSize">
                                 <DataAnnotationsValidator />
                                 @AddEditForm(editSize)
                                 <div class="border p-3 mb-3">
                                     <label class="mr-2" for="sizes">Choose size:</label>
-                                    <select id="sizes" name="sizes" @bind="productSize.SizeId">
+                                    <input list="sizes" @onchange="e => SetSize(productSize, e.Value.ToString())"/>
+                                    <datalist  id="sizes" name="sizes"  >
                                         @foreach (var size in _sizes)
                                         {
-                                            <option value="@size.Id">@size.Name</option>
+                                            <option>@size.Name</option>
                                         }
-                                    </select>
+                                    </datalist>
                                     <label class="ml-2 mr-2" for="quantity">Quantity:</label>
                                     <InputNumber id="quantity" min="0" max="1000" @bind-Value="productSize.Quantity" />
                                     <button type="button" class="btn btn-dark ml-2" @onclick="() => RemoveSize(product, productSize)">Remove size</button>
                                     <ValidationMessage For="@(() => productSize.Quantity)" />
                                     <ValidationMessage For="@(() => productSize.SizeId)" />
 
-
                                 </div>
                             </EditForm>
+
                         }
-                        <button type="button" class="btn btn-dark" @onclick="() => AddNewSize(product)">Add next size</button>
                         <button type="button" class="btn btn-outline-dark" @onclick="() => Remove(product)">Remove product</button>
+                        <button type="button" class="btn btn-dark" @onclick="() => AddNewSize(product)">Add next size</button>
 
 
                     </div>
@@ -85,12 +87,13 @@
     </div>
 
 </section>
-<div class="position-absolute bottom-0 end-0">
+<div class="position-absolute">
 </div>
 
 
 @code
 {
+    private const int MAX_ADDED_PRODUCT = 30;
     private List<CreateProductDto> _createdProductDtos;
     private List<SizeDto> _sizes;
     private EditForm _editForm;
@@ -102,34 +105,56 @@
         _createdProductDtos = new List<CreateProductDto>();
         _editContexts = new List<EditContext>();
         _sizes = await SizeService.GetAllAsync();
-        await AddNewProduct();
+        AddNewProduct();
     }
 
-
-
-    private async Task AddNewProduct()
+    private void SetSize(CreateProductSizeDto createDto, string size)
     {
-        if (_createdProductDtos.Count == 10)
+        if (string.IsNullOrEmpty(size))
         {
-            await JsRuntime.InvokeVoidAsync("alert", "Maximum number of added products up to 10!"); // Alert
+            createDto.SizeId = default;
+            return;
+
+        }
+
+        var selectedSize = _sizes.FirstOrDefault(s => s.Name == size);
+
+        if (selectedSize is null)
+        {
+            createDto.SizeId = default;
+            return;
+
+        }
+
+        createDto.SizeId = selectedSize.Id;
+    }
+
+    private void AddNewProduct()
+    {
+        if (_createdProductDtos.Count == MAX_ADDED_PRODUCT)
+        {
+            Toast.ShowToast($"Maximum number of added products up to {MAX_ADDED_PRODUCT}!", ToastLevel.Warning);
             return;
         }
         var newProduct = new CreateProductDto();
         AddNewSize(newProduct);
         _createdProductDtos.Add(newProduct);
-        await InvokeAsync(StateHasChanged);
+        StateHasChanged();
     }
 
     private void AddNewSize(CreateProductDto product)
     {
         product.AvailableSizes.Add(new CreateProductSizeDto());
-        InvokeAsync(StateHasChanged);
+        StateHasChanged();
+
     }
+
 
     private async void OnButtonClick()
     {
         await Task.Run(AddNewProduct);
         await JsRuntime.InvokeVoidAsync("OnScrollEvent");
+        StateHasChanged();
     }
 
     private async void Remove(CreateProductDto product)
@@ -165,7 +190,7 @@
 
         this.StateHasChanged();
     }
-  
+
     private async Task Submit()
     {
         bool isValidate = true;

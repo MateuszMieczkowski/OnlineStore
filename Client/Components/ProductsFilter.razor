@@ -1,0 +1,45 @@
+﻿@using SneakersBase.Shared.Models
+<section class="jumbotron text-left">
+    <div class="container">
+        <form id="filter">
+            <div class="col-sm-8">
+                <div class="form-group">
+                    <label for="inputSearchFilter">Search:</label>
+                    <input class="form-control" id="inputSearchFilter" type="text" value="@_searchString" @oninput="SearchStringChanged">
+                </div>
+                <button type="button" @onclick="Reset" class="btn btn-outline-dark">Clear</button>
+            </div>
+        </form>
+    </div>
+</section>
+
+
+@code
+{
+    [Parameter]
+    public List<ProductDto>? Products { get; set; }
+    [Parameter]
+    public EventCallback OnSearchStringChanged { get; set; }
+    private string? _searchString = string.Empty;
+    private void SearchStringChanged(ChangeEventArgs e)
+    {
+        _searchString = e?.Value?.ToString();
+        StageFilter();
+        if (!string.IsNullOrEmpty(_searchString))
+        {
+            Products?.ForEach(p => p.IsVisible = p.Name.ToLower().Contains(_searchString.ToLower()) || p.ReferenceNumber.ToLower().Contains(_searchString.ToLower()));
+        }
+        OnSearchStringChanged.InvokeAsync();
+
+    }
+    private void StageFilter()
+    {
+        Products?.ForEach(x => x.IsVisible = true);
+    }
+    private void Reset()
+    {
+        _searchString = string.Empty;
+        StageFilter();
+        OnSearchStringChanged.InvokeAsync();
+    }
+}

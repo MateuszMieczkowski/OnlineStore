@@ -1,5 +1,5 @@
 ﻿@inherits LayoutComponentBase
-
+@inject ToastService Toast;
 <Toast></Toast>
 <div class="page">
     <div class="sidebar">
@@ -7,8 +7,36 @@
     </div>
 
     <main>
-        <ErrorBoundary>
-        @Body
+        <ErrorBoundary @ref="errorBoundary">
+            <ChildContent>
+                @Body
+            </ChildContent>
+            <ErrorContent Context="ex">
+                @if (HandleError(@ex))
+                {
+                    <p>@ex.Message</p>
+                }
+            </ErrorContent>
         </ErrorBoundary>
     </main>
 </div>
+
+@code
+{
+    ErrorBoundary errorBoundary;
+
+    protected override void OnParametersSet()
+    {
+        errorBoundary?.Recover();
+    }
+
+    private bool HandleError(Exception ex)
+    {
+        var msg = ex.Message;
+        var trace = ex.StackTrace;
+        Toast.ShowToast($"Something went wrong: {ex.Message}", ToastLevel.Error);
+        return true;
+    }
+}
+
+
