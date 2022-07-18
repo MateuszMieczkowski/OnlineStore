@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using NLog.Web;
+using SneakersBase.Client.Configurations;
 using SneakersBase.Server;
 using SneakersBase.Server.Authentication;
 using SneakersBase.Server.Entities;
@@ -66,6 +67,16 @@ builder.Services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator
 
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("FrontEndClient", p =>
+    
+        p.AllowAnyMethod()
+            .AllowAnyHeader()
+            .WithOrigins(builder.Configuration["AllowedOrigins"])
+    );
+});
+
 var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -82,6 +93,9 @@ else
 }
 
 var scope = app.Services.CreateScope();
+
+app.UseCors("FrontEndClient");
+
 var seeder = scope.ServiceProvider.GetRequiredService<SneakersSeeder>();
 seeder.Seed();
 
