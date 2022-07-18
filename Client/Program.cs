@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using SneakersBase.Client;
 using SneakersBase.Client.Brokers.API;
+using SneakersBase.Client.Configurations;
 using SneakersBase.Client.Providers;
 using SneakersBase.Client.Services;
 
@@ -23,5 +24,8 @@ builder.Services.AddScoped<IApiBroker, ApiBroker>();
 
 builder.Services.AddScoped<ISizeService, SizeService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+
+var url = builder.Configuration.Get<Configuration>().BaseAddress;
+
+builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(url) });
 await builder.Build().RunAsync();
