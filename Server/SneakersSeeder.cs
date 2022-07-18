@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using SneakerBase.Entities;
+using SneakersBase.Server.Entities;
 
 namespace SneakersBase.Server
 {
@@ -31,6 +31,13 @@ namespace SneakersBase.Server
                 {
                     var products = GetProducts();
                     _dbContext.Products.AddRange(products);
+                    _dbContext.SaveChanges();
+                }
+
+                if (!_dbContext.Roles.Any())
+                {
+                    var roles = GetRoles();
+                    _dbContext.Roles.AddRange(roles);
                     _dbContext.SaveChanges();
                 }
             }
@@ -83,5 +90,26 @@ namespace SneakersBase.Server
 
             return list;
         }
+        private IEnumerable<Role> GetRoles()
+        {
+            var roles = new List<Role>()
+            {
+                new Role()
+                {
+                    Name = "User"
+                },
+                new Role()
+                {
+                    Name = "Manager"
+                },
+                new Role()
+                {
+                    Name = "Admin"
+                }
+            };
+
+            return roles;
+        }
+
     }
 }

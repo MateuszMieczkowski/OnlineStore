@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Configuration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SneakersBase.Shared.Dtos.Validators;
+﻿using System.ComponentModel.DataAnnotations;
+using SneakersBase.Shared.Models.Validators;
 
-namespace SneakerBase.Shared.Dtos
+namespace SneakersBase.Shared.Models
 {
     public class CreateProductSizeDto
     {

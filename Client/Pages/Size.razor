@@ -1,10 +1,10 @@
 ﻿@page "/size"
+@attribute [Authorize]
+@using SneakersBase.Shared.Models
 @inject HttpClient Http;
 @inject ToastService Toast
 @inject IJSRuntime JsRuntime;
 @inject ISizeService SizeService
-@using SneakerBase.Shared.Dtos
-@using SneakersBase.Shared.Dtos
 
 
 <div class="container">
@@ -99,22 +99,37 @@
             };
         await JsRuntime.InvokeVoidAsync("ScrollTop");
     }
-    private void SaveEdit()
+    private async void SaveEdit()
     {
-        confirmedSize.Name = editedSize.Name;
+        if (confirmedSize == null || editedSize == null)
+        {
+            Toast.ShowToast("Something went wrong", ToastLevel.Error);
+            return;
+        }
+        var updatedSize = await SizeService.Update(confirmedSize.Id, editedSize);
+
+        confirmedSize.Name = updatedSize.Name;
         Toast.ShowToast("Size updated!", ToastLevel.Success);
         CancelEdit();
+        StateHasChanged();
     }
 
-    private void RemoveSize(SizeDto sizeDto)
+    private async void RemoveSize(SizeDto sizeDto)
     {
         if (sizeDto == null)
         {
             Toast.ShowToast("Something went wrong", ToastLevel.Error);
             return;
         }
+        var isRemoved = await SizeService.Remove(sizeDto.Id);
+        if (!isRemoved)
+        {
+            Toast.ShowToast("Something went wrong during removing size", ToastLevel.Error);
+            return;
+        }
         sizes?.Remove(sizeDto);
         Toast.ShowToast("Size removed!", ToastLevel.Success);
+        StateHasChanged();
 
     }
 
@@ -124,21 +139,26 @@
         confirmedSize = null;
     }
 
-    private void AddSize(CreateSizeDto sizeDto)
+    private async void AddSize(CreateSizeDto sizeDto)
     {
         if (sizeDto == null)
         {
-            Toast.ShowToast("Something went wrong", ToastLevel.Error);
+            Toast.ShowToast("Something went wrong try again", ToastLevel.Error);
             return;
         }
-        var newSize = new SizeDto()
-            {
-                Id = 100,
-                Name = sizeDto.Name
-            };
-        sizeDto.Name = string.Empty; ;
 
-        sizes?.Add(newSize);
-        Toast.ShowToast("Size added!", ToastLevel.Success);
+        try
+        {
+            var newSize = await SizeService.Create(sizeDto);
+            sizes?.Add(newSize);
+            Toast.ShowToast("Size added!", ToastLevel.Success);
+
+            sizeDto.Name = string.Empty; ;
+            StateHasChanged();
+        }
+        catch (Exception e)
+        {
+            Toast.ShowToast(e.Message, ToastLevel.Error);
+        }
     }
 }

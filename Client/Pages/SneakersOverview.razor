@@ -1,8 +1,7 @@
 ﻿@page "/overview"
-@using SneakerBase.Shared.Dtos
-@using System.Runtime.CompilerServices
+@attribute [Authorize]
 @using SneakersBase.Client.Components
-@using SneakersBase.Shared.Dtos
+@using SneakersBase.Shared.Models
 @inject HttpClient Http
 @inject ToastService Toast
 @inject ISizeService SizeService
@@ -50,29 +49,32 @@
                     <EditForm Model="productSize" @ref="editFormProductSize">
                         <DataAnnotationsValidator />
                         <div class="col">
+                            <ValidationMessage For="@(() => productSize.Quantity)" />
+                            <ValidationMessage For="@(() => productSize.SizeId)" />
                             <label class="mr-2" for="sizes">Size:</label>
-                            <select id="sizes" name="sizes" @bind="productSize.SizeId">
+
+                            <input value="@productSize.Size" list="sizes" @onchange="e => SetSize(productSize, e.Value.ToString())"/>
+                            <datalist id="sizes" name="sizes">
                                 @foreach (var size in _sizes)
                                 {
                                     if (size.Id == productSize.SizeId)
                                     {
-                                        <option value="@size.Id" selected>@size.Name</option>
+                                        <option>@size.Name</option>
 
                                     }
                                     else
                                     {
-                                        <option value="@size.Id">@size.Name</option>
+                                        <option>@size.Name</option>
                                     }
                                 }
-                            </select>
+                            </datalist>
                             <label class="mr-2 ml-2" for="quantity">Quantity:</label>
-                            <input id="quantity" type="number" min="0" max="1000" @oninput="(e) => UpdateProductQuantity(_editProduct, productSize, e)" @bind-value="productSize.Quantity" />
+                            <input id="quantity" type="number" min="0" max="1000" @oninput="(e) => UpdateProductQuantity(_editProduct, productSize, e)" @bind-value="productSize.Quantity"/>
                             <div class="btn-group mt-1 mb-1" role="group">
                                 <button type="button" class="btn btn-dark" @onclick="() => AddQuantity(_editProduct, productSize)">+</button>
                                 <button type="button" class="btn btn-dark" @onclick="() => SubQuantity(_editProduct, productSize)">-</button>
                                 <button type="button" class="btn btn-dark" @onclick="() => RemoveSize(_editProduct, productSize)">Remove size</button>
-                                <ValidationMessage For="@(() => productSize.Quantity)" />
-                                <ValidationMessage For="@(() => productSize.SizeId)" />
+
                             </div>
                         </div>
                     </EditForm>
@@ -87,6 +89,7 @@
 
         </div>
     }
+    <ProductsFilter Products="products" OnSearchStringChanged="Refresh"></ProductsFilter>
     @if (products == null)
     {
         //  <p><em>Loading...</em></p>
@@ -105,7 +108,7 @@
             </thead>
             <tbody>
 
-                @foreach (var product in products)
+                @foreach (var product in products.Where(p => p.IsVisible))
                 {
                     <tr>
 
@@ -125,9 +128,6 @@
                     </tr>
 
                     <div id="info" style="width: 198%" hidden="@product.IsHidden">
-
-
-
                         <div class="form-row">
                             <div class="form-control col-3">
 
@@ -187,29 +187,55 @@
     {
         product.IsHidden = !product.IsHidden;
     }
+    private void SetSize(UpdateProductSizeDto updateDto, string size)
+    {
+        if (string.IsNullOrEmpty(size))
+        {
+            updateDto.SizeId = default;
+            return;
 
+        }
+
+        var selectedSize = _sizes.FirstOrDefault(s => s.Name == size);
+
+        if (selectedSize is null)
+        {
+            updateDto.SizeId = default;
+            return;
+
+        }
+
+        updateDto.SizeId = selectedSize.Id;
+        updateDto.Size = selectedSize.Name;
+    }
 
     private void OpenDeleteDialog(ProductDto productToDelete)
     {
         if (productToDelete is null)
-            return;
+        {
+            throw new Exception("Something went wrong during deleting");
+        }
         _productToDelete = productToDelete;
         DeleteDialog.Show();
     }
-    protected void OnRemoveDialogClose(bool deleteConfirmed)
+    protected async void OnRemoveDialogClose(bool deleteConfirmed)
     {
         if (deleteConfirmed)
         {
             if (_productToDelete is null)
-                return;
-            //var response = await Http.DeleteAsync($"api/products/{_productToDelete.Id}");
-            //if (response.IsSuccessStatusCode)
-            //{
-            //   _productToDelete.IsVisible = false;
-            products.Remove(_productToDelete);
-            _productToDelete = null;
-            Toast.ShowToast("Removed successfully", ToastLevel.Success);
-            //}
+            {
+                throw new Exception("Something went wrong during deleting");
+            }
+            var response = await Http.DeleteAsync($"api/products/{_productToDelete.Id}");
+            if (response.IsSuccessStatusCode)
+            {
+                _productToDelete.IsVisible = false;
+                products.Remove(_productToDelete);
+                _productToDelete = null;
+
+                StateHasChanged();
+                Toast.ShowToast("Removed successfully", ToastLevel.Success);
+            }
         }
     }
     private void AddQuantity(UpdateProductDto product, UpdateProductSizeDto productSize)
@@ -272,6 +298,7 @@
                 {
                     Quantity = s.Quantity,
                     SizeId = s.SizeId,
+                    Size = s.Size
                 }).ToList()
             };
         await JsRuntime.InvokeVoidAsync("ScrollTop");
@@ -312,7 +339,9 @@
         {
             Toast.ShowToast("Something went wrong: " + response.RequestMessage?.Content, ToastLevel.Error);
         }
-
-
+    }
+    private void Refresh()
+    {
+        StateHasChanged();
     }
 }

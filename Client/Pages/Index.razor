@@ -3,23 +3,12 @@
 @using System.Text.Json
 @using System.Net
 @using System.Net.Http.Headers
-@using SneakerBase.Shared.Dtos
+@using SneakersBase.Client.Components
+@using SneakersBase.Shared.Models
 
 <PageTitle>Sneakers</PageTitle>
 
-<section class="jumbotron text-left">
-    <div class="container">
-        <form id="filter">
-            <div class="col-sm-8">
-                <div class="form-group">
-                    <label for="inputSearchFilter">Search:</label>
-                    <input class="form-control" id="inputSearchFilter" type="text" value="@_searchString" @oninput="SearchStringChanged">
-                </div>
-                <button type="button" @onclick="Reset" class="btn btn-outline-dark">Clear</button>
-            </div>
-        </form>
-    </div>
-</section>
+<ProductsFilter Products="products" OnSearchStringChanged="Refresh"></ProductsFilter>
 
 @if (products == null)
 {
@@ -67,7 +56,6 @@ else
 @code {
 
     private List<ProductDto>? products;
-    private string? _searchString = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -78,27 +66,10 @@ else
     {
         product.IsHidden = !product.IsHidden;
     }
-    private void StageFilter()
+  
+    private void Refresh()
     {
-        products?.ForEach(x => x.IsVisible = true);
         StateHasChanged();
-    }
-    private void SearchStringChanged(ChangeEventArgs e)
-    {
-        _searchString = e?.Value?.ToString();
-        StageFilter();
-        if (!string.IsNullOrEmpty(_searchString))
-        {
-            products?.ForEach(p => p.IsVisible =  p.Name.ToLower().Contains(_searchString.ToLower()) || p.ReferenceNumber.ToLower().Contains(_searchString.ToLower()));
-        }
-        StateHasChanged();
-
-    }
-
-    private void Reset()
-    {
-        _searchString = string.Empty;
-        StageFilter();
     }
 
 }

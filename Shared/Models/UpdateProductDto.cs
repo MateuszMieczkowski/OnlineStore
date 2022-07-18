@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SneakerBase.Shared.Dtos;
-using SneakerBase.Shared.Dtos.Validators;
-using SneakersBase.Shared.Dtos.Validators;
+﻿using System.ComponentModel.DataAnnotations;
+using SneakersBase.Shared.Models.Validators;
 
-namespace SneakersBase.Shared.Dtos
+namespace SneakersBase.Shared.Models
 {
     public class UpdateProductDto
     {

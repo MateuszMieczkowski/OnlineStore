@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SneakerBase.Shared.Dtos
+namespace SneakersBase.Server.Entities
 {
-    public class SizeDto
+    public class Role
     {
         public int Id { get; set; }
         public string Name { get; set; }

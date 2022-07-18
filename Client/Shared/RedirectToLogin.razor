@@ -1,0 +1,12 @@
+﻿@inject NavigationManager NavManager
+@inject ToastService Toast
+
+@code
+{
+  
+    protected override void OnInitialized()
+    {
+        Toast.ShowToast("You have to login to continue", ToastLevel.Info);
+        NavManager.NavigateTo("users/login");
+    }
+}
