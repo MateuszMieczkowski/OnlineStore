@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SneakersBase.Server.Services;
 using SneakersBase.Shared.Models;
 
 namespace SneakersBase.Server.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/products")]
     public class ProductController : ControllerBase
     {
@@ -16,9 +18,11 @@ namespace SneakersBase.Server.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public ActionResult<IEnumerable<ProductDto>> GetAll() => Ok(_productService.GetAll());
 
         [HttpGet("search")]
+        [AllowAnonymous]
         public ActionResult<IEnumerable<ProductDto>> GetBySerach([FromQuery] string filter) =>
             Ok(_productService.GetBySerach(filter));
 

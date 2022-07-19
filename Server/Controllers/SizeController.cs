@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SneakersBase.Server.Services;
 using SneakersBase.Shared.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SneakersBase.Server.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/size")]
     public class SizeController : ControllerBase
     {
@@ -32,7 +34,7 @@ namespace SneakersBase.Server.Controllers
         [HttpPut("{id:int}")]
         public ActionResult<SizeDto> Update([FromRoute] int id, [FromBody] UpdateSizeDto dto)
         {
-            return Created("api/size", _sizeService.Update(id, dto));
+            return Ok(_sizeService.Update(id, dto));
         }
         [HttpDelete("{id:int}")]
         public ActionResult Remove([FromRoute] int id)

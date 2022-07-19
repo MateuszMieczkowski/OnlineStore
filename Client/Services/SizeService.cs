@@ -21,51 +21,27 @@ namespace SneakersBase.Client.Services
 
     public class SizeService : ISizeService
     {
-        private readonly HttpClient _http;
         private readonly IApiBroker _apiBroker;
 
-        public SizeService(HttpClient http, IApiBroker apiBroker)
+        public SizeService(IApiBroker apiBroker)
         {
-            _http = http;
             _apiBroker = apiBroker;
         }
-        public async Task<List<SizeDto>> GetAllAsync()
-        {
-            var sizeDtos = await _apiBroker.GetAllSizesAsync();
-         //   var sizeDtos = await _http.GetFromJsonAsync<List<SizeDto>>("/api/size");
-            return sizeDtos;
-        }
+        public async Task<List<SizeDto>> GetAllAsync() => await _apiBroker.GetSizesAsync();
 
         public async Task<SizeDto> Create(CreateSizeDto dto)
         {
-            using var response = await _http.PostAsJsonAsync("api/size", dto);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                string exceptionMessage = await response.Content.ReadAsStringAsync();
-
-                throw new Exception("Something went wrong: " + exceptionMessage);
-            }
-            var sizeDto = await response.Content.ReadFromJsonAsync<SizeDto>();
-            return sizeDto;
+            return await _apiBroker.PostSizeAsync(dto);
         }
 
         public async Task<bool> Remove(int id)
         {
-            using var response = await _http.DeleteAsync($"api/size/{id}");
-            return response.IsSuccessStatusCode;
+            return await _apiBroker.RemoveSizeAsync(id);
         }
 
         public async Task<SizeDto> Update(int id, UpdateSizeDto dto)
         {
-            using var response = await _http.PutAsJsonAsync($"api/size/{id}", dto);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                throw new Exception("Something went wrong: " + response.ReasonPhrase);
-            }
-            var sizeDto = await response.Content.ReadFromJsonAsync<SizeDto>();
-            return sizeDto;
+            return await _apiBroker.UpdateSizeAsync(id, dto);
         }
     }
 }

@@ -101,6 +101,7 @@ seeder.Seed();
 
 app.UseMiddleware<ErrorHandlingMiddleware>();
 
+app.UseAuthentication();
 
 app.UseHttpsRedirection();
 

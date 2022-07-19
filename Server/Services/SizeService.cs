@@ -67,7 +67,7 @@ namespace SneakersBase.Server.Services
         {
             var size = GetSizeById(id);
 
-            IsSizeDuplicated(size.Name);
+            IsSizeDuplicated(dto.Name, size.Id);
 
             size.Name = dto.Name;
 
@@ -88,9 +88,9 @@ namespace SneakersBase.Server.Services
             return size;
         }
 
-        private bool IsSizeDuplicated(string name)
+        private bool IsSizeDuplicated(string name, int exceptionId = default)
         {
-            bool isDuplicated = _dbContext.Sizes.Any(s => s.Name == name);
+            bool isDuplicated = _dbContext.Sizes.Any(s => s.Name == name && s.Id != exceptionId);
             if(isDuplicated)
                 throw new DuplicateSizeException();
             return isDuplicated;

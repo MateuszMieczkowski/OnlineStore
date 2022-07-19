@@ -2,8 +2,9 @@
 @attribute [Authorize]
 @using SneakersBase.Client.Components
 @using SneakersBase.Shared.Models
-@inject HttpClient Http
+@*@inject HttpClient Http*@
 @inject ToastService Toast
+@inject IProductService ProductService
 @inject ISizeService SizeService
 @inject IJSRuntime JsRuntime
 <PageTitle>Sneakers overview</PageTitle>
@@ -53,7 +54,7 @@
                             <ValidationMessage For="@(() => productSize.SizeId)" />
                             <label class="mr-2" for="sizes">Size:</label>
 
-                            <input value="@productSize.Size" list="sizes" @onchange="e => SetSize(productSize, e.Value.ToString())"/>
+                            <input value="@productSize.Size" list="sizes" @onchange="e => SetSize(productSize, e.Value.ToString())" />
                             <datalist id="sizes" name="sizes">
                                 @foreach (var size in _sizes)
                                 {
@@ -69,7 +70,7 @@
                                 }
                             </datalist>
                             <label class="mr-2 ml-2" for="quantity">Quantity:</label>
-                            <input id="quantity" type="number" min="0" max="1000" @oninput="(e) => UpdateProductQuantity(_editProduct, productSize, e)" @bind-value="productSize.Quantity"/>
+                            <input id="quantity" type="number" min="0" max="1000" @oninput="(e) => UpdateProductQuantity(_editProduct, productSize, e)" @bind-value="productSize.Quantity" />
                             <div class="btn-group mt-1 mb-1" role="group">
                                 <button type="button" class="btn btn-dark" @onclick="() => AddQuantity(_editProduct, productSize)">+</button>
                                 <button type="button" class="btn btn-dark" @onclick="() => SubQuantity(_editProduct, productSize)">-</button>
@@ -179,7 +180,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        products = await Http.GetFromJsonAsync<List<ProductDto>>("/api/products");
+        products = await ProductService.GetAllAsync();
         _sizes = await SizeService.GetAllAsync();
         DeleteDialog.Close();
     }
@@ -222,19 +223,26 @@
     {
         if (deleteConfirmed)
         {
-            if (_productToDelete is null)
+            try
             {
-                throw new Exception("Something went wrong during deleting");
-            }
-            var response = await Http.DeleteAsync($"api/products/{_productToDelete.Id}");
-            if (response.IsSuccessStatusCode)
-            {
-                _productToDelete.IsVisible = false;
-                products.Remove(_productToDelete);
-                _productToDelete = null;
+                bool isRemoved = await ProductService.Remove(_productToDelete.Id);
+                if (isRemoved)
+                {
+                    _productToDelete.IsVisible = false;
+                    products.Remove(_productToDelete);
+                    _productToDelete = null;
 
-                StateHasChanged();
-                Toast.ShowToast("Removed successfully", ToastLevel.Success);
+                    StateHasChanged();
+                    Toast.ShowToast("Removed successfully", ToastLevel.Success);
+                }
+                else
+                {
+                    Toast.ShowToast("Something went wrong during removing", ToastLevel.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                Toast.ShowToast("Something went wrong: " + ex.Message, ToastLevel.Error);
             }
         }
     }
@@ -277,10 +285,20 @@
     private async Task OnInputFileChange(InputFileChangeEventArgs e, UpdateProductDto dto)
     {
         var fileFormat = "image/png";
-        var imageFile = await e.File.RequestImageFileAsync(fileFormat, 250, 250);
 
-        var buffer = new byte[imageFile.Size];
-        await imageFile.OpenReadStream().ReadAsync(buffer);
+        if (e.File.ContentType != fileFormat)
+        {
+            Toast.ShowToast("You can only add images in .png format!", ToastLevel.Error);
+            return;
+        }
+        if (e.File.Size > 1024 * 200)
+        {
+            Toast.ShowToast("Max size of image is 200kB!", ToastLevel.Error);
+            return;
+        }
+
+        var buffer = new byte[e.File.Size];
+        await e.File.OpenReadStream().ReadAsync(buffer);
         dto.ThumbnailPath = $"data:{fileFormat};base64, {Convert.ToBase64String(buffer)}";
 
         this.StateHasChanged();
@@ -315,17 +333,13 @@
             return;
         if (editFormProductSize.EditContext != null && editFormProduct.EditContext != null && (!editFormProduct.EditContext.Validate() || !editFormProductSize.EditContext.Validate()))
         {
-            return; ;
+            return;
+            ;
         }
-        using var response = await Http.PutAsJsonAsync($"api/products/{_confirmEditProduct.Id}", _editProduct);
-        if (response.IsSuccessStatusCode)
+        try
         {
-            var updatedDto = response.Content.ReadFromJsonAsync<ProductDto>().Result;
-            if (updatedDto is null)
-            {
-                Toast.ShowToast("Something went wrong", ToastLevel.Error);
-                return;
-            }
+            var updatedDto = await ProductService.Update(_confirmEditProduct.Id, _editProduct);
+
             _confirmEditProduct.Name = updatedDto.Name;
             _confirmEditProduct.ReferenceNumber = updatedDto.ReferenceNumber;
             _confirmEditProduct.Quantity = updatedDto.Quantity;
@@ -335,11 +349,12 @@
             StateHasChanged();
             Toast.ShowToast("Updated successfully", ToastLevel.Success);
         }
-        else
+        catch (Exception ex)
         {
-            Toast.ShowToast("Something went wrong: " + response.RequestMessage?.Content, ToastLevel.Error);
+            Toast.ShowToast("Something went wrong: " + ex.Message, ToastLevel.Error);
         }
     }
+
     private void Refresh()
     {
         StateHasChanged();

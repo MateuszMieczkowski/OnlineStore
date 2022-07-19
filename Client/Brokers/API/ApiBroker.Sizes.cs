@@ -11,6 +11,15 @@ namespace SneakersBase.Client.Brokers.API
     {
         private const string SizeRelativeUrl = "api/size";
 
-        public async Task<List<SizeDto>> GetAllSizesAsync() => await GetAsync<List<SizeDto>>(SizeRelativeUrl);
+        public async Task<List<SizeDto>> GetSizesAsync() => await GetWithAuthAsync<List<SizeDto>>(SizeRelativeUrl);
+
+        public async Task<SizeDto> PostSizeAsync(CreateSizeDto dto) =>
+            await PostAsync<CreateSizeDto, SizeDto>(SizeRelativeUrl, dto);
+
+        public async Task<SizeDto> UpdateSizeAsync(int id, UpdateSizeDto dto) =>
+            await PutAsync<UpdateSizeDto, SizeDto>(SizeRelativeUrl + $"/{id}", dto);
+
+        public async Task<bool> RemoveSizeAsync(int id) =>
+            await DeleteAsync(SizeRelativeUrl + $"/{id}");
     }
 }

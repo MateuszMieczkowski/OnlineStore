@@ -106,12 +106,20 @@
             Toast.ShowToast("Something went wrong", ToastLevel.Error);
             return;
         }
-        var updatedSize = await SizeService.Update(confirmedSize.Id, editedSize);
+        try
+        {
+            var updatedSize = await SizeService.Update(confirmedSize.Id, editedSize);
 
-        confirmedSize.Name = updatedSize.Name;
-        Toast.ShowToast("Size updated!", ToastLevel.Success);
-        CancelEdit();
-        StateHasChanged();
+            confirmedSize.Name = updatedSize.Name;
+            Toast.ShowToast("Size updated!", ToastLevel.Success);
+            CancelEdit();
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Toast.ShowToast("Something went wrong: " + ex.Message, ToastLevel.Error);
+        }
+
     }
 
     private async void RemoveSize(SizeDto sizeDto)
@@ -121,16 +129,22 @@
             Toast.ShowToast("Something went wrong", ToastLevel.Error);
             return;
         }
-        var isRemoved = await SizeService.Remove(sizeDto.Id);
-        if (!isRemoved)
+        try
         {
-            Toast.ShowToast("Something went wrong during removing size", ToastLevel.Error);
-            return;
+            var isRemoved = await SizeService.Remove(sizeDto.Id);
+            if (!isRemoved)
+            {
+                Toast.ShowToast("Something went wrong during removing size", ToastLevel.Error);
+                return;
+            }
+            sizes?.Remove(sizeDto);
+            Toast.ShowToast("Size removed!", ToastLevel.Success);
+            StateHasChanged();
         }
-        sizes?.Remove(sizeDto);
-        Toast.ShowToast("Size removed!", ToastLevel.Success);
-        StateHasChanged();
-
+        catch (Exception ex)
+        {
+            Toast.ShowToast("Something went wrong: " + ex.Message, ToastLevel.Error);
+        }
     }
 
     private void CancelEdit()
@@ -156,9 +170,9 @@
             sizeDto.Name = string.Empty; ;
             StateHasChanged();
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            Toast.ShowToast(e.Message, ToastLevel.Error);
+            Toast.ShowToast("Something went wrong: " + ex.Message, ToastLevel.Error);
         }
     }
 }

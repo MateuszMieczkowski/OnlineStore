@@ -43,9 +43,7 @@ li:hover {
 .img-thumbnail {
     /*max-height: 180px;*/ /* using max-height property*/
     /*max-width: 250px;*/
-    transition: all .2s ease-in-out;
 }
-.img-thumbnail:hover { transform: scale(1.1); }
 
 .col-md-2, .jumbotron {
     animation: showMe 2s forwards;
@@ -71,7 +69,7 @@ li:hover {
     height: 80px;
     animation: spin 700ms linear infinite;
     top: 40%;
-    left: 55%;
+    left: 50%;
     position: absolute;
 }
 

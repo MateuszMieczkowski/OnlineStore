@@ -9,9 +9,10 @@ namespace SneakersBase.Client.Brokers.API
 {
     public partial interface IApiBroker
     {
-        Task<List<SizeDto>> GetSizesAsync();
-        Task<SizeDto> PostSizeAsync(CreateSizeDto dto);
-        Task<SizeDto> UpdateSizeAsync(int id, UpdateSizeDto dto);
-        Task<bool> RemoveSizeAsync(int id);
+        Task<List<ProductDto>> GetProductsAsync();
+        Task<bool> PostProductsAsync(List<CreateProductDto> dtos);
+        Task<ProductDto> UpdateProductAsync(int id, UpdateProductDto dto);
+        Task<bool> RemoveProductAsync(int id);
+
     }
 }

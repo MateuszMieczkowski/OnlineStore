@@ -20,7 +20,7 @@ namespace SneakersBase.Client.Providers
             _localStorage = localStorage;
             _jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
         }
-
+        public async Task<string> GetAuthenticationJwtToken() => await _localStorage.GetItemAsync<string>("accessToken");
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
             var user = new ClaimsPrincipal(new ClaimsIdentity());

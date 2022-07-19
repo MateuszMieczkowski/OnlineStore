@@ -1,5 +1,5 @@
 ﻿@page "/"
-@inject HttpClient Http
+@inject IProductService ProductService
 @using System.Text.Json
 @using System.Net
 @using System.Net.Http.Headers
@@ -59,7 +59,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        products = await Http.GetFromJsonAsync<List<ProductDto>>("/api/products") ?? new();
+        products = await ProductService.GetAllAsync();
     }
 
     private void Toggle(ProductDto product)

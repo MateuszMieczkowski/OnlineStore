@@ -19,7 +19,6 @@ namespace SneakersBase.Client.Brokers.API
 
             var auth = await response.Content.ReadFromJsonAsync<AuthResponse>();
 
-          //  var auth = JsonSerializer.Deserialize<AuthResponse>
           return auth;
         }
 

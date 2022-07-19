@@ -1,11 +1,10 @@
 ﻿@page "/create"
 @attribute [Authorize]
 @inject IJSRuntime JsRuntime
-@inject HttpClient Http
+@inject IProductService ProductService
 @inject ToastService Toast
 @inject NavigationManager NavManager
 @inject ISizeService SizeService
-@inject ILogger<SneakersCreator> Logger
 @using Microsoft.AspNetCore.Components
 @using SneakersBase.Shared.Models
 <section role="main">
@@ -25,7 +24,7 @@
 
                             <label class="d-block">Model image</label>
                             <img class="d-block" src="@product.ThumbnailPath" />
-                            <InputFile OnChange="(e) => OnInputFileChange(e, product)" accept=".png" />
+                            <InputFile OnChange="(e) => OnInputFileChange(e, product)" accept=".png"  />
                             <ValidationMessage For="@(() => product.ThumbnailPath)" />
                             <br><br />
                             <label class="d-block" for="InputProductName">Model</label>
@@ -53,8 +52,8 @@
                                 @AddEditForm(editSize)
                                 <div class="border p-3 mb-3">
                                     <label class="mr-2" for="sizes">Choose size:</label>
-                                    <input list="sizes" @onchange="e => SetSize(productSize, e.Value.ToString())"/>
-                                    <datalist  id="sizes" name="sizes"  >
+                                    <input list="sizes" @onchange="e => SetSize(productSize, e.Value.ToString())" />
+                                    <datalist id="sizes" name="sizes">
                                         @foreach (var size in _sizes)
                                         {
                                             <option>@size.Name</option>
@@ -94,16 +93,14 @@
 @code
 {
     private const int MAX_ADDED_PRODUCT = 30;
-    private List<CreateProductDto> _createdProductDtos;
+    private readonly List<CreateProductDto> _createdProductDtos = new();
     private List<SizeDto> _sizes;
     private EditForm _editForm;
     private EditForm _editSizeForm;
-    private List<EditContext> _editContexts;
+    private readonly List<EditContext> _editContexts = new();
 
     protected override async Task OnInitializedAsync()
     {
-        _createdProductDtos = new List<CreateProductDto>();
-        _editContexts = new List<EditContext>();
         _sizes = await SizeService.GetAllAsync();
         AddNewProduct();
     }
@@ -182,10 +179,20 @@
     private async Task OnInputFileChange(InputFileChangeEventArgs e, CreateProductDto dto)
     {
         var fileFormat = "image/png";
-        var imageFile = await e.File.RequestImageFileAsync(fileFormat, 250, 250);
 
-        var buffer = new byte[imageFile.Size];
-        await imageFile.OpenReadStream().ReadAsync(buffer);
+        if (e.File.ContentType != fileFormat)
+        {
+            Toast.ShowToast("You can only add images in .png format!", ToastLevel.Error);
+            return;
+        }
+        if (e.File.Size > 1024 * 200)
+        {
+            Toast.ShowToast("Max size of image is 200kB!", ToastLevel.Error);
+            return;
+        }
+
+        var buffer = new byte[e.File.Size];
+        await e.File.OpenReadStream().ReadAsync(buffer);
         dto.ThumbnailPath = $"data:{fileFormat};base64, {Convert.ToBase64String(buffer)}";
 
         this.StateHasChanged();
@@ -204,15 +211,22 @@
 
         if (isValidate)
         {
-            using var response = await Http.PostAsJsonAsync("api/products", _createdProductDtos);
-            if (!response.IsSuccessStatusCode)
+            try
             {
-
-                Toast.ShowToast($"There was an error: {response.ReasonPhrase}", ToastLevel.Error);
-                return;
+                var isCreated = await ProductService.CreateProducts(_createdProductDtos);
+                if (!isCreated)
+                {
+                    Toast.ShowToast("There was an error during creating", ToastLevel.Error);
+                    return;
+                }
+                Toast.ShowToast("Products created successfully!", ToastLevel.Success);
+                NavManager.NavigateTo("/");
             }
-            Toast.ShowToast("Products created successfully!", ToastLevel.Success);
-            NavManager.NavigateTo("/");
+            catch (Exception ex)
+            {
+                Toast.ShowToast($"There was an error: {ex.Message}", ToastLevel.Error);
+                throw;
+            }
         }
     }
 
