@@ -50,7 +50,7 @@ namespace SneakersBase.Server
             {
                 Name = $"Jordan 1 Mid Triple White 2.0 ({Random.Shared.Next(2012, 2022)})",
                 ReferenceNumber = $"{Random.Shared.Next(111111, 9999999)}-{Random.Shared.Next(100, 999)}",
-                ThumbnailPath = $"sneakers/sneaker{Random.Shared.Next(2, 6)}.png",
+                //ThumbnailPath = $"sneakers/sneaker{Random.Shared.Next(2, 6)}.png",
                 AvailableSizes = new List<ProductSize>()
                 {
                     new ProductSize()

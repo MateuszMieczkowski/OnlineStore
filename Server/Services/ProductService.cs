@@ -85,11 +85,27 @@ namespace SneakersBase.Server.Services
 
         public void CreateMany(IEnumerable<CreateProductDto> dtos)
         {
+            
+
+
             var products = _mapper.Map<List<Product>>(dtos);
             _dbContext.Products.AddRange(products);
             _dbContext.SaveChanges();
-        }
 
+            //for (int i = 0; i < dtos.Count(); i++)
+            //{
+
+            //}
+        }
+        //public async Task<IActionResult> Save()
+        //{
+        //    var tempFileName = Path.GetTempFileName();
+        //    using (var writer = System.IO.File.OpenWrite(tempFileName))
+        //    {
+        //        await Request.Body.CopyToAsync(writer);
+        //    }
+        //    return Ok(Path.GetFileNameWithoutExtension(tempFileName));
+        //}
         public void RemoveById(int id)
         {
             var product = GetById(id);
@@ -103,7 +119,7 @@ namespace SneakersBase.Server.Services
 
             product.Name = dto.Name;
             product.ReferenceNumber = dto.ReferenceNumber;
-            product.ThumbnailPath = dto.ThumbnailPath;
+      //      product.ThumbnailPath = dto.ThumbnailPath;
             product.AvailableSizes = dto.AvailableSizes.Select(s => new ProductSize()
             {
                 Quantity = s.Quantity,

@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <Folder Include="Components\Toast\" />
+    <Folder Include="wwwroot\sneakers\" />
   </ItemGroup>
 
 </Project>

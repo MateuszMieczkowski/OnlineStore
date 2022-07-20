@@ -5,7 +5,6 @@
         public int Id { get; set; }
         public string Name { get; set; }
         public string ReferenceNumber { get; set; }
-        public string? ThumbnailPath { get; set; }
         public virtual List<ProductSize> AvailableSizes { get; set; }
     }
 }
