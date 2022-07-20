@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SneakersBase.Server.Entities;
 using SneakersBase.Server.Services;
 using SneakersBase.Shared.Models;
 
@@ -11,10 +12,12 @@ namespace SneakersBase.Server.Controllers
     public class ProductController : ControllerBase
     {
         private readonly IProductService _productService;
+        private readonly IWebHostEnvironment _env;
 
-        public ProductController(IProductService productService)
+        public ProductController(IProductService productService, IWebHostEnvironment env)
         {
             _productService = productService;
+            _env = env;
         }
 
         [HttpGet]
@@ -29,8 +32,32 @@ namespace SneakersBase.Server.Controllers
         [HttpPost]
         public ActionResult PostMany([FromBody] List<CreateProductDto> dtos)
         {
-            _productService.CreateMany(dtos);
+            var products = _productService.CreateMany(dtos);
+
+            SaveFiles(products, dtos);
             return Created("api/products", null);
+        }
+        private async void SaveFiles(List<Product> products, List<CreateProductDto> dtos)
+        {
+            var rootPath = Directory.GetCurrentDirectory();
+
+            foreach (var product in products)
+            {
+                var em = dtos.GetEnumerator();
+                em.MoveNext();
+                var dto = em.Current;
+
+                var filePath = $"{_env.ContentRootPath}/Sneakers/{product.Id}";
+                //if (System.IO.File.Exists(fullPath))
+                //{
+                //    System.IO.File.Delete(fullPath);
+                //    ViewBag.deleteSuccess = "true";
+                //}
+                var buf = Convert.FromBase64String(dto.ThumbnailPath);
+
+                await System.IO.File.WriteAllBytesAsync(filePath, buf);
+                   // await Request.Body.CopyToAsync(writer);
+            }
         }
 
         [HttpDelete("{id:int}")]
@@ -46,5 +73,5 @@ namespace SneakersBase.Server.Controllers
             return Ok(_productService.Update(id, dto));
         }
 
-}
+    }
 }

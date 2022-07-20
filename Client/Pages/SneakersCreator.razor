@@ -23,7 +23,8 @@
                         <div class="form-group ">
 
                             <label class="d-block">Model image</label>
-                            <img class="d-block" src="@product.ThumbnailPath" />
+
+                            <img class="d-block" src="data:image/png;base64,@product.ThumbnailPath" />
                             <InputFile OnChange="(e) => OnInputFileChange(e, product)" accept=".png"  />
                             <ValidationMessage For="@(() => product.ThumbnailPath)" />
                             <br><br />
@@ -98,6 +99,8 @@
     private EditForm _editForm;
     private EditForm _editSizeForm;
     private readonly List<EditContext> _editContexts = new();
+
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -192,9 +195,12 @@
         }
 
         var buffer = new byte[e.File.Size];
+        //using (var stream = e.File.OpenReadStream())
+        //{
+        //    await stream.ReadAsync(buffer); // copy the stream to the buffer
+        //}
         await e.File.OpenReadStream().ReadAsync(buffer);
-        dto.ThumbnailPath = $"data:{fileFormat};base64, {Convert.ToBase64String(buffer)}";
-
+        dto.ThumbnailPath = Convert.ToBase64String(buffer);
         this.StateHasChanged();
     }
 

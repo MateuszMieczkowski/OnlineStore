@@ -17,7 +17,7 @@ namespace SneakersBase.Server.Services
     {
         IEnumerable<ProductDto> GetAll();
         IEnumerable<ProductDto> GetBySerach(string filter);
-        void CreateMany(IEnumerable<CreateProductDto> dtos);
+        List<Product> CreateMany(IEnumerable<CreateProductDto> dtos);
         void RemoveById(int id);
         ProductDto Update(int id, UpdateProductDto product);
     }
@@ -76,36 +76,48 @@ namespace SneakersBase.Server.Services
                     .Products
                     .FirstOrDefault(p => p.Id == id);
             }
-           
+
 
             if (product is null)
                 throw new NotFoundException("Product not found");
             return product;
         }
 
-        public void CreateMany(IEnumerable<CreateProductDto> dtos)
+        public List<Product> CreateMany(IEnumerable<CreateProductDto> dtos)
         {
-            
+
 
 
             var products = _mapper.Map<List<Product>>(dtos);
             _dbContext.Products.AddRange(products);
             _dbContext.SaveChanges();
 
-            //for (int i = 0; i < dtos.Count(); i++)
-            //{
-
-            //}
+            return products;
+            //SaveFiles(products, dtos.ToList());
         }
-        //public async Task<IActionResult> Save()
-        //{
-        //    var tempFileName = Path.GetTempFileName();
-        //    using (var writer = System.IO.File.OpenWrite(tempFileName))
-        //    {
-        //        await Request.Body.CopyToAsync(writer);
-        //    }
-        //    return Ok(Path.GetFileNameWithoutExtension(tempFileName));
-        //}
+
+        private async void SaveFiles(List<Product> products, List<CreateProductDto> dtos)
+        {
+            var rootPath = Directory.GetCurrentDirectory();
+
+            foreach (var product in products)
+            {
+                var em = dtos.GetEnumerator();
+                em.MoveNext();
+                var dto = em.Current;
+
+
+                var filePath = $"{rootPath}/sneakers/{product.Id}";
+                //if (System.IO.File.Exists(fullPath))
+                //{
+                //    System.IO.File.Delete(fullPath);
+                //    ViewBag.deleteSuccess = "true";
+                //}
+
+                var buf = Convert.FromBase64String(dto.ThumbnailPath);
+                await File.WriteAllBytesAsync(filePath, buf);
+            }
+        }
         public void RemoveById(int id)
         {
             var product = GetById(id);
@@ -119,7 +131,7 @@ namespace SneakersBase.Server.Services
 
             product.Name = dto.Name;
             product.ReferenceNumber = dto.ReferenceNumber;
-      //      product.ThumbnailPath = dto.ThumbnailPath;
+            //      product.ThumbnailPath = dto.ThumbnailPath;
             product.AvailableSizes = dto.AvailableSizes.Select(s => new ProductSize()
             {
                 Quantity = s.Quantity,
@@ -134,7 +146,7 @@ namespace SneakersBase.Server.Services
             return productDto;
         }
 
-       
+
     }
-    
+
 }

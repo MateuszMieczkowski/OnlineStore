@@ -12,6 +12,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.7" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.7" PrivateAssets="all" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.21.0" />
+    <PackageReference Include="Tewr.Blazor.FileReader" Version="3.3.1.21360" />
   </ItemGroup>
 
   <ItemGroup>
@@ -20,7 +21,6 @@
 
   <ItemGroup>
     <Folder Include="Components\Toast\" />
-    <Folder Include="wwwroot\sneakers\" />
   </ItemGroup>
 
 </Project>
