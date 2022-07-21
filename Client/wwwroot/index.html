@@ -10,10 +10,8 @@
     <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
     <link href="css/app.css" rel="stylesheet" />
     <link href="css/style.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" integrity="sha384-gfdkjb5BdAXd+lj+gudLWI+BXq4IuLW5IT+brZEZsLFm++aCMlF1V92rMkPaX4PP" crossorigin="anonymous">
     <link href="css/utilities/toast.css" rel="stylesheet">
 
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="js/utils.js"></script>
     <script>
         // When the user clicks the button, the page scrolls to the top
@@ -27,20 +25,13 @@
             window.scrollTo(0, 0);
         }
     </script>
-    <script>
-        function SubmitByFormId(id) {
-            var form = document.getElementById(id);
 
-            document.getElementById(id).addEventListener("click", function () {
-                form.submit();
-            });
-        }
-    </script>
 </head>
 
 <body>
 <div id="app">
-    <div class="spinner"></div>
+    <!-- <div class="spinner"></div>-->
+    <p>Loading...</p>
 </div>
 
     <div id="blazor-error-ui">

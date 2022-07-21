@@ -218,7 +218,6 @@
         {
             try
             {
-                adding = "disabled";
                 StateHasChanged();
                 var isCreated = await ProductService.CreateProducts(_createdProductDtos);
                 if (!isCreated)
@@ -234,10 +233,7 @@
                 Toast.ShowToast($"There was an error: {ex.Message}", ToastLevel.Error);
                 throw;
             }
-            finally
-            {
-                adding = string.Empty;
-            }
+            
         }
     }
 
