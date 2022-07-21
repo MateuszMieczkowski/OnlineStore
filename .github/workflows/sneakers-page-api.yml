@@ -1,12 +1,12 @@
-name: Build and deploy .NET Core app to Windows WebApp sneakers-base-api
+name: Build and deploy .NET Core app to Windows WebApp sneakers-page-api
 on:
   push:
     branches:
     - master
 env:
-  AZURE_WEBAPP_NAME: sneakers-base-api
+  AZURE_WEBAPP_NAME: sneakers-page-api
   AZURE_WEBAPP_PACKAGE_PATH: Server/publish
-  AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.sneakers_base_api_5688 }}
+  AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.sneakers_page_api_61f1 }}
   CONFIGURATION: Release
   DOTNET_CORE_VERSION: 6.0.x
   WORKING_DIRECTORY: Server
