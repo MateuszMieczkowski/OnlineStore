@@ -41,7 +41,7 @@ namespace SneakersBase.Client.Brokers.API
         public async Task<TDto> PostAsync<TPostDto, TDto>(string relativeUrl, TPostDto content)
         {
             using var response = await _httpClient.PostAsJsonAsync(relativeUrl, content);
-            Validate(response);
+            await Validate(response);
 
             return await response.Content.ReadFromJsonAsync<TDto>();
         }
