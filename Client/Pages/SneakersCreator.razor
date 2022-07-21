@@ -6,6 +6,7 @@
 @inject NavigationManager NavManager
 @inject ISizeService SizeService
 @using Microsoft.AspNetCore.Components
+@using Microsoft.IdentityModel.Tokens
 @using SneakersBase.Shared.Models
 <section role="main">
     <div class="container mt-5">
@@ -192,14 +193,15 @@
     private async Task OnInputFileChange(InputFileChangeEventArgs e, CreateProductDto dto)
     {
         var fileFormat = "image/png";
+        int maxFileSizeInKB = 1024 * 100;
         if (e.File.ContentType != fileFormat)
         {
             Toast.ShowToast("You can only add images in .png format!", ToastLevel.Error);
             return;
         }
-        if (e.File.Size > 1024 * 200)
+        if (e.File.Size > maxFileSizeInKB)
         {
-            Toast.ShowToast("Max size of image is 200kB!", ToastLevel.Error);
+            Toast.ShowToast("Max size of image is 100kB!", ToastLevel.Error);
             return;
         }
 

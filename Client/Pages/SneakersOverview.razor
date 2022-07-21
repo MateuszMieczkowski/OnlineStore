@@ -7,6 +7,7 @@
 @inject IProductService ProductService
 @inject ISizeService SizeService
 @inject IJSRuntime JsRuntime
+@inject IConfiguration Configuration
 <PageTitle>Sneakers overview</PageTitle>
 
 <div class="container">
@@ -31,7 +32,7 @@
                     }
                     else
                     {
-                        <img class="d-block" style="max-width: 20rem" src="https://sneakersblobcontainer.blob.core.windows.net/public-container/@_confirmEditProduct.Id" />
+                        <img class="d-block" style="max-width: 20rem" src="@storageUrl/@_confirmEditProduct.Id" />
                     }
                     <InputFile OnChange="(e) => OnInputFileChange(e, _editProduct)" accept=".png" />
 
@@ -170,7 +171,7 @@
                                 }
                                 else
                                 {
-                                    <img class="d-flex" style="max-width: 20rem" src="https://sneakersblobcontainer.blob.core.windows.net/public-container/@product.Id" />
+                                    <img class="d-flex" style="max-width: 20rem" src="@storageUrl/@product.Id" />
                                 }
                             </div>
                         </div>
@@ -191,11 +192,14 @@
     private EditForm editFormProduct;
     private EditForm editFormProductSize;
     private ProductDto _productToDelete { get; set; }
+    private string storageUrl;
+
 
     private ModelDialogBase DeleteDialog { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
+        storageUrl = Configuration.GetValue<string>("StorageAddress");
         products = await ProductService.GetAllAsync();
         _sizes = await SizeService.GetAllAsync();
         DeleteDialog.Close();
@@ -301,15 +305,15 @@
     private async Task OnInputFileChange(InputFileChangeEventArgs e, UpdateProductDto dto)
     {
         var fileFormat = "image/png";
-
+        int maxFileSizeInKB = 1024 * 100;
         if (e.File.ContentType != fileFormat)
         {
             Toast.ShowToast("You can only add images in .png format!", ToastLevel.Error);
             return;
         }
-        if (e.File.Size > 1024 * 200)
+        if (e.File.Size > maxFileSizeInKB)
         {
-            Toast.ShowToast("Max size of image is 200kB!", ToastLevel.Error);
+            Toast.ShowToast("Max size of image is 100kB!", ToastLevel.Error);
             return;
         }
 
