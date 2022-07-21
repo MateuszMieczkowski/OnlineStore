@@ -30,26 +30,30 @@ namespace SneakersBase.Server.Controllers
             Ok(_productService.GetBySerach(filter));
 
         [HttpPost]
-        public ActionResult PostMany([FromBody] List<CreateProductDto> dtos)
+        public async Task<ActionResult> PostMany([FromBody] List<CreateProductDto> dtos)
         {
+
             var products = _productService.CreateMany(dtos);
-            _azureStorage.Upload(dtos);
-            
+            await _azureStorage.Upload(dtos, products);
+
             return Created("api/products", null);
         }
-      
+
 
         [HttpDelete("{id:int}")]
-        public ActionResult RemoveById([FromRoute] int id)
+        public async Task<ActionResult> RemoveById([FromRoute] int id)
         {
             _productService.RemoveById(id);
+            await _azureStorage.Remove(id);
             return NoContent();
         }
 
         [HttpPut("{id:int}")]
-        public ActionResult<ProductDto> Update([FromRoute] int id, [FromBody] UpdateProductDto dto)
+        public async Task<ActionResult<ProductDto>> Update([FromRoute] int id, [FromBody] UpdateProductDto dto)
         {
-            return Ok(_productService.Update(id, dto));
+            _productService.Update(id, dto);
+            await _azureStorage.Update(id, dto);
+            return Ok();
         }
 
     }

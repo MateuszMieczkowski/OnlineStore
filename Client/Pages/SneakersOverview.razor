@@ -24,9 +24,18 @@
                 <div class="form-group ">
 
                     <label class="d-block">Model image</label>
-                    <img class="d-block" style="max-width: 20rem" src="@_editProduct.ThumbnailPath" />
+                    @if (!string.IsNullOrEmpty(_editProduct.ThumbnailPath))
+                    {
+                        <ValidationMessage For="@(() => _editProduct.ThumbnailPath)" />
+                        <img class="d-block" style="max-width: 20rem" src="data:image/png;base64,@_editProduct.ThumbnailPath" />
+                    }
+                    else
+                    {
+                        <img class="d-block" style="max-width: 20rem" src="https://sneakersblobcontainer.blob.core.windows.net/public-container/@_confirmEditProduct.Id" />
+                    }
                     <InputFile OnChange="(e) => OnInputFileChange(e, _editProduct)" accept=".png" />
-                    <ValidationMessage For="@(() => _editProduct.ThumbnailPath)" />
+
+
                     <br><br />
                     <label class="d-block" for="InputProductName">Model</label>
                     <InputText class="form-control" id="InputProductName" placeholder="Enter model" @bind-Value=_editProduct.Name />
@@ -155,7 +164,7 @@
 
                             <div class="form-control col-9">
                                 <label class="d-flex">Model image</label>
-                                <img class="d-flex" style="max-width: 20rem;" src="@product.ThumbnailPath" />
+                                <img class="d-flex" style="max-width: 20rem;" src="https://sneakersblobcontainer.blob.core.windows.net/public-container/@product.Id" />
                             </div>
                         </div>
                     </div>
@@ -299,8 +308,7 @@
 
         var buffer = new byte[e.File.Size];
         await e.File.OpenReadStream().ReadAsync(buffer);
-        dto.ThumbnailPath = $"data:{fileFormat};base64, {Convert.ToBase64String(buffer)}";
-
+        dto.ThumbnailPath = Convert.ToBase64String(buffer);
         this.StateHasChanged();
     }
 

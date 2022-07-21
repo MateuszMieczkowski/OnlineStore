@@ -73,7 +73,7 @@
 
                         }
                         <button type="button" class="btn btn-outline-dark" @onclick="() => Remove(product)">Remove product</button>
-                        <button type="button" class="btn btn-dark" @onclick="() => AddNewSize(product)">Add next size</button>
+                        <button type="button" class="btn btn-dark"  @onclick="() => AddNewSize(product)">Add next size</button>
 
 
                     </div>
@@ -95,6 +95,7 @@
 
 @code
 {
+    private string adding = string.Empty;
     private const int MAX_ADDED_PRODUCT = 30;
     private readonly List<CreateProductDto> _createdProductDtos = new();
     private List<SizeDto> _sizes;
@@ -217,7 +218,8 @@
         {
             try
             {
-
+                adding = "disabled";
+                StateHasChanged();
                 var isCreated = await ProductService.CreateProducts(_createdProductDtos);
                 if (!isCreated)
                 {
@@ -231,6 +233,10 @@
             {
                 Toast.ShowToast($"There was an error: {ex.Message}", ToastLevel.Error);
                 throw;
+            }
+            finally
+            {
+                adding = string.Empty;
             }
         }
     }

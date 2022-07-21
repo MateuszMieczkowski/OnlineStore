@@ -7,6 +7,7 @@ using Azure.Core;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.TagHelpers.Cache;
 using Microsoft.Identity.Client;
 using SneakersBase.Server.Entities;
 using SneakersBase.Shared.Models;
@@ -16,7 +17,9 @@ namespace SneakersBase.Server
     public interface IAzureStorage
     {
         Task<string> Upload(IFormCollection formCollection);
-        Task Upload(IEnumerable<CreateProductDto> products);
+        Task<bool> Upload(IEnumerable<CreateProductDto> dtos, IEnumerable<Product> products);
+        Task<bool> Update(int id, UpdateProductDto dto);
+        Task<bool> Remove(int id);
     }
 
     public class AzureStorage : IAzureStorage
@@ -39,8 +42,6 @@ namespace SneakersBase.Server
                 await container.SetAccessPolicyAsync(PublicAccessType.Blob);
 
             var file = formCollection.Files.First();
-            //   foreach (var file in formCollection.Files)
-            // {
             var blob = container.GetBlobClient(file.FileName);
             await blob.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots);
             using (var fileStream = file.OpenReadStream())
@@ -48,19 +49,23 @@ namespace SneakersBase.Server
                 await blob.UploadAsync(fileStream, new BlobHttpHeaders { ContentType = file.ContentType });
             }
             return blob.Uri.ToString();
-            //   }
         }
-        public async Task Upload(IEnumerable<CreateProductDto> products)
+        public async Task<bool> Upload(IEnumerable<CreateProductDto> dtos, IEnumerable<Product> products)
         {
-            var container = new BlobContainerClient(_storageConnectionString, _storageContainerName);
-            var createResponse = await container.CreateIfNotExistsAsync();
-            if (createResponse != null && createResponse.GetRawResponse().Status == 201)
-                await container.SetAccessPolicyAsync(PublicAccessType.Blob);
+            if (dtos.Count() != products.Count())
+                throw new Exception("Something went wrong during uploading images");
+
+            var container = await GetContainter();
 
             string contentType = "image/png";
-            foreach (var dto in products)
+
+            var em = dtos.GetEnumerator();
+            foreach (var product in products)
             {
-                var blob = container.GetBlobClient(dto.ReferenceNumber);
+                em.MoveNext();
+                var dto = em.Current;
+
+                var blob = container.GetBlobClient(product.Id.ToString());
                 await blob.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots);
                 var bytes = Convert.FromBase64String(dto.ThumbnailPath);
                 using (var fileStream = new StreamContent(new MemoryStream(bytes)).ReadAsStream())
@@ -68,6 +73,42 @@ namespace SneakersBase.Server
                     await blob.UploadAsync(fileStream, new BlobHttpHeaders { ContentType = contentType });
                 }
             }
+
+            return true;
+        }
+        public async Task<bool> Update(int id, UpdateProductDto dto)
+        {
+            var container = await GetContainter();
+
+            string contentType = "image/png";
+
+
+            var blob = container.GetBlobClient(id.ToString());
+            await blob.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots);
+            var bytes = Convert.FromBase64String(dto.ThumbnailPath);
+            using (var fileStream = new StreamContent(new MemoryStream(bytes)).ReadAsStream())
+            {
+                await blob.UploadAsync(fileStream, new BlobHttpHeaders { ContentType = contentType });
+            }
+
+            return true;
+        }
+        private async Task<BlobContainerClient> GetContainter()
+        {
+            var container = new BlobContainerClient(_storageConnectionString, _storageContainerName);
+            var createResponse = await container.CreateIfNotExistsAsync();
+            if (createResponse != null && createResponse.GetRawResponse().Status == 201)
+                await container.SetAccessPolicyAsync(PublicAccessType.Blob);
+
+            return container;
+        }
+        public async Task<bool> Remove(int id)
+        {
+            var container = await GetContainter();
+
+            var blob = container.GetBlobClient(id.ToString());
+            await blob.DeleteIfExistsAsync();
+            return true;
         }
     }
 
