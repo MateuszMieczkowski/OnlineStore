@@ -93,7 +93,6 @@ namespace SneakersBase.Server.Services
             _dbContext.SaveChanges();
 
             return products;
-            //SaveFiles(products, dtos.ToList());
         }
 
         private async void SaveFiles(List<Product> products, List<CreateProductDto> dtos)
@@ -131,7 +130,6 @@ namespace SneakersBase.Server.Services
 
             product.Name = dto.Name;
             product.ReferenceNumber = dto.ReferenceNumber;
-            //      product.ThumbnailPath = dto.ThumbnailPath;
             product.AvailableSizes = dto.AvailableSizes.Select(s => new ProductSize()
             {
                 Quantity = s.Quantity,

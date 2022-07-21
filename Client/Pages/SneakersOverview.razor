@@ -164,7 +164,14 @@
 
                             <div class="form-control col-9">
                                 <label class="d-flex">Model image</label>
-                                <img class="d-flex" style="max-width: 20rem;" src="https://sneakersblobcontainer.blob.core.windows.net/public-container/@product.Id" />
+                                @if (!string.IsNullOrEmpty(product.ImgUrl))
+                                {
+                                    <img class="d-flex" style="max-width: 20rem" src="data:image/png;base64,@product.ImgUrl" />
+                                }
+                                else
+                                {
+                                    <img class="d-flex" style="max-width: 20rem" src="https://sneakersblobcontainer.blob.core.windows.net/public-container/@product.Id" />
+                                }
                             </div>
                         </div>
                     </div>
@@ -319,7 +326,6 @@
             {
                 Name = editProduct.Name,
                 ReferenceNumber = editProduct.ReferenceNumber,
-                ThumbnailPath = editProduct.ThumbnailPath,
                 AvailableSizes = editProduct.AvailableSizes.Select(s => new UpdateProductSizeDto()
                 {
                     Quantity = s.Quantity,
@@ -351,10 +357,14 @@
             _confirmEditProduct.Name = updatedDto.Name;
             _confirmEditProduct.ReferenceNumber = updatedDto.ReferenceNumber;
             _confirmEditProduct.Quantity = updatedDto.Quantity;
-            _confirmEditProduct.ThumbnailPath = updatedDto.ThumbnailPath;
             _confirmEditProduct.AvailableSizes = updatedDto.AvailableSizes;
+            if (!string.IsNullOrEmpty(_editProduct.ThumbnailPath))
+            {
+                _confirmEditProduct.ImgUrl = _editProduct.ThumbnailPath;
+            }
             CancelEdit();
             StateHasChanged();
+
             Toast.ShowToast("Updated successfully", ToastLevel.Success);
         }
         catch (Exception ex)

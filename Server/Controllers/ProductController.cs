@@ -49,11 +49,10 @@ namespace SneakersBase.Server.Controllers
         }
 
         [HttpPut("{id:int}")]
-        public async Task<ActionResult<ProductDto>> Update([FromRoute] int id, [FromBody] UpdateProductDto dto)
+        public ActionResult<ProductDto> Update([FromRoute] int id, [FromBody] UpdateProductDto dto)
         {
-            _productService.Update(id, dto);
-            await _azureStorage.Update(id, dto);
-            return Ok();
+            _azureStorage.Update(id, dto);
+            return Ok(_productService.Update(id, dto));
         }
 
     }

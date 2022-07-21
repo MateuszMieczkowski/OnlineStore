@@ -78,13 +78,17 @@ namespace SneakersBase.Server
         }
         public async Task<bool> Update(int id, UpdateProductDto dto)
         {
+            if (string.IsNullOrEmpty(dto.ThumbnailPath))
+            {
+                return false;
+            }
             var container = await GetContainter();
 
             string contentType = "image/png";
 
 
             var blob = container.GetBlobClient(id.ToString());
-            await blob.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots);
+            await blob.DeleteIfExistsAsync();
             var bytes = Convert.FromBase64String(dto.ThumbnailPath);
             using (var fileStream = new StreamContent(new MemoryStream(bytes)).ReadAsStream())
             {

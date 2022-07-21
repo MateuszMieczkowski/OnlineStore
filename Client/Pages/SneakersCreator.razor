@@ -56,12 +56,20 @@
                                 <div class="border p-3 mb-3">
                                     <label class="mr-2" for="sizes">Choose size:</label>
                                     <input list="sizes" @onchange="e => SetSize(productSize, e.Value.ToString())" />
-                                    <datalist id="sizes" name="sizes">
-                                        @foreach (var size in _sizes)
-                                        {
-                                            <option>@size.Name</option>
-                                        }
-                                    </datalist>
+                                    @if (_sizes == null)
+                                    {
+                                        <div class="spinner" />
+                                    }
+                                    else
+                                    {
+                                        <datalist id="sizes" name="sizes">
+                                            @foreach (var size in _sizes)
+                                            {
+                                                <option>@size.Name</option>
+                                            }
+                                        </datalist>
+                                    }
+
                                     <label class="ml-2 mr-2" for="quantity">Quantity:</label>
                                     <InputNumber id="quantity" min="0" max="1000" @bind-Value="productSize.Quantity" />
                                     <button type="button" class="btn btn-dark ml-2" @onclick="() => RemoveSize(product, productSize)">Remove size</button>
@@ -73,7 +81,7 @@
 
                         }
                         <button type="button" class="btn btn-outline-dark" @onclick="() => Remove(product)">Remove product</button>
-                        <button type="button" class="btn btn-dark"  @onclick="() => AddNewSize(product)">Add next size</button>
+                        <button type="button" class="btn btn-dark" @onclick="() => AddNewSize(product)">Add next size</button>
 
 
                     </div>
@@ -95,7 +103,6 @@
 
 @code
 {
-    private string adding = string.Empty;
     private const int MAX_ADDED_PRODUCT = 30;
     private readonly List<CreateProductDto> _createdProductDtos = new();
     private List<SizeDto> _sizes;
@@ -197,7 +204,7 @@
         }
 
         var buffer = new byte[e.File.Size];
-       
+
         await e.File.OpenReadStream().ReadAsync(buffer);
         dto.ThumbnailPath = Convert.ToBase64String(buffer);
         this.StateHasChanged();
@@ -233,7 +240,7 @@
                 Toast.ShowToast($"There was an error: {ex.Message}", ToastLevel.Error);
                 throw;
             }
-            
+
         }
     }
 

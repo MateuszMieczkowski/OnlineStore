@@ -12,7 +12,6 @@ namespace SneakersBase.Shared.Models
         [Required(ErrorMessage = "Reference number is required.")]
         public string ReferenceNumber { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Model image is required.")]
         public string ThumbnailPath { get; set; } = string.Empty;
         
         public int Quantity { get; set; }

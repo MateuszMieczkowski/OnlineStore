@@ -1,8 +1,5 @@
-﻿@page "/sneakers"
+﻿@page "/"
 @inject IProductService ProductService
-@using System.Text.Json
-@using System.Net
-@using System.Net.Http.Headers
 @using SneakersBase.Client.Components
 @using SneakersBase.Shared.Models
 
@@ -24,7 +21,7 @@ else
             {
                 <div class="col-md-2">
                     <div class="card mb-5 ml-2">
-                        <img class="img-thumbnail" src="https://sneakersblobcontainer.blob.core.windows.net/public-container/test" alt="Sneaker image" @onclick="() => Toggle(product)">
+                        <img class="img-thumbnail" src="https://sneakersblobcontainer.blob.core.windows.net/public-container/@product.Id" alt="Sneaker image" @onclick="() => Toggle(product)">
                         <div class="card-body">
                             <p class="card-text">@product.Name</p>
                             <p class="card-text">@product.ReferenceNumber</p>
