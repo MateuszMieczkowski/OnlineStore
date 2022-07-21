@@ -1,9 +1,11 @@
 using System.Reflection;
 using System.Text;
+using Azure.Identity;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Azure;
 using Microsoft.IdentityModel.Tokens;
 using NLog.Web;
 using SneakersBase.Client.Configurations;
@@ -65,6 +67,8 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>(); 
 builder.Services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator>();
 
+builder.Services.AddScoped<IAzureStorage, AzureStorage>();
+
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddCors(options =>
@@ -76,6 +80,8 @@ builder.Services.AddCors(options =>
             .WithOrigins(builder.Configuration["AllowedOrigins"])
     );
 });
+
+
 
 var app = builder.Build();
 // Configure the HTTP request pipeline.

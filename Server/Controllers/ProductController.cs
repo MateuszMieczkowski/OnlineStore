@@ -12,12 +12,12 @@ namespace SneakersBase.Server.Controllers
     public class ProductController : ControllerBase
     {
         private readonly IProductService _productService;
-        private readonly IWebHostEnvironment _env;
+        private readonly IAzureStorage _azureStorage;
 
-        public ProductController(IProductService productService, IWebHostEnvironment env)
+        public ProductController(IProductService productService, IAzureStorage azureStorage)
         {
             _productService = productService;
-            _env = env;
+            _azureStorage = azureStorage;
         }
 
         [HttpGet]
@@ -33,32 +33,11 @@ namespace SneakersBase.Server.Controllers
         public ActionResult PostMany([FromBody] List<CreateProductDto> dtos)
         {
             var products = _productService.CreateMany(dtos);
-
-            SaveFiles(products, dtos);
+            _azureStorage.Upload(dtos);
+            
             return Created("api/products", null);
         }
-        private async void SaveFiles(List<Product> products, List<CreateProductDto> dtos)
-        {
-            var rootPath = Directory.GetCurrentDirectory();
-
-            foreach (var product in products)
-            {
-                var em = dtos.GetEnumerator();
-                em.MoveNext();
-                var dto = em.Current;
-
-                var filePath = $"{_env.ContentRootPath}/Sneakers/{product.Id}";
-                //if (System.IO.File.Exists(fullPath))
-                //{
-                //    System.IO.File.Delete(fullPath);
-                //    ViewBag.deleteSuccess = "true";
-                //}
-                var buf = Convert.FromBase64String(dto.ThumbnailPath);
-
-                await System.IO.File.WriteAllBytesAsync(filePath, buf);
-                   // await Request.Body.CopyToAsync(writer);
-            }
-        }
+      
 
         [HttpDelete("{id:int}")]
         public ActionResult RemoveById([FromRoute] int id)

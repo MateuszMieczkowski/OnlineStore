@@ -15,6 +15,7 @@ namespace SneakersBase.Shared.Models
         [Required(ErrorMessage = "Model image is required.")]
         public string ThumbnailPath { get; set; } = string.Empty;
 
+
         [MinLength(1, ErrorMessage = "There must be at least one size.")]
         [CreateProductDtoSizesValidation]
         public List<CreateProductSizeDto> AvailableSizes { get; set; } = new ();

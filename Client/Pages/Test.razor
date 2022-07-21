@@ -1,28 +1,33 @@
-﻿@page "/show-image-2"
-@inject HttpClient Http
-@inject IJSRuntime JS
-
-<h1>Stream Image Data Example</h1>
-
+﻿@page "/test"
+@using System.Net.Http.Headers
+@inject HttpClient HttpClient
 <p>
-    <img id="image" />
+    <InputFile OnChange="@HandleSelected" />
+    @if (ImgUrl != null)
+    {
+        <div>
+            <img src="@ImgUrl" class="image-preview" />
+        </div>
+    }
 </p>
 
-<button @onclick="SetImageAsync">
-    Set Image
-</button>
-
-@code {
-    private async Task<Stream> GetImageStreamAsync()
+@code
+{
+    public string ImgUrl { get; set; }
+    private async Task HandleSelected(InputFileChangeEventArgs e)
     {
-        return await Http.GetStreamAsync(
-            "https://avatars.githubusercontent.com/u/9141961");
-    }
-
-    private async Task SetImageAsync()
-    {
-        var imageStream = await GetImageStreamAsync();
-        var dotnetImageStream = new DotNetStreamReference(imageStream);
-        await JS.InvokeVoidAsync("setImage", "image", dotnetImageStream);
+        var imageFile = e.File;
+        if (imageFile == null)
+            return;
+        var resizedFile = await imageFile.RequestImageFileAsync("image/png", 600, 600);
+        using (var ms = resizedFile.OpenReadStream(resizedFile.Size))
+        {
+            var content = new MultipartFormDataContent();
+            content.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data");
+            content.Add(new StreamContent(ms, Convert.ToInt32(resizedFile.Size)), "image", imageFile.Name);
+            content.Add(new StreamContent(ms, Convert.ToInt32(resizedFile.Size)), "image", imageFile.Name);
+            var response = await HttpClient.PostAsync("api/upload", content);
+            ImgUrl = await response.Content.ReadAsStringAsync();
+        }
     }
 }

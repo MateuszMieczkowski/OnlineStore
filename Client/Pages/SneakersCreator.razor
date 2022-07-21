@@ -23,9 +23,11 @@
                         <div class="form-group ">
 
                             <label class="d-block">Model image</label>
-
-                            <img class="d-block" src="data:image/png;base64,@product.ThumbnailPath" />
-                            <InputFile OnChange="(e) => OnInputFileChange(e, product)" accept=".png"  />
+                            @if (!string.IsNullOrEmpty(product.ThumbnailPath))
+                            {
+                                <img class="d-block" src="data:image/png;base64,@product.ThumbnailPath" />
+                            }
+                            <InputFile OnChange="(e) => OnInputFileChange(e, product)" accept=".png" />
                             <ValidationMessage For="@(() => product.ThumbnailPath)" />
                             <br><br />
                             <label class="d-block" for="InputProductName">Model</label>
@@ -182,7 +184,6 @@
     private async Task OnInputFileChange(InputFileChangeEventArgs e, CreateProductDto dto)
     {
         var fileFormat = "image/png";
-
         if (e.File.ContentType != fileFormat)
         {
             Toast.ShowToast("You can only add images in .png format!", ToastLevel.Error);
@@ -195,10 +196,7 @@
         }
 
         var buffer = new byte[e.File.Size];
-        //using (var stream = e.File.OpenReadStream())
-        //{
-        //    await stream.ReadAsync(buffer); // copy the stream to the buffer
-        //}
+       
         await e.File.OpenReadStream().ReadAsync(buffer);
         dto.ThumbnailPath = Convert.ToBase64String(buffer);
         this.StateHasChanged();
@@ -219,6 +217,7 @@
         {
             try
             {
+
                 var isCreated = await ProductService.CreateProducts(_createdProductDtos);
                 if (!isCreated)
                 {
