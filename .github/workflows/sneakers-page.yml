@@ -6,7 +6,7 @@ on:
 env:
   AZURE_WEBAPP_NAME: sneakers-page
   AZURE_WEBAPP_PACKAGE_PATH: Server/publish
-  AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.sneakers_page_1273 }}
+  AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.sneakers_page_7795 }}
   CONFIGURATION: Release
   DOTNET_CORE_VERSION: 6.0.x
   WORKING_DIRECTORY: Server
