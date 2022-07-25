@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <RunAOTCompilation>true</RunAOTCompilation>
     <Nullable>enable</Nullable>
+    <RunAOTCompilation>true</RunAOTCompilation>
     <ImplicitUsings>enable</ImplicitUsings>
 
   </PropertyGroup>
