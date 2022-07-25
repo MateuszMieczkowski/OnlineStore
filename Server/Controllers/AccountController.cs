@@ -23,7 +23,6 @@ namespace SneakersBase.Server.Controllers
         }
 
         [HttpPost("register")]
-        [AllowAnonymous]
         public ActionResult RegisterUser([FromBody] RegisterUserDto dto)
         {
             _accountService.RegisterUser(dto);
