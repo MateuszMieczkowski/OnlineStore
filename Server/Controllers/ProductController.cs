@@ -22,18 +22,18 @@ namespace SneakersBase.Server.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public ActionResult<IEnumerable<ProductDto>> GetAll() => Ok(_productService.GetAll());
+        public async Task<ActionResult<IEnumerable<ProductDto>>> GetAll() => Ok(await _productService.GetAllAsync());
 
         [HttpGet("search")]
         [AllowAnonymous]
-        public ActionResult<IEnumerable<ProductDto>> GetBySerach([FromQuery] string filter) =>
-            Ok(_productService.GetBySerach(filter));
+        public async Task<ActionResult<IEnumerable<ProductDto>>> GetBySerach([FromQuery] string filter) =>
+            Ok(await _productService.GetBySerachAsync(filter));
 
         [HttpPost]
         public async Task<ActionResult> PostMany([FromBody] List<CreateProductDto> dtos)
         {
 
-            var products = _productService.CreateMany(dtos);
+            var products = await _productService.CreateManyAsync(dtos);
             await _azureStorage.Upload(dtos, products);
 
             return Created("api/products", null);
@@ -49,10 +49,12 @@ namespace SneakersBase.Server.Controllers
         }
 
         [HttpPut("{id:int}")]
-        public ActionResult<ProductDto> Update([FromRoute] int id, [FromBody] UpdateProductDto dto)
+        public async Task<ActionResult<ProductDto>> Update([FromRoute] int id, [FromBody] UpdateProductDto dto)
         {
-            _azureStorage.Update(id, dto);
-            return Ok(_productService.Update(id, dto));
+            await _azureStorage.Update(id, dto);
+            var updatedDto = await _productService.UpdateAsync(id, dto);
+
+            return Ok(updatedDto);
         }
 
     }

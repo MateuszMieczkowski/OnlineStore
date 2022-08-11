@@ -15,11 +15,11 @@ namespace SneakersBase.Server.Services
 {
     public interface IProductService
     {
-        IEnumerable<ProductDto> GetAll();
-        IEnumerable<ProductDto> GetBySerach(string filter);
-        List<Product> CreateMany(IEnumerable<CreateProductDto> dtos);
+        Task<IEnumerable<ProductDto>> GetAllAsync();
+        Task<IEnumerable<ProductDto>> GetBySerachAsync(string filter);
+        Task<List<Product>> CreateManyAsync(IEnumerable<CreateProductDto> dtos);
         void RemoveById(int id);
-        ProductDto Update(int id, UpdateProductDto product);
+        Task<ProductDto> UpdateAsync(int id, UpdateProductDto product);
     }
 
     public class ProductService : IProductService
@@ -35,27 +35,29 @@ namespace SneakersBase.Server.Services
             _logger = logger;
         }
 
-        public IEnumerable<ProductDto> GetAll()
+        public async Task<IEnumerable<ProductDto>> GetAllAsync()
         {
-            var products = _dbContext.Products
+            var products = await _dbContext.Products
                 .Include(p => p.AvailableSizes)
                 .ThenInclude(s => s.Size)
-                .ToList();
+                .ToListAsync();
+
             var productsDto = _mapper.Map<List<ProductDto>>(products);
             return productsDto;
         }
 
-        public IEnumerable<ProductDto> GetBySerach(string filter)
+        public async Task<IEnumerable<ProductDto>> GetBySerachAsync(string filter)
         {
             if (string.IsNullOrEmpty(filter))
             {
-                return GetAll();
+                return await GetAllAsync();
             }
             var products = _dbContext.Products
                 .Include(p => p.AvailableSizes)
                 .ThenInclude(s => s.Size)
                 .Where(p => p.Name.Contains(filter) || p.ReferenceNumber.Contains(filter))
-                .ToList();
+                .ToListAsync();
+
             var productsDto = _mapper.Map<List<ProductDto>>(products);
             return productsDto;
         }
@@ -83,40 +85,16 @@ namespace SneakersBase.Server.Services
             return product;
         }
 
-        public List<Product> CreateMany(IEnumerable<CreateProductDto> dtos)
+        public async Task<List<Product>> CreateManyAsync(IEnumerable<CreateProductDto> dtos)
         {
-
-
-
             var products = _mapper.Map<List<Product>>(dtos);
+
             _dbContext.Products.AddRange(products);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
 
             return products;
         }
 
-        private async void SaveFiles(List<Product> products, List<CreateProductDto> dtos)
-        {
-            var rootPath = Directory.GetCurrentDirectory();
-
-            foreach (var product in products)
-            {
-                var em = dtos.GetEnumerator();
-                em.MoveNext();
-                var dto = em.Current;
-
-
-                var filePath = $"{rootPath}/sneakers/{product.Id}";
-                //if (System.IO.File.Exists(fullPath))
-                //{
-                //    System.IO.File.Delete(fullPath);
-                //    ViewBag.deleteSuccess = "true";
-                //}
-
-                var buf = Convert.FromBase64String(dto.ThumbnailPath);
-                await File.WriteAllBytesAsync(filePath, buf);
-            }
-        }
         public void RemoveById(int id)
         {
             var product = GetById(id);
@@ -124,9 +102,13 @@ namespace SneakersBase.Server.Services
             _dbContext.Products.Remove(product);
             _dbContext.SaveChanges();
         }
-        public ProductDto Update(int id, UpdateProductDto dto)
+        public async Task<ProductDto> UpdateAsync(int id, UpdateProductDto dto)
         {
-            var product = GetById(id, true);
+            //var product = GetById(id, true);
+            var product = await _dbContext.Products
+                .Include(p => p.AvailableSizes)
+                .ThenInclude(s => s.Size)
+                .FirstAsync(p => p.Id == id);
 
             product.Name = dto.Name;
             product.ReferenceNumber = dto.ReferenceNumber;
@@ -137,8 +119,7 @@ namespace SneakersBase.Server.Services
                 ProductId = product.Id
             }).ToList();
 
-            _dbContext.Products.Update(product);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
 
             var productDto = _mapper.Map<ProductDto>(GetById(id, true));
             return productDto;

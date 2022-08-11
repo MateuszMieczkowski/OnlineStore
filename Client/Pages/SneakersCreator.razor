@@ -214,36 +214,37 @@
 
     private async Task Submit()
     {
-        bool isValidate = true;
-        foreach (var editContext in _editContexts)
+        try
         {
-            if (!editContext.Validate())
+            foreach (var editContext in _editContexts)
             {
-                isValidate = false;
-            }
-        }
-
-        if (isValidate)
-        {
-            try
-            {
-                StateHasChanged();
-                var isCreated = await ProductService.CreateProducts(_createdProductDtos);
-                if (!isCreated)
+                if (!editContext.Validate())
                 {
-                    Toast.ShowToast("There was an error during creating", ToastLevel.Error);
-                    return;
+                    throw new ArgumentException("Products doesn't passed validation!");
                 }
-                Toast.ShowToast("Products created successfully!", ToastLevel.Success);
-                NavManager.NavigateTo("/");
-            }
-            catch (Exception ex)
-            {
-                Toast.ShowToast($"There was an error: {ex.Message}", ToastLevel.Error);
-                throw;
             }
 
+
+            StateHasChanged();
+            var isCreated = await ProductService.CreateProducts(_createdProductDtos);
+            if (!isCreated)
+            {
+                Toast.ShowToast("There was an error during creating", ToastLevel.Error);
+                return;
+            }
+            Toast.ShowToast("Products created successfully!", ToastLevel.Success);
+            NavManager.NavigateTo("/");
         }
+        catch(ArgumentException ex)
+        {
+           Toast.ShowToast($"{ex.Message}", ToastLevel.Warning);
+        }
+        catch (Exception ex)
+        {
+            Toast.ShowToast($"Something went wrong: {ex.Message}", ToastLevel.Error);
+            throw;
+        }
+
     }
 
     private string AddEditForm(EditContext? editContext)

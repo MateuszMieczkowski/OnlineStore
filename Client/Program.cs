@@ -19,7 +19,7 @@ builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<ApiAuthenticationStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(p =>
     p.GetRequiredService<ApiAuthenticationStateProvider>());
-
+                 
 builder.Services.AddScoped<IApiBroker, ApiBroker>();
 
 builder.Services.AddScoped<IProductService, ProductService>();

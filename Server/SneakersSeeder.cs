@@ -44,48 +44,59 @@ namespace SneakersBase.Server
 
         }
 
-        public static IEnumerable<Product> GetProducts()
+        public IEnumerable<Product> GetProducts()
         {
+            var random = new Random();
+            var size = _dbContext.Sizes.First();
             var list = Enumerable.Range(1, 20).Select(index => new Product()
             {
                 Name = $"Jordan 1 Mid Triple White 2.0 ({Random.Shared.Next(2012, 2022)})",
                 ReferenceNumber = $"{Random.Shared.Next(111111, 9999999)}-{Random.Shared.Next(100, 999)}",
                 //ThumbnailPath = $"sneakers/sneaker{Random.Shared.Next(2, 6)}.png",
-                AvailableSizes = new List<ProductSize>()
-                {
-                    new ProductSize()
-                    {
-                        Size = new Size()
-                        {
-                            Name = "43"
-                        },
-                        Quantity = Random.Shared.Next(10, 55)
-                    },
-                    new ProductSize()
-                    {
-                        Size = new Size()
-                        {
-                            Name = "44"
-                        },
-                        Quantity = Random.Shared.Next(10, 55)
-                    },
-                    new ProductSize()
-                    {
-                        Size = new Size()
-                        {
-                            Name = "45"
-                        },
-                        Quantity = Random.Shared.Next(10, 55)
-                    },
-                    new ProductSize()
-                    {
-                        Size = new Size()
-                        {
-                            Name = "42"
-                        },
-                        Quantity = Random.Shared.Next(10, 55)
-                    }
-                },
+
+                AvailableSizes = new List<ProductSize>() { new ProductSize(){
+                    Quantity = Random.Shared.Next(10, 55),
+                    Size = size
+                } }
+
+
+
+
+                //AvailableSizes = new List<ProductSize>()
+                //{
+                //    new ProductSize()
+                //    {
+                //        Size = new Size()
+                //        {
+                //            Name = "43"
+                //        },
+                //        Quantity = Random.Shared.Next(10, 55)
+                //    },
+                //    new ProductSize()
+                //    {
+                //        Size = new Size()
+                //        {
+                //            Name = "44"
+                //        },
+                //        Quantity = Random.Shared.Next(10, 55)
+                //    },
+                //    new ProductSize()
+                //    {
+                //        Size = new Size()
+                //        {
+                //            Name = "45"
+                //        },
+                //        Quantity = Random.Shared.Next(10, 55)
+                //    },
+                //    new ProductSize()
+                //    {
+                //        Size = new Size()
+                //        {
+                //            Name = "42"
+                //        },
+                //        Quantity = Random.Shared.Next(10, 55)
+                //    }
+                //},
             }).ToList();
 
             return list;
