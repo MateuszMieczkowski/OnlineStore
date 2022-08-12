@@ -58,7 +58,9 @@ namespace SneakersBase.Server.Services
         public void Remove(int id)
         {
             var size = GetSizeById(id);
+            var productSizes = _dbContext.ProductSizes.Where(x => x.SizeId == id).ToList();
 
+            _dbContext.ProductSizes.RemoveRange(productSizes);
             _dbContext.Sizes.Remove(size);
             _dbContext.SaveChanges();
         }

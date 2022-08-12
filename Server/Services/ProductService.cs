@@ -109,13 +109,13 @@ namespace SneakersBase.Server.Services
                 .Include(p => p.AvailableSizes)
                 .ThenInclude(s => s.Size)
                 .FirstAsync(p => p.Id == id);
-
             product.Name = dto.Name;
             product.ReferenceNumber = dto.ReferenceNumber;
             product.AvailableSizes = dto.AvailableSizes.Select(s => new ProductSize()
             {
                 Quantity = s.Quantity,
                 SizeId = s.SizeId,
+                Size = !s.SizeId.HasValue && !string.IsNullOrEmpty(s.Size) ? new Size { Name = s.Size} : null,
                 ProductId = product.Id
             }).ToList();
 

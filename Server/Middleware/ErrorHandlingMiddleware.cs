@@ -42,7 +42,7 @@ namespace SneakersBase.Server.Middleware
                 _logger.LogError(e, e.Message);
 
                 context.Response.StatusCode = 500;
-
+                await context.Response.WriteAsync(e.Message);
             }
         }
     }

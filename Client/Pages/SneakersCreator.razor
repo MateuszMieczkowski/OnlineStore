@@ -129,6 +129,7 @@
         }
 
         var selectedSize = _sizes.FirstOrDefault(s => s.Name == size);
+        createDto.Size = size;
 
         if (selectedSize is null)
         {

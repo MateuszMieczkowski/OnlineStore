@@ -1,4 +1,5 @@
 {
-  "rewrite": "index.html",
-  "route": "*"
+  "navigationFallback": {
+    "rewrite": "/index.html"
+  }
 }

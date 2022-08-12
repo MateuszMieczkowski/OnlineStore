@@ -88,6 +88,9 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    var scope = app.Services.CreateScope();
+    var seeder = scope.ServiceProvider.GetRequiredService<SneakersSeeder>();
+    seeder.Seed();
     app.UseWebAssemblyDebugging();
     app.UseSwagger();
     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sneakers API"));
@@ -99,12 +102,10 @@ else
     app.UseHsts();
 }
 
-var scope = app.Services.CreateScope();
 
 app.UseCors("FrontEndClient");
 
-var seeder = scope.ServiceProvider.GetRequiredService<SneakersSeeder>();
-seeder.Seed();
+
 
 app.UseMiddleware<ErrorHandlingMiddleware>();
 

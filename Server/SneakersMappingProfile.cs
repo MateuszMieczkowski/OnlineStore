@@ -8,7 +8,9 @@ namespace SneakersBase.Server
     {
         public SneakersMappingProfile()
         {
-            CreateMap<CreateProductSizeDto, ProductSize>();
+            CreateMap<CreateProductSizeDto, ProductSize>()
+                .ForMember(m => m.Size, c => c.MapFrom(s => !s.SizeId.HasValue && !string.IsNullOrEmpty(s.Size) ? new Size { Name = s.Size } : null));
+
             CreateMap<CreateProductDto, Product>();
 
             CreateMap<Size, SizeDto>();
