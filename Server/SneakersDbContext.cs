@@ -30,8 +30,7 @@ namespace SneakersBase.Server
 
             modelBuilder.Entity<Size>()
                 .Property(s => s.Name)
-                .IsRequired()
-                .HasMaxLength(4);
+                .IsRequired();
                 
 
             modelBuilder.Entity<ProductSize>()

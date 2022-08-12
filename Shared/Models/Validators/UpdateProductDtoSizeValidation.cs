@@ -8,7 +8,7 @@ namespace SneakersBase.Shared.Models.Validators
         {
             var sizes = (List<UpdateProductSizeDto>)value;
             var hs = new HashSet<int>();
-            bool areSizesUnique = sizes.All(x => hs.Add(x.SizeId));
+            bool areSizesUnique = sizes.Where(s => s.SizeId.HasValue).All(x => hs.Add((int)x.SizeId));
 
             if (!areSizesUnique)
             {
