@@ -32,13 +32,13 @@
                             <ValidationMessage For="@(() => product.ThumbnailPath)" />
                             <br><br />
                             <label class="d-block" for="InputProductName">Model</label>
-                            <InputText class="form-control" id="InputProductName" placeholder="Enter model" @bind-Value=product.Name />
+                            <InputText class="form-control" id="InputProductName" placeholder="Enter model" @bind-Value=product.Name autocomplete="off"/>
                             <ValidationMessage For="@(() => product.Name)" />
 
                         </div>
                         <div class="form-group">
                             <label for="InputReferenceNumber">Reference number</label>
-                            <InputText class="form-control" id="InputReferenceNumber" placeholder="Enter reference number" @bind-Value="product.ReferenceNumber" />
+                            <InputText class="form-control" id="InputReferenceNumber" placeholder="Enter reference number" @bind-Value="product.ReferenceNumber" autocomplete="off"/>
                             <ValidationMessage For="@(() => product.ReferenceNumber)" />
                         </div>
                         <ValidationMessage For="@(() => product.AvailableSizes)" />

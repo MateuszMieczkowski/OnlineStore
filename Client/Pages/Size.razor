@@ -17,7 +17,7 @@
                 <EditForm Model="createdSize" OnValidSubmit="() => AddSize(createdSize)">
                     <DataAnnotationsValidator />
                     <label class="d-block" for="InputSizeName">Size name</label>
-                    <InputText class="form-control" id="InputSizeName" placeholder="Enter size name" @bind-Value=createdSize.Name />
+                    <InputText class="form-control" id="InputSizeName" placeholder="Enter size name" @bind-Value=createdSize.Name autocomplete="off"/>
                     <ValidationMessage For="@(() => createdSize.Name)" />
                     <button type="submit" class="btn btn-dark mt-1">Add new</button>
                 </EditForm>
@@ -31,7 +31,7 @@
                 <EditForm Model="editedSize" OnValidSubmit="SaveEdit">
                     <DataAnnotationsValidator />
                     <label class="d-block" for="InputSizeName">Size name</label>
-                    <InputText class="form-control" id="InputSizeName" placeholder="Enter size name" @bind-Value=editedSize.Name />
+                    <InputText class="form-control" id="InputSizeName" placeholder="Enter size name" @bind-Value=editedSize.Name autocomplete="off"/>
                     <ValidationMessage For="@(() => editedSize.Name)" />
                     <div class="mt-1">
                         <button type="button" @onclick="CancelEdit" class="btn btn-outline-dark">Cancel</button>
