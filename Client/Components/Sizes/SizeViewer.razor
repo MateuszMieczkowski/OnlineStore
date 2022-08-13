@@ -1,0 +1,48 @@
+﻿@if (Sizes == null)
+{
+    <div class="spinner"></div>
+}
+else
+{
+    <table class="table table-bordered table-hover d-sm-table">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Size</th>
+                <th scope="col">Options</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var size in Sizes)
+            {
+                <tr>
+                    <td>@size.Name</td>
+                    <td>
+                        <button type="button" class="btn btn-dark" @onclick="(e) => EditBtn_Click(size)">Edit</button>
+                        <button type="button" class="btn btn-dark" @onclick="(e) => RemoveBtn_Click(size)">Remove</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code
+{
+    [Parameter]
+    public IEnumerable<SizeDto>? Sizes { get; set; }
+    [Parameter]
+    public EventCallback<SizeDto> OnEditClick{ get; set; }
+    [Parameter]
+    public EventCallback<SizeDto> OnRemoveClick{ get; set; }
+
+    private async Task EditBtn_Click(SizeDto size)
+    {
+        await OnEditClick.InvokeAsync(size);
+      //  StateHasChanged();
+    }
+
+    private async Task RemoveBtn_Click(SizeDto size)
+    {
+        await OnRemoveClick.InvokeAsync(size);
+    }
+}
