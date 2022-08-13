@@ -59,8 +59,8 @@ namespace SneakersBase.Server.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.Property<int?>("SizeId")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("SizeId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -90,11 +90,9 @@ namespace SneakersBase.Server.Migrations
 
             modelBuilder.Entity("SneakersBase.Server.Entities.Size", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
                         .IsRequired()

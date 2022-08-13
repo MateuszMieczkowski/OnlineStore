@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SneakersBase.Client.Providers;
 using SneakersBase.Client.Shared;
+using SneakersBase.Shared.Models;
 
 namespace SneakersBase.Client.Brokers.API
 {
@@ -79,5 +80,7 @@ namespace SneakersBase.Client.Brokers.API
 
             return true;
         }
+
+        
     }
 }

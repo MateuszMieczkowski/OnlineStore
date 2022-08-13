@@ -27,12 +27,14 @@ namespace SneakersBase.Server.Services
         private readonly SneakersDbContext _dbContext;
         private readonly IMapper _mapper;
         private readonly ILogger<ProductService> _logger;
+        private readonly ISizeService _sizeService;
 
-        public ProductService(SneakersDbContext dbContext, IMapper mapper, ILogger<ProductService> logger)
+        public ProductService(SneakersDbContext dbContext, IMapper mapper, ILogger<ProductService> logger, ISizeService sizeService)
         {
             _dbContext = dbContext;
             _mapper = mapper;
             _logger = logger;
+            _sizeService = sizeService;
         }
 
         public async Task<IEnumerable<ProductDto>> GetAllAsync()
@@ -40,6 +42,7 @@ namespace SneakersBase.Server.Services
             var products = await _dbContext.Products
                 .Include(p => p.AvailableSizes)
                 .ThenInclude(s => s.Size)
+                .OrderByDescending(x => x.Id)
                 .ToListAsync();
 
             var productsDto = _mapper.Map<List<ProductDto>>(products);
@@ -56,6 +59,7 @@ namespace SneakersBase.Server.Services
                 .Include(p => p.AvailableSizes)
                 .ThenInclude(s => s.Size)
                 .Where(p => p.Name.Contains(filter) || p.ReferenceNumber.Contains(filter))
+                .OrderByDescending(x => x.Id)
                 .ToListAsync();
 
             var productsDto = _mapper.Map<List<ProductDto>>(products);
@@ -87,9 +91,13 @@ namespace SneakersBase.Server.Services
 
         public async Task<List<Product>> CreateManyAsync(IEnumerable<CreateProductDto> dtos)
         {
+            var newSizes = await _sizeService.GetNewSizesAsync(dtos);
+
             var products = _mapper.Map<List<Product>>(dtos);
 
+            _dbContext.Sizes.AddRange(newSizes);
             _dbContext.Products.AddRange(products);
+
             await _dbContext.SaveChangesAsync();
 
             return products;
@@ -104,18 +112,18 @@ namespace SneakersBase.Server.Services
         }
         public async Task<ProductDto> UpdateAsync(int id, UpdateProductDto dto)
         {
-            //var product = GetById(id, true);
             var product = await _dbContext.Products
                 .Include(p => p.AvailableSizes)
                 .ThenInclude(s => s.Size)
                 .FirstAsync(p => p.Id == id);
+
             product.Name = dto.Name;
             product.ReferenceNumber = dto.ReferenceNumber;
             product.AvailableSizes = dto.AvailableSizes.Select(s => new ProductSize()
             {
                 Quantity = s.Quantity,
                 SizeId = s.SizeId,
-                Size = !s.SizeId.HasValue && !string.IsNullOrEmpty(s.Size) ? new Size { Name = s.Size} : null,
+                Size = !s.SizeId.HasValue && !string.IsNullOrEmpty(s.Size) ? new Size { Name = s.Size } : null,
                 ProductId = product.Id
             }).ToList();
 

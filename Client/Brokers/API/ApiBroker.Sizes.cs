@@ -16,10 +16,10 @@ namespace SneakersBase.Client.Brokers.API
         public async Task<SizeDto> PostSizeAsync(CreateSizeDto dto) =>
             await PostAsync<CreateSizeDto, SizeDto>(SizeRelativeUrl, dto);
 
-        public async Task<SizeDto> UpdateSizeAsync(int id, UpdateSizeDto dto) =>
+        public async Task<SizeDto> UpdateSizeAsync(Guid id, UpdateSizeDto dto) =>
             await PutAsync<UpdateSizeDto, SizeDto>(SizeRelativeUrl + $"/{id}", dto);
 
-        public async Task<bool> RemoveSizeAsync(int id) =>
+        public async Task<bool> RemoveSizeAsync(Guid id) =>
             await DeleteAsync(SizeRelativeUrl + $"/{id}");
     }
 }

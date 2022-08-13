@@ -17,7 +17,7 @@ namespace SneakersBase.Server
             _dbContext = dbContext;
         }
 
-        public void Seed()
+        public void SeedProduction()
         {
             if (_dbContext.Database.CanConnect())
             {
@@ -25,6 +25,33 @@ namespace SneakersBase.Server
                 if (pendingMigrations.Any())
                 {
                     _dbContext.Database.Migrate();
+                }
+
+                if (!_dbContext.Roles.Any())
+                {
+                    var roles = GetRoles();
+                    _dbContext.Roles.AddRange(roles);
+                    _dbContext.SaveChanges();
+                }
+                
+            }
+
+        }
+        public void SeedDebug()
+        {
+            if (_dbContext.Database.CanConnect())
+            {
+                var pendingMigrations = _dbContext.Database.GetPendingMigrations();
+                if (pendingMigrations.Any())
+                {
+                    _dbContext.Database.Migrate();
+                }
+
+                if (!_dbContext.Sizes.Any())
+                {
+                    var sizes = GetSizes();
+                    _dbContext.Sizes.AddRange(sizes);
+                    _dbContext.SaveChanges();
                 }
 
                 if (!_dbContext.Products.Any())
@@ -40,67 +67,38 @@ namespace SneakersBase.Server
                     _dbContext.Roles.AddRange(roles);
                     _dbContext.SaveChanges();
                 }
+
             }
 
         }
 
+
         public IEnumerable<Product> GetProducts()
         {
             var random = new Random();
-            var size = _dbContext.Sizes.First();
+            var size = _dbContext.Sizes.FirstOrDefault();
             var list = Enumerable.Range(1, 20).Select(index => new Product()
             {
                 Name = $"Jordan 1 Mid Triple White 2.0 ({Random.Shared.Next(2012, 2022)})",
                 ReferenceNumber = $"{Random.Shared.Next(111111, 9999999)}-{Random.Shared.Next(100, 999)}",
-                //ThumbnailPath = $"sneakers/sneaker{Random.Shared.Next(2, 6)}.png",
-
                 AvailableSizes = new List<ProductSize>() { new ProductSize(){
                     Quantity = Random.Shared.Next(10, 55),
                     Size = size
                 } }
-
-
-
-
-                //AvailableSizes = new List<ProductSize>()
-                //{
-                //    new ProductSize()
-                //    {
-                //        Size = new Size()
-                //        {
-                //            Name = "43"
-                //        },
-                //        Quantity = Random.Shared.Next(10, 55)
-                //    },
-                //    new ProductSize()
-                //    {
-                //        Size = new Size()
-                //        {
-                //            Name = "44"
-                //        },
-                //        Quantity = Random.Shared.Next(10, 55)
-                //    },
-                //    new ProductSize()
-                //    {
-                //        Size = new Size()
-                //        {
-                //            Name = "45"
-                //        },
-                //        Quantity = Random.Shared.Next(10, 55)
-                //    },
-                //    new ProductSize()
-                //    {
-                //        Size = new Size()
-                //        {
-                //            Name = "42"
-                //        },
-                //        Quantity = Random.Shared.Next(10, 55)
-                //    }
-                //},
             }).ToList();
 
             return list;
         }
+        private IEnumerable<Size> GetSizes()
+        {
+            var list = Enumerable.Range(1, 5).Select(index => new Size()
+            {
+                Name = $"{Random.Shared.Next(35, 46)}",
+            }).ToList();
+
+            return list;
+        }
+
         private IEnumerable<Role> GetRoles()
         {
             var roles = new List<Role>()

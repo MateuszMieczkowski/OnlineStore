@@ -17,7 +17,7 @@ namespace SneakersBase.Server.Controllers
     {
         private readonly ISizeService _sizeService;
 
-        public SizeController(ISizeService sizeService) 
+        public SizeController(ISizeService sizeService)
         {
             _sizeService = sizeService;
         }
@@ -31,13 +31,13 @@ namespace SneakersBase.Server.Controllers
             return Created("api/size", _sizeService.Create(dto));
         }
 
-        [HttpPut("{id:int}")]
-        public ActionResult<SizeDto> Update([FromRoute] int id, [FromBody] UpdateSizeDto dto)
+        [HttpPut("{id}")]
+        public ActionResult<SizeDto> Update([FromRoute] Guid id, [FromBody] UpdateSizeDto dto)
         {
             return Ok(_sizeService.Update(id, dto));
         }
-        [HttpDelete("{id:int}")]
-        public ActionResult Remove([FromRoute] int id)
+        [HttpDelete("{id}")]
+        public ActionResult Remove([FromRoute] Guid id)
         {
             _sizeService.Remove(id);
             return NoContent();

@@ -217,12 +217,17 @@
     {
         try
         {
+            bool isValidate = true;
             foreach (var editContext in _editContexts)
             {
                 if (!editContext.Validate())
                 {
-                    throw new ArgumentException("Products doesn't passed validation!");
+                    isValidate = false;
                 }
+            }
+            if (!isValidate)
+            {
+                throw new ArgumentException("Products doesn't passed validation!");
             }
 
 
@@ -236,9 +241,9 @@
             Toast.ShowToast("Products created successfully!", ToastLevel.Success);
             NavManager.NavigateTo("/");
         }
-        catch(ArgumentException ex)
+        catch (ArgumentException ex)
         {
-           Toast.ShowToast($"{ex.Message}", ToastLevel.Warning);
+            Toast.ShowToast($"{ex.Message}", ToastLevel.Warning);
         }
         catch (Exception ex)
         {

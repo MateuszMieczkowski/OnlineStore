@@ -7,8 +7,8 @@ namespace SneakersBase.Shared.Models.Validators
         public override bool IsValid(object value)
         {
             var sizes = (List<CreateProductSizeDto>)value;
-            var hs = new HashSet<int>();
-            bool areSizesUnique = sizes.Where(s => s.SizeId.HasValue).All(x => hs.Add(x.SizeId.Value));
+            var hs = new HashSet<string>();
+            bool areSizesUnique = sizes.Where(s => !string.IsNullOrEmpty(s.Size)).All(x => hs.Add(x.Size));
 
             if (!areSizesUnique)
             {

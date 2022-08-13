@@ -15,8 +15,8 @@ namespace SneakersBase.Client.Services
     {
         Task<List<SizeDto>> GetAllAsync();
         Task<SizeDto> Create(CreateSizeDto dto);
-        Task<bool> Remove(int id);
-        Task<SizeDto> Update(int id, UpdateSizeDto dto);
+        Task<bool> Remove(Guid id);
+        Task<SizeDto> Update(Guid id, UpdateSizeDto dto);
     }
 
     public class SizeService : ISizeService
@@ -34,12 +34,12 @@ namespace SneakersBase.Client.Services
             return await _apiBroker.PostSizeAsync(dto);
         }
 
-        public async Task<bool> Remove(int id)
+        public async Task<bool> Remove(Guid id)
         {
             return await _apiBroker.RemoveSizeAsync(id);
         }
 
-        public async Task<SizeDto> Update(int id, UpdateSizeDto dto)
+        public async Task<SizeDto> Update(Guid id, UpdateSizeDto dto)
         {
             return await _apiBroker.UpdateSizeAsync(id, dto);
         }

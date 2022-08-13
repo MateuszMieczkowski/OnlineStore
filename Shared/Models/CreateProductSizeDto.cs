@@ -5,7 +5,7 @@ namespace SneakersBase.Shared.Models
 {
     public class CreateProductSizeDto
     {
-        public int? SizeId { get; set; }
+        public Guid? SizeId { get; set; }
 
         public string? Size { get; set; }
 

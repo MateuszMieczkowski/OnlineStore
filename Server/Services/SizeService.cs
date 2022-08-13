@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using SneakersBase.Server.Entities;
 using SneakersBase.Server.Services.Exceptions;
 using SneakersBase.Shared.Models;
@@ -15,8 +16,9 @@ namespace SneakersBase.Server.Services
     {
         IEnumerable<SizeDto> GetAll();
         SizeDto Create(CreateSizeDto dto);
-        void Remove(int id);
-        SizeDto Update(int id, UpdateSizeDto dto);
+        void Remove(Guid id);
+        SizeDto Update(Guid id, UpdateSizeDto dto);
+        Task<IEnumerable<Size>> GetNewSizesAsync(IEnumerable<CreateProductDto> products);
     }
 
     public class SizeService : ISizeService
@@ -34,7 +36,7 @@ namespace SneakersBase.Server.Services
 
         public IEnumerable<SizeDto> GetAll()
         {
-            var sizes = _dbContext.Sizes.ToList();
+            var sizes = _dbContext.Sizes.OrderBy(x => x.Name).ToList();
             var sizeDtos = _mapper.Map<List<SizeDto>>(sizes);
             return sizeDtos;
         }
@@ -55,7 +57,7 @@ namespace SneakersBase.Server.Services
             return sizeDto;
         }
 
-        public void Remove(int id)
+        public void Remove(Guid id)
         {
             var size = GetSizeById(id);
             var productSizes = _dbContext.ProductSizes.Where(x => x.SizeId == id).ToList();
@@ -65,7 +67,7 @@ namespace SneakersBase.Server.Services
             _dbContext.SaveChanges();
         }
 
-        public SizeDto Update(int id, UpdateSizeDto dto)
+        public SizeDto Update(Guid id, UpdateSizeDto dto)
         {
             var size = GetSizeById(id);
 
@@ -80,7 +82,7 @@ namespace SneakersBase.Server.Services
             return updatedDto;
         }
 
-        private Size GetSizeById(int id)
+        private Size GetSizeById(Guid id)
         {
             var size = _dbContext.Sizes.FirstOrDefault(s => s.Id == id);
             if (size is null)
@@ -90,12 +92,40 @@ namespace SneakersBase.Server.Services
             return size;
         }
 
-        private bool IsSizeDuplicated(string name, int exceptionId = default)
+        private bool IsSizeDuplicated(string name, Guid exceptionId = default)
         {
             bool isDuplicated = _dbContext.Sizes.Any(s => s.Name == name && s.Id != exceptionId);
-            if(isDuplicated)
+            if (isDuplicated)
                 throw new DuplicateSizeException();
             return isDuplicated;
+        }
+
+        public async Task<IEnumerable<Size>> GetNewSizesAsync(IEnumerable<CreateProductDto> products)
+        {
+            var allSizes = await _dbContext.Sizes.ToListAsync();
+            var newSizes = new List<Size>();
+            foreach (var product in products)
+            {
+                var sizesToCreate = product.AvailableSizes.Where(s => !s.SizeId.HasValue && !string.IsNullOrEmpty(s.Size));
+                foreach (var productSize in sizesToCreate)
+                {
+                    var existingSize = allSizes.FirstOrDefault(x => x.Name == productSize.Size);
+                    if (existingSize != null)
+                    {
+                        productSize.SizeId = existingSize.Id;
+                        continue;
+                    }
+
+                    productSize.SizeId = Guid.NewGuid();
+                    var newSize = new Size() { Id = productSize.SizeId.Value, Name = productSize.Size };
+                    allSizes.Add(newSize);
+                    newSizes.Add(newSize);
+                }
+            }
+            //   _dbContext.Sizes.AddRange(newSizes);
+            // await _dbContext.SaveChangesAsync();
+            return newSizes;
+
         }
 
     }

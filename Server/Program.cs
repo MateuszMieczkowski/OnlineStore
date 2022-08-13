@@ -64,7 +64,7 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ISizeService, SizeService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 
-builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>(); 
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator>();
 
 builder.Services.AddScoped<IAzureStorage, AzureStorage>();
@@ -74,10 +74,10 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("FrontEndClient", p =>
-    
+
         p.AllowAnyMethod()
             .AllowAnyHeader()
-            .WithOrigins(builder.Configuration["AllowedOrigins"], 
+            .WithOrigins(builder.Configuration["AllowedOrigins"],
                          builder.Configuration["ClientAddress"])
     );
 });
@@ -86,17 +86,20 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 // Configure the HTTP request pipeline.
+var scope = app.Services.CreateScope();
+var seeder = scope.ServiceProvider.GetRequiredService<SneakersSeeder>();
 if (app.Environment.IsDevelopment())
 {
-    var scope = app.Services.CreateScope();
-    var seeder = scope.ServiceProvider.GetRequiredService<SneakersSeeder>();
-    seeder.Seed();
+    seeder.SeedDebug();
+
     app.UseWebAssemblyDebugging();
     app.UseSwagger();
     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sneakers API"));
 }
 else
 {
+    seeder.SeedProduction();
+
     app.UseExceptionHandler("/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();

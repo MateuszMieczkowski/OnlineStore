@@ -11,7 +11,7 @@ namespace SneakersBase.Client.Brokers.API
     {
         Task<List<SizeDto>> GetSizesAsync();
         Task<SizeDto> PostSizeAsync(CreateSizeDto dto);
-        Task<SizeDto> UpdateSizeAsync(int id, UpdateSizeDto dto);
-        Task<bool> RemoveSizeAsync(int id);
+        Task<SizeDto> UpdateSizeAsync(Guid id, UpdateSizeDto dto);
+        Task<bool> RemoveSizeAsync(Guid id);
     }
 }
