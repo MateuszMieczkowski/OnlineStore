@@ -10,7 +10,7 @@ namespace SneakerBaseTests
 
         public SneakersMappingProfileTests()
         {
-            _mapper = new SneakersMappingProfile();
+            //_mapper = new SneakersMappingProfile();
         }
 
         [Fact]

@@ -77,8 +77,9 @@ builder.Services.AddCors(options =>
     
         p.AllowAnyMethod()
             .AllowAnyHeader()
-            .WithOrigins(builder.Configuration["AllowedOrigins"], 
-                         builder.Configuration["ClientAddress"])
+            .AllowAnyOrigin()
+            //.WithOrigins(builder.Configuration["AllowedOrigins"], 
+            //             builder.Configuration["ClientAddress"])
     );
 });
 
