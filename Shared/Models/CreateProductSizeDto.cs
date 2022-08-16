@@ -10,6 +10,7 @@ namespace SneakersBase.Shared.Models
         public string? Size { get; set; }
 
         [MinInt(MinValue = 1, ValueName = "Quantity")]
-        public int Quantity { get; set; }
+        [Required]
+        public int? Quantity { get; set; }
     }
 }
