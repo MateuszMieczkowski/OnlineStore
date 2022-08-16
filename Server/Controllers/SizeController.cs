@@ -23,7 +23,7 @@ namespace SneakersBase.Server.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<SizeDto>> GetAll() => Ok(_sizeService.GetAll());
+        public async Task<ActionResult<IEnumerable<SizeDto>>> GetAll() => Ok(await _sizeService.GetAll());
 
         [HttpPost]
         public ActionResult<SizeDto> Create([FromBody] CreateSizeDto dto)

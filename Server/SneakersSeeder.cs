@@ -76,8 +76,8 @@ namespace SneakersBase.Server
         public IEnumerable<Product> GetProducts()
         {
             var random = new Random();
-            var size = _dbContext.Sizes.FirstOrDefault();
-            var list = Enumerable.Range(1, 20).Select(index => new Product()
+            var size = _dbContext.Sizes.First();
+            var list = Enumerable.Range(1, 100).Select(index => new Product()
             {
                 Name = $"Jordan 1 Mid Triple White 2.0 ({Random.Shared.Next(2012, 2022)})",
                 ReferenceNumber = $"{Random.Shared.Next(111111, 9999999)}-{Random.Shared.Next(100, 999)}",

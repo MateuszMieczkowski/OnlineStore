@@ -16,6 +16,7 @@ namespace SneakersBase.Server.Services
     public interface IProductService
     {
         Task<IEnumerable<ProductDto>> GetAllAsync();
+        Task<IEnumerable<ProductDto>> GetAllTest();
         Task<IEnumerable<ProductDto>> GetBySerachAsync(string filter);
         Task<List<Product>> CreateManyAsync(IEnumerable<CreateProductDto> dtos);
         void RemoveById(int id);
@@ -40,6 +41,7 @@ namespace SneakersBase.Server.Services
         public async Task<IEnumerable<ProductDto>> GetAllAsync()
         {
             var products = await _dbContext.Products
+                .AsNoTracking()
                 .Include(p => p.AvailableSizes)
                 .ThenInclude(s => s.Size)
                 .OrderByDescending(x => x.Id)
@@ -49,6 +51,19 @@ namespace SneakersBase.Server.Services
             return productsDto;
         }
 
+        public async Task<IEnumerable<ProductDto>> GetAllTest()
+        {
+            var products = await _dbContext.Products
+                .Include(p => p.AvailableSizes)
+                .ThenInclude(s => s.Size)
+                .OrderByDescending(x => x.Id)
+                .ToListAsync();
+
+            var productsDto = _mapper.Map<List<ProductDto>>(products);
+            return productsDto;
+        }
+
+
         public async Task<IEnumerable<ProductDto>> GetBySerachAsync(string filter)
         {
             if (string.IsNullOrEmpty(filter))
@@ -56,6 +71,7 @@ namespace SneakersBase.Server.Services
                 return await GetAllAsync();
             }
             var products = _dbContext.Products
+                .AsNoTracking()
                 .Include(p => p.AvailableSizes)
                 .ThenInclude(s => s.Size)
                 .Where(p => p.Name.Contains(filter) || p.ReferenceNumber.Contains(filter))

@@ -24,6 +24,10 @@ namespace SneakersBase.Server.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<ProductDto>>> GetAll() => Ok(await _productService.GetAllAsync());
 
+        [HttpGet("test")]
+        [AllowAnonymous]
+        public async Task<ActionResult<IEnumerable<ProductDto>>> GetAllTest() => Ok(await _productService.GetAllAsync());
+
         [HttpGet("search")]
         [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<ProductDto>>> GetBySerach([FromQuery] string filter) =>

@@ -14,7 +14,7 @@ namespace SneakersBase.Server.Services
 {
     public interface ISizeService
     {
-        IEnumerable<SizeDto> GetAll();
+        Task<IEnumerable<SizeDto>> GetAll();
         SizeDto Create(CreateSizeDto dto);
         void Remove(Guid id);
         SizeDto Update(Guid id, UpdateSizeDto dto);
@@ -34,9 +34,12 @@ namespace SneakersBase.Server.Services
             _logger = logger;
         }
 
-        public IEnumerable<SizeDto> GetAll()
+        public async Task<IEnumerable<SizeDto>> GetAll()
         {
-            var sizes = _dbContext.Sizes.OrderBy(x => x.Name).ToList();
+            var sizes = await _dbContext.Sizes
+                .AsNoTracking()
+                .OrderBy(x => x.Name)
+                .ToListAsync();
             var sizeDtos = _mapper.Map<List<SizeDto>>(sizes);
             return sizeDtos;
         }

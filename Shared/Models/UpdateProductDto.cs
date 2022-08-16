@@ -6,10 +6,11 @@ namespace SneakersBase.Shared.Models
     public class UpdateProductDto
     {
         [Required(ErrorMessage = "Model name is required.")]
-        [MinLength(3, ErrorMessage = "Model name must be at least 3 characters long")]
+        [MaxLength(100)]
         public string Name { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Reference number is required.")]
+        [MaxLength(50)]
         public string ReferenceNumber { get; set; } = string.Empty;
 
         public string ThumbnailPath { get; set; } = string.Empty;

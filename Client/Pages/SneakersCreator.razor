@@ -10,8 +10,8 @@
 @using SneakersBase.Shared.Models
 <section role="main">
     <div class="container mt-5">
-
         <h2>Add new products...</h2>
+        @*<button @onclick="AddTestProduct">Add test product</button>*@
         <form>
             @foreach (var product in _createdProductDtos)
             {
@@ -32,13 +32,13 @@
                             <ValidationMessage For="@(() => product.ThumbnailPath)" />
                             <br><br />
                             <label class="d-block" for="InputProductName">Model</label>
-                            <InputText class="form-control" id="InputProductName" placeholder="Enter model" @bind-Value=product.Name autocomplete="off"/>
+                            <InputText class="form-control" id="InputProductName" placeholder="Enter model" @bind-Value=product.Name autocomplete="off" />
                             <ValidationMessage For="@(() => product.Name)" />
 
                         </div>
                         <div class="form-group">
                             <label for="InputReferenceNumber">Reference number</label>
-                            <InputText class="form-control" id="InputReferenceNumber" placeholder="Enter reference number" @bind-Value="product.ReferenceNumber" autocomplete="off"/>
+                            <InputText class="form-control" id="InputReferenceNumber" placeholder="Enter reference number" @bind-Value="product.ReferenceNumber" autocomplete="off" />
                             <ValidationMessage For="@(() => product.ReferenceNumber)" />
                         </div>
                         <ValidationMessage For="@(() => product.AvailableSizes)" />
@@ -56,7 +56,7 @@
                                 @AddEditForm(editSize)
                                 <div class="border p-3 mb-3">
                                     <label class="mr-2" for="sizes">Choose size:</label>
-                                    <input list="sizes" @onchange="e => SetSize(productSize, e.Value.ToString())" />
+                                    <input list="sizes" @onchange="e => SetSize(productSize, e.Value.ToString())"/>
                                     @if (_sizes == null)
                                     {
                                         <div class="spinner" />
@@ -71,9 +71,9 @@
                                         </datalist>
                                     }
 
-                                    <label class="ml-2 mr-2" for="quantity">Quantity:</label>
-                                    <InputNumber id="quantity" min="0" max="1000" @bind-Value="productSize.Quantity" />
-                                    <button type="button" class="btn btn-dark ml-2" @onclick="() => RemoveSize(product, productSize)">Remove size</button>
+                                    <label class="ml-2 mr-2" for="quantity" >Quantity:</label>
+                                    <input type="number" onshow="this.value=''" id="quantity" min="0" max="1000"/>
+                                    <button type="button" class="btn btn-dark ml-2" @onclick="() => RemoveSize(product, productSize)" tabindex="-1">Remove size</button>
                                     <ValidationMessage For="@(() => productSize.Quantity)" />
                                     <ValidationMessage For="@(() => productSize.SizeId)" />
 
@@ -81,7 +81,7 @@
                             </EditForm>
 
                         }
-                        <button type="button" class="btn btn-outline-dark" @onclick="() => Remove(product)">Remove product</button>
+                        <button type="button" class="btn btn-outline-dark" @onclick="() => Remove(product)" tabindex="-1">Remove product</button>
                         <button type="button" class="btn btn-dark" @onclick="() => AddNewSize(product)">Add next size</button>
 
 
@@ -257,5 +257,45 @@
     {
         if (editContext != null) _editContexts.Add(editContext);
         return string.Empty;
+    }
+    private void AddTestProduct()
+    {
+        var testCreateDto = new CreateProductDto()
+            {
+                Name = "Nike Air Force 1 Low '07 White Black Pebbled Leather",
+                ReferenceNumber = "CT2302-100",
+                AvailableSizes = new List<CreateProductSizeDto>()
+                {
+            new CreateProductSizeDto()
+            {
+                Size = "9.5US",
+                Quantity = 7
+            },
+                new CreateProductSizeDto()
+            {
+                Size = "10US",
+                Quantity = 7
+            },
+                new CreateProductSizeDto()
+            {
+                Size = "10.5US",
+                Quantity = 15
+            },
+                new CreateProductSizeDto()
+            {
+                Size = "11US",
+                Quantity = 17
+            },
+                new CreateProductSizeDto()
+            {
+                Size = "11.5US",
+                Quantity = 2
+            }
+        },
+
+            };
+        _createdProductDtos.Add(testCreateDto);
+
+
     }
 }

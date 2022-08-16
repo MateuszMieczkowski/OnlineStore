@@ -21,12 +21,12 @@ namespace SneakersBase.Server
             modelBuilder.Entity<Product>()
                 .Property(p => p.Name)
                 .IsRequired()
-                .HasMaxLength(50);
+                .HasMaxLength(100);
 
             modelBuilder.Entity<Product>()
                 .Property(p => p.ReferenceNumber)
                 .IsRequired()
-                .HasMaxLength(25);
+                .HasMaxLength(50);
 
             modelBuilder.Entity<Size>()
                 .Property(s => s.Name)
