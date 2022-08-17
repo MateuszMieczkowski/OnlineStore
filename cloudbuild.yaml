@@ -1,0 +1,10 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', '$_IMAGE_PATH:$SHORT_SHA', '.']
+
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', '$_IMAGE_PATH:$SHORT_SHA']
+  
+- name: 'gcr.io/cloud-builders/gcloud'
+  args: ['run', 'deploy', '$_SERVICE_NAME', '--region=$_DEPLOY_REGION', '--platform=$_PLATFORM', '--image=$_IMAGE_PATH:$SHORT_SHA']
+  
