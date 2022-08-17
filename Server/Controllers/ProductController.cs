@@ -12,9 +12,9 @@ namespace SneakersBase.Server.Controllers
     public class ProductController : ControllerBase
     {
         private readonly IProductService _productService;
-        private readonly IAzureStorage _azureStorage;
+        private readonly IBlobStorage _azureStorage;
 
-        public ProductController(IProductService productService, IAzureStorage azureStorage)
+        public ProductController(IProductService productService, IBlobStorage azureStorage)
         {
             _productService = productService;
             _azureStorage = azureStorage;

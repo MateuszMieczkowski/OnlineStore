@@ -14,7 +14,7 @@ using SneakersBase.Shared.Models;
 
 namespace SneakersBase.Server
 {
-    public interface IAzureStorage
+    public interface IBlobStorage
     {
         Task<string> Upload(IFormCollection formCollection);
         Task<bool> Upload(IEnumerable<CreateProductDto> dtos, IEnumerable<Product> products);
@@ -22,7 +22,7 @@ namespace SneakersBase.Server
         Task<bool> Remove(int id);
     }
 
-    public class AzureStorage : IAzureStorage
+    public class AzureStorage : IBlobStorage
     {
         private readonly string _storageConnectionString;
         private readonly string _storageContainerName;

@@ -14,9 +14,9 @@ namespace SneakersBase.Server.Controllers
     [ApiController]
     public class UploadController : ControllerBase
     {
-        private readonly IAzureStorage _azureStorage;
+        private readonly IBlobStorage _azureStorage;
 
-        public UploadController(IAzureStorage azureStorage)
+        public UploadController(IBlobStorage azureStorage)
         {
             _azureStorage = azureStorage;
         }

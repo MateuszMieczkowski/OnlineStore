@@ -10,6 +10,8 @@
 @using SneakersBase.Shared.Models
 <section role="main">
     <div class="container mt-5">
+
+
         <h2>Add new products...</h2>
         @*<button @onclick="AddTestProduct">Add test product</button>*@
         <form>
@@ -28,7 +30,7 @@
                             {
                                 <img class="d-block" src="data:image/png;base64,@product.ThumbnailPath" />
                             }
-                            <InputFile OnChange="(e) => OnInputFileChange(e, product)" accept=".png" />
+                            <InputFile id="formFile" class="form-control" OnChange="(e) => OnInputFileChange(e, product)" accept=".png" />
                             <ValidationMessage For="@(() => product.ThumbnailPath)" />
                             <br><br />
                             <label class="d-block" for="InputProductName">Model</label>

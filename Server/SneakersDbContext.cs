@@ -18,10 +18,16 @@ namespace SneakersBase.Server
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Product>()
-                .Property(p => p.Name)
+            modelBuilder.Entity<Product>(eb =>
+            {
+                eb.Property(p => p.Name)
                 .IsRequired()
                 .HasMaxLength(100);
+                eb.Property(p => p.Name)
+                .IsRequired()
+                .HasMaxLength(100);
+            });
+                
 
             modelBuilder.Entity<Product>()
                 .Property(p => p.ReferenceNumber)

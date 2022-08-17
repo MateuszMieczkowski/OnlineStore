@@ -67,7 +67,7 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator>();
 
-builder.Services.AddScoped<IAzureStorage, AzureStorage>();
+builder.Services.AddScoped<IBlobStorage, AzureStorage>();
 
 builder.Services.AddSwaggerGen();
 
