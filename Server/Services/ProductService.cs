@@ -1,17 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AutoMapper;
-using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using SneakersBase.Server.Entities;
-using SneakersBase.Server.Services.Exceptions;
-using SneakersBase.Shared.Models;
+using OnlineStore.Server.Entities;
+using OnlineStore.Server.Services.Exceptions;
+using OnlineStore.Shared.Models;
 
-namespace SneakersBase.Server.Services
+namespace OnlineStore.Server.Services
 {
     public interface IProductService
     {
@@ -25,12 +18,12 @@ namespace SneakersBase.Server.Services
 
     public class ProductService : IProductService
     {
-        private readonly SneakersDbContext _dbContext;
+        private readonly OnlineStoreDbContext _dbContext;
         private readonly IMapper _mapper;
         private readonly ILogger<ProductService> _logger;
         private readonly ISizeService _sizeService;
 
-        public ProductService(SneakersDbContext dbContext, IMapper mapper, ILogger<ProductService> logger, ISizeService sizeService)
+        public ProductService(OnlineStoreDbContext dbContext, IMapper mapper, ILogger<ProductService> logger, ISizeService sizeService)
         {
             _dbContext = dbContext;
             _mapper = mapper;

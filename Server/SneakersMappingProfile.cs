@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using SneakersBase.Server.Entities;
-using SneakersBase.Shared.Models;
+using OnlineStore.Server.Entities;
+using OnlineStore.Shared.Models;
 
-namespace SneakersBase.Server
+namespace OnlineStore.Server
 {
     public class SneakersMappingProfile : Profile
     {

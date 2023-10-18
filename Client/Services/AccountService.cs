@@ -1,48 +1,43 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Blazored.LocalStorage;
+﻿using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
-using SneakersBase.Client.Brokers.API;
-using SneakersBase.Client.Providers;
-using SneakersBase.Shared.Models;
+using OnlineStore.Client.Brokers.API;
+using OnlineStore.Client.Providers;
+using OnlineStore.Shared.Models;
 
-namespace SneakersBase.Client.Services
+namespace OnlineStore.Client.Services;
+
+public interface IAccountService
 {
-    public interface IAccountService
+    Task<bool> AuthenticateAsync(LoginDto loginDto);
+    Task Logout();
+}
+
+public class AccountService : IAccountService
+{
+    private readonly AuthenticationStateProvider _authenticationStateProvider;
+    private readonly IApiBroker _broker;
+    private readonly ILocalStorageService _localStorage;
+
+    public AccountService(IApiBroker broker, ILocalStorageService localStorage,
+        AuthenticationStateProvider authenticationStateProvider)
     {
-        Task<bool> AuthenticateAsync(LoginDto loginDto);
-        Task Logout();
+        _broker = broker;
+        _localStorage = localStorage;
+        _authenticationStateProvider = authenticationStateProvider;
     }
 
-    public class AccountService : IAccountService
+    public async Task<bool> AuthenticateAsync(LoginDto loginDto)
     {
-        private readonly IApiBroker _broker;
-        private readonly ILocalStorageService _localStorage;
-        private readonly AuthenticationStateProvider _authenticationStateProvider;
+        var response = await _broker.LoginAsync(loginDto);
 
-        public AccountService(IApiBroker broker, ILocalStorageService localStorage, AuthenticationStateProvider authenticationStateProvider)
-        {
-            _broker = broker;
-            _localStorage = localStorage;
-            _authenticationStateProvider = authenticationStateProvider;
-        }
+        await _localStorage.SetItemAsync("accessToken", response.Token);
 
-        public async Task<bool> AuthenticateAsync(LoginDto loginDto)
-        {
-            var response = await _broker.LoginAsync(loginDto);
+        await ((ApiAuthenticationStateProvider)_authenticationStateProvider).LoggedIn();
+        return true;
+    }
 
-            await _localStorage.SetItemAsync("accessToken", response.Token);
-
-            await ((ApiAuthenticationStateProvider)_authenticationStateProvider).LoggedIn();
-            return true;
-        }
-
-        public async Task Logout()
-        {
-            await ((ApiAuthenticationStateProvider)_authenticationStateProvider).LoggedOut();
-        }
+    public async Task Logout()
+    {
+        await ((ApiAuthenticationStateProvider)_authenticationStateProvider).LoggedOut();
     }
 }

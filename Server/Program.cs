@@ -8,14 +8,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Azure;
 using Microsoft.IdentityModel.Tokens;
 using NLog.Web;
-using SneakersBase.Client.Configurations;
+using OnlineStore.Server;
+using OnlineStore.Server.Authentication;
+using OnlineStore.Server.Entities;
+using OnlineStore.Server.Middleware;
+using OnlineStore.Server.Services;
+using OnlineStore.Server.Validators;
+using OnlineStore.Shared.Models;
 using SneakersBase.Server;
-using SneakersBase.Server.Authentication;
-using SneakersBase.Server.Entities;
-using SneakersBase.Server.Middleware;
-using SneakersBase.Server.Services;
-using SneakersBase.Server.Validators;
-using SneakersBase.Shared.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,10 +51,10 @@ builder.Services.AddAuthentication(option =>
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
-builder.Services.AddDbContext<SneakersDbContext>(
+builder.Services.AddDbContext<OnlineStoreDbContext>(
     options => options.UseSqlServer(builder.Configuration.GetConnectionString("SneakersDbConnection")));
 
-builder.Services.AddScoped<SneakersSeeder>();
+builder.Services.AddScoped<StoreSeeder>();
 builder.Services.AddScoped<ErrorHandlingMiddleware>();
 
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
@@ -87,7 +87,7 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 // Configure the HTTP request pipeline.
 var scope = app.Services.CreateScope();
-var seeder = scope.ServiceProvider.GetRequiredService<SneakersSeeder>();
+var seeder = scope.ServiceProvider.GetRequiredService<StoreSeeder>();
 if (app.Environment.IsDevelopment())
 {
     seeder.SeedDebug();

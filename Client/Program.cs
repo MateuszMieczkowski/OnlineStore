@@ -2,11 +2,11 @@ using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using SneakersBase.Client;
-using SneakersBase.Client.Brokers.API;
-using SneakersBase.Client.Configurations;
-using SneakersBase.Client.Providers;
-using SneakersBase.Client.Services;
+using OnlineStore.Client;
+using OnlineStore.Client.Brokers.API;
+using OnlineStore.Client.Configurations;
+using OnlineStore.Client.Providers;
+using OnlineStore.Client.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -19,7 +19,7 @@ builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<ApiAuthenticationStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(p =>
     p.GetRequiredService<ApiAuthenticationStateProvider>());
-                 
+
 builder.Services.AddScoped<IApiBroker, ApiBroker>();
 
 builder.Services.AddScoped<IProductService, ProductService>();

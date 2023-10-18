@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SneakersBase.Server.Services;
-using SneakersBase.Shared.Models;
-using Microsoft.AspNetCore.Authorization;
+using OnlineStore.Server.Services;
+using OnlineStore.Shared.Models;
 
-namespace SneakersBase.Server.Controllers
+namespace OnlineStore.Server.Controllers
 {
     [ApiController]
     [Authorize]

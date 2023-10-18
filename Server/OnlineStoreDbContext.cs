@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SneakersBase.Server.Entities;
+using OnlineStore.Server.Entities;
 
-namespace SneakersBase.Server
+namespace OnlineStore.Server
 {
-    public class SneakersDbContext : DbContext
+    public class OnlineStoreDbContext : DbContext
     {
         public DbSet<Product> Products { get; set; }
         public DbSet<Size> Sizes { get; set; }
@@ -11,7 +11,7 @@ namespace SneakersBase.Server
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
 
-        public SneakersDbContext(DbContextOptions<SneakersDbContext> options) : base(options)
+        public OnlineStoreDbContext(DbContextOptions<OnlineStoreDbContext> options) : base(options)
         {
 
         }

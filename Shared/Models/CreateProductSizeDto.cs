@@ -1,16 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using SneakersBase.Shared.Models.Validators;
+using OnlineStore.Shared.Models.Validators;
 
-namespace SneakersBase.Shared.Models
+namespace OnlineStore.Shared.Models;
+
+public class CreateProductSizeDto
 {
-    public class CreateProductSizeDto
-    {
-        public Guid? SizeId { get; set; }
+    public Guid? SizeId { get; set; }
 
-        public string? Size { get; set; }
+    public string? Size { get; set; }
 
-        [MinInt(MinValue = 1, ValueName = "Quantity")]
-        [Required]
-        public int? Quantity { get; set; }
-    }
+    [MinInt(MinValue = 1, ValueName = "Quantity")]
+    [Required]
+    public int? Quantity { get; set; }
 }

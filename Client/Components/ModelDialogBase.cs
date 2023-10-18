@@ -1,53 +1,44 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 
-namespace SneakersBase.Client.Components
+namespace OnlineStore.Client.Components;
+
+public class ModelDialogBase : ComponentBase
 {
-    public class ModelDialogBase : ComponentBase
+    public enum ModalDialogType
     {
-        protected bool DeleteDialogOpen { get; set; } = false;
-        [Parameter] public string? Title { get; set; }
-        [Parameter] public string? Text { get; set; }
-        [Parameter] public EventCallback<bool> OnClose { get; set; }
-        [Parameter] public ModalDialogType DialogType { get; set; }
+        Ok,
+        OkCancel,
+        DeleteCancel
+    }
 
-     
-      
+    protected bool DeleteDialogOpen { get; set; }
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string? Text { get; set; }
+    [Parameter] public EventCallback<bool> OnClose { get; set; }
+    [Parameter] public ModalDialogType DialogType { get; set; }
 
-        protected Task ModalCancel()
-        {
-            Close();
-            return OnClose.InvokeAsync(false);
-        }
 
-        protected Task ModalOk()
-        {
-            Close();
-            return OnClose.InvokeAsync(true);
-        }
+    protected Task ModalCancel()
+    {
+        Close();
+        return OnClose.InvokeAsync(false);
+    }
 
-        public void Close()
-        {
-            DeleteDialogOpen = false;
-            StateHasChanged();
-        }
+    protected Task ModalOk()
+    {
+        Close();
+        return OnClose.InvokeAsync(true);
+    }
 
-        public void Show()
-        {
-            DeleteDialogOpen = true;
-            StateHasChanged();
-        }
+    public void Close()
+    {
+        DeleteDialogOpen = false;
+        StateHasChanged();
+    }
 
-        public enum ModalDialogType
-        {
-            Ok,
-            OkCancel,
-            DeleteCancel
-        }
+    public void Show()
+    {
+        DeleteDialogOpen = true;
+        StateHasChanged();
     }
 }
-

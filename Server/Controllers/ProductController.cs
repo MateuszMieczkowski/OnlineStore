@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SneakersBase.Server.Entities;
-using SneakersBase.Server.Services;
-using SneakersBase.Shared.Models;
+using OnlineStore.Server.Services;
+using OnlineStore.Shared.Models;
 
-namespace SneakersBase.Server.Controllers
+namespace OnlineStore.Server.Controllers
 {
     [ApiController]
     [Authorize]

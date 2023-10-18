@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Azure.Storage.Blobs;
-using Azure.Storage.Blobs.Models;
-using Microsoft.AspNetCore.Mvc;
-using SneakersBase.Server.Services.Exceptions;
+﻿using Microsoft.AspNetCore.Mvc;
+using OnlineStore.Server.Services.Exceptions;
 
-namespace SneakersBase.Server.Controllers
+namespace OnlineStore.Server.Controllers
 {
     [Route("api/upload")]
     [ApiController]

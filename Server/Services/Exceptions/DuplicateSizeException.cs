@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SneakersBase.Server.Services.Exceptions
+﻿namespace OnlineStore.Server.Services.Exceptions
 {
     public class DuplicateSizeException : DuplicateException
     {

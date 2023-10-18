@@ -1,4 +1,4 @@
-﻿namespace SneakersBase.Server.Services.Exceptions
+﻿namespace OnlineStore.Server.Services.Exceptions
 {
     public class DuplicateException : Exception
     {

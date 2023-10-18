@@ -5,13 +5,14 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using OnlineStore.Server;
 using SneakersBase.Server;
 
 #nullable disable
 
 namespace SneakersBase.Server.Migrations
 {
-    [DbContext(typeof(SneakersDbContext))]
+    [DbContext(typeof(OnlineStoreDbContext))]
     [Migration("20220816140551_LongerProductDetails")]
     partial class LongerProductDetails
     {

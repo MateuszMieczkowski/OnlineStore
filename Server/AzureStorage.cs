@@ -1,18 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Azure.Core;
-using Azure.Storage.Blobs;
+﻿using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.TagHelpers.Cache;
-using Microsoft.Identity.Client;
-using SneakersBase.Server.Entities;
-using SneakersBase.Shared.Models;
+using OnlineStore.Server.Entities;
+using OnlineStore.Shared.Models;
 
-namespace SneakersBase.Server
+namespace OnlineStore.Server
 {
     public interface IBlobStorage
     {

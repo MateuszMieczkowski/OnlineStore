@@ -1,17 +1,17 @@
 ﻿@inherits SizeBase;
 @page "/size"
+@using OnlineStore.Client.Components.Sizes
 @attribute [Authorize]
-@using SneakersBase.Client.Components.Sizes
 
 <div class="container">
 
-    <div class="w-25 m-auto ">
-        <SizeCreator CreateSizeModel="CreateSize" OnAddingSize="AddSize"></SizeCreator>
+	<div class="w-25 m-auto ">
+		<SizeCreator CreateSizeModel="CreateSize" OnAddingSize="AddSize"></SizeCreator>
 
-   
-        <SizeEditor @bind-UpdateSizeModel="EditSize" @bind-ConfirmSizeModel="ConfirmSize" OnSubmitUpdatingSize="SaveEdit"></SizeEditor>
-  
-        <SizeViewer Sizes="sizes" OnEditClick="UpdateSize" OnRemoveClick="RemoveSize"></SizeViewer>
-    </div>
+
+		<SizeEditor @bind-UpdateSizeModel="EditSize" @bind-ConfirmSizeModel="ConfirmSize" OnSubmitUpdatingSize="SaveEdit"></SizeEditor>
+
+		<SizeViewer Sizes="sizes" OnEditClick="UpdateSize" OnRemoveClick="RemoveSize"></SizeViewer>
+	</div>
 
 </div>

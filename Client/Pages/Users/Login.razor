@@ -1,50 +1,49 @@
 ﻿@page "/users/login"
-@using SneakersBase.Shared.Models
+@using OnlineStore.Shared.Models
 @inject IAccountService AccountService
 @inject NavigationManager NavManager
 @inject ToastService Toast
 
 <div class="container p-5">
-    <EditForm Model="loginDto" OnValidSubmit="HandleLogin">
-        <DataAnnotationsValidator></DataAnnotationsValidator>
-        <div class="form-group">
-            <label for="exampleInputLogin1">Login</label>
-            <input @bind="loginDto.Login" type="text" class="form-control" id="exampleInputLogin1" aria-describedby="loginHelp" placeholder="Enter login">
-            <ValidationMessage For="@(() => loginDto.Login)" />
-        </div>
-        <div class="form-group">
-            <label for="exampleInputPassword1">Password</label>
-            <input @bind="loginDto.Password" type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
-            <ValidationMessage For="@(() => loginDto.Password)" />
-        </div>
+	<EditForm Model="loginDto" OnValidSubmit="HandleLogin">
+		<DataAnnotationsValidator></DataAnnotationsValidator>
+		<div class="form-group">
+			<label for="exampleInputLogin1">Login</label>
+			<input @bind="loginDto.Login" type="text" class="form-control" id="exampleInputLogin1" aria-describedby="loginHelp" placeholder="Enter login">
+			<ValidationMessage For="@(() => loginDto.Login)"/>
+		</div>
+		<div class="form-group">
+			<label for="exampleInputPassword1">Password</label>
+			<input @bind="loginDto.Password" type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+			<ValidationMessage For="@(() => loginDto.Password)"/>
+		</div>
 
-        <button type="submit" class="btn btn-dark">Submit</button>
-    </EditForm>
+		<button type="submit" class="btn btn-dark">Submit</button>
+	</EditForm>
 </div>
 
 @code
 {
-    private LoginDto loginDto = new();
+	private readonly LoginDto loginDto = new();
 
-    private async void HandleLogin()
-    {
-        try
-        {
-            bool isAuthenticated = await AccountService.AuthenticateAsync(loginDto);
-            if (isAuthenticated)
-            {
-                Toast.ShowToast("Login succesfully", ToastLevel.Success);
-                NavManager.NavigateTo("");
-            }
-            else
-            {
-                Toast.ShowToast("Login failed try again", ToastLevel.Error);
-            }
-        }
-        catch (Exception ex)
-        {
-            Toast.ShowToast("Login failed try again", ToastLevel.Error);
-        }
-
-    }
+	private async void HandleLogin()
+	{
+		try
+		{
+			var isAuthenticated = await AccountService.AuthenticateAsync(loginDto);
+			if (isAuthenticated)
+			{
+				Toast.ShowToast("Login succesfully", ToastLevel.Success);
+				NavManager.NavigateTo("");
+			}
+			else
+			{
+				Toast.ShowToast("Login failed try again", ToastLevel.Error);
+			}
+		}
+		catch (Exception ex)
+		{
+			Toast.ShowToast("Login failed try again", ToastLevel.Error);
+		}
+	}
 }

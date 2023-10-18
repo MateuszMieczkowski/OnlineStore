@@ -1,10 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SneakersBase.Shared.Models
+namespace OnlineStore.Shared.Models;
+
+public class CreateSizeDto
 {
-    public class CreateSizeDto
-    {
-        [Required(ErrorMessage = "Size name is required.")]
-        public string Name { get; set; } = string.Empty;
-    }
+    [Required(ErrorMessage = "Size name is required.")]
+    public string Name { get; set; } = string.Empty;
 }

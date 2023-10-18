@@ -1,20 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using SneakersBase.Server.Authentication;
-using SneakersBase.Server.Entities;
-using SneakersBase.Server.Services.Exceptions;
-using SneakersBase.Shared.Models;
+using OnlineStore.Server.Authentication;
+using OnlineStore.Server.Entities;
+using OnlineStore.Server.Services.Exceptions;
+using OnlineStore.Shared.Models;
 
-namespace SneakersBase.Server.Services
+namespace OnlineStore.Server.Services
 {
     public interface IAccountService
     {
@@ -24,12 +20,12 @@ namespace SneakersBase.Server.Services
 
     public class AccountService : IAccountService
     {
-        private readonly SneakersDbContext _context;
+        private readonly OnlineStoreDbContext _context;
         private readonly IPasswordHasher<User> _passwordHasher;
         private readonly AuthenticationSettings _authenticationSettings;
         private readonly IMapper _mapper;
 
-        public AccountService(SneakersDbContext context, IPasswordHasher<User> passwordHasher, AuthenticationSettings authenticationSettings, IMapper mapper)
+        public AccountService(OnlineStoreDbContext context, IPasswordHasher<User> passwordHasher, AuthenticationSettings authenticationSettings, IMapper mapper)
         {
             _context = context;
             _passwordHasher = passwordHasher;

@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FluentValidation;
-using SneakersBase.Shared.Models;
+﻿using FluentValidation;
+using OnlineStore.Shared.Models;
 
-namespace SneakersBase.Server.Validators
+namespace OnlineStore.Server.Validators
 {
     public class RegisterUserDtoValidator : AbstractValidator<RegisterUserDto>
     {
-        public RegisterUserDtoValidator(SneakersDbContext dbContext)
+        public RegisterUserDtoValidator(OnlineStoreDbContext dbContext)
         {
             RuleFor(x => x.Login)
                 .NotEmpty();

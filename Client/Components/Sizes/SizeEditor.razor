@@ -1,51 +1,55 @@
-﻿@if (UpdateSizeModel != null && ConfirmSizeModel != null)
+﻿@using OnlineStore.Shared.Models
+@if (UpdateSizeModel != null && ConfirmSizeModel != null)
 {
-    <h5>Update size:</h5>
-    <div class="form-group border p-2">
-        <EditForm Model="UpdateSizeModel" OnValidSubmit="() => UpdateSize(UpdateSizeModel)">
-            <DataAnnotationsValidator />
-            <label class="d-block" for="InputSizeName">Size name</label>
-            <InputText class="form-control" id="InputSizeName" placeholder="Enter size name" @bind-Value="UpdateSizeModel.Name" autocomplete="off" />
-            <ValidationMessage For="@(() => UpdateSizeModel.Name)" />
-            <div class="mt-1">
-                <button type="button" @onclick="CancelEdit" class="btn btn-outline-dark">Close</button>
-                <button type="submit" class="btn btn-dark">Save update</button>
-            </div>
+	<h5>Update size:</h5>
+	<div class="form-group border p-2">
+		<EditForm Model="UpdateSizeModel" OnValidSubmit="() => UpdateSize(UpdateSizeModel)">
+			<DataAnnotationsValidator/>
+			<label class="d-block" for="InputSizeName">Size name</label>
+			<InputText class="form-control" id="InputSizeName" placeholder="Enter size name" @bind-Value="UpdateSizeModel.Name" autocomplete="off"/>
+			<ValidationMessage For="@(() => UpdateSizeModel.Name)"/>
+			<div class="mt-1">
+				<button type="button" @onclick="CancelEdit" class="btn btn-outline-dark">Close</button>
+				<button type="submit" class="btn btn-dark">Save update</button>
+			</div>
 
-        </EditForm>
-    </div>
+		</EditForm>
+	</div>
 }
 
 @code
 {
-    [Parameter]
-    public UpdateSizeDto? UpdateSizeModel { get; set; }
-    [Parameter]
-    public SizeDto? ConfirmSizeModel { get; set; }
-    [Parameter]
-    public EventCallback<SizeDto> ConfirmSizeModelChanged { get; set; }
-    [Parameter]
-    public EventCallback<UpdateSizeDto> UpdateSizeModelChanged { get; set; }
+	[Parameter]
+	public UpdateSizeDto? UpdateSizeModel { get; set; }
 
-    [Parameter]
-    public EventCallback<UpdateSizeDto> OnSubmitUpdatingSize { get; set; }
+	[Parameter]
+	public SizeDto? ConfirmSizeModel { get; set; }
 
-    private async void UpdateSize(UpdateSizeDto updateSizeDto)
-    {
-        if (updateSizeDto == null || ConfirmSizeModel == null)
-        {
-            throw new Exception("Something went wrong try refresh page");
-        }
-        await OnSubmitUpdatingSize.InvokeAsync(updateSizeDto);
+	[Parameter]
+	public EventCallback<SizeDto> ConfirmSizeModelChanged { get; set; }
 
-      //  await CancelEdit();
-    }
+	[Parameter]
+	public EventCallback<UpdateSizeDto> UpdateSizeModelChanged { get; set; }
 
-    public async Task CancelEdit()
-    {
-        UpdateSizeModel = null;
-        ConfirmSizeModel = null;
-        await UpdateSizeModelChanged.InvokeAsync(UpdateSizeModel);
-        await ConfirmSizeModelChanged.InvokeAsync(ConfirmSizeModel);
-    }
+	[Parameter]
+	public EventCallback<UpdateSizeDto> OnSubmitUpdatingSize { get; set; }
+
+	private async void UpdateSize(UpdateSizeDto updateSizeDto)
+	{
+		if (updateSizeDto == null || ConfirmSizeModel == null)
+		{
+			throw new Exception("Something went wrong try refresh page");
+		}
+		await OnSubmitUpdatingSize.InvokeAsync(updateSizeDto);
+
+	//  await CancelEdit();
+	}
+
+	public async Task CancelEdit()
+	{
+		UpdateSizeModel = null;
+		ConfirmSizeModel = null;
+		await UpdateSizeModelChanged.InvokeAsync(UpdateSizeModel);
+		await ConfirmSizeModelChanged.InvokeAsync(ConfirmSizeModel);
+	}
 }

@@ -1,12 +1,6 @@
-﻿using System;
-using System.Buffers;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SneakersBase.Server.Services.Exceptions;
+﻿using OnlineStore.Server.Services.Exceptions;
 
-namespace SneakersBase.Server.Middleware
+namespace OnlineStore.Server.Middleware
 {
     public class ErrorHandlingMiddleware : IMiddleware
     {

@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using SneakersBase.Server.Entities;
-using SneakersBase.Server.Services.Exceptions;
-using SneakersBase.Shared.Models;
+using OnlineStore.Server.Entities;
+using OnlineStore.Server.Services.Exceptions;
+using OnlineStore.Shared.Models;
 
-namespace SneakersBase.Server.Services
+namespace OnlineStore.Server.Services
 {
     public interface ISizeService
     {
@@ -23,11 +17,11 @@ namespace SneakersBase.Server.Services
 
     public class SizeService : ISizeService
     {
-        private readonly SneakersDbContext _dbContext;
+        private readonly OnlineStoreDbContext _dbContext;
         private readonly IMapper _mapper;
         private readonly ILogger<SizeService> _logger;
 
-        public SizeService(SneakersDbContext dbContext, IMapper mapper, ILogger<SizeService> logger)
+        public SizeService(OnlineStoreDbContext dbContext, IMapper mapper, ILogger<SizeService> logger)
         {
             _dbContext = dbContext;
             _mapper = mapper;

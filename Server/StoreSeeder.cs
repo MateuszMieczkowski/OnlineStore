@@ -1,18 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using SneakersBase.Server.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using OnlineStore.Server.Entities;
 
-namespace SneakersBase.Server
+namespace OnlineStore.Server
 {
-    public class SneakersSeeder
+    public class StoreSeeder
     {
-        private readonly SneakersDbContext _dbContext;
+        private readonly OnlineStoreDbContext _dbContext;
 
-        public SneakersSeeder(SneakersDbContext dbContext)
+        public StoreSeeder(OnlineStoreDbContext dbContext)
         {
             _dbContext = dbContext;
         }
