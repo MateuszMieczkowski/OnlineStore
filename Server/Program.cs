@@ -1,11 +1,8 @@
 using System.Reflection;
 using System.Text;
-using Azure.Identity;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Azure;
 using Microsoft.IdentityModel.Tokens;
 using NLog.Web;
 using OnlineStore.Server;
@@ -15,7 +12,6 @@ using OnlineStore.Server.Middleware;
 using OnlineStore.Server.Services;
 using OnlineStore.Server.Validators;
 using OnlineStore.Shared.Models;
-using SneakersBase.Server;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,7 +34,7 @@ builder.Services.AddAuthentication(option =>
 {
     cfg.RequireHttpsMetadata = false;
     cfg.SaveToken = true;
-    cfg.TokenValidationParameters = new TokenValidationParameters()
+    cfg.TokenValidationParameters = new TokenValidationParameters
     {
         ValidIssuer = authenticationSettings.JwtIssuer,
         ValidAudience = authenticationSettings.JwtIssuer,
@@ -74,14 +70,12 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("FrontEndClient", p =>
-
         p.AllowAnyMethod()
             .AllowAnyHeader()
             .WithOrigins(builder.Configuration["AllowedOrigins"],
-                         builder.Configuration["ClientAddress"])
+                builder.Configuration["ClientAddress"])
     );
 });
-
 
 
 var app = builder.Build();
@@ -107,7 +101,6 @@ else
 
 
 app.UseCors("FrontEndClient");
-
 
 
 app.UseMiddleware<ErrorHandlingMiddleware>();
