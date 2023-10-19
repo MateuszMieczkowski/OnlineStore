@@ -46,28 +46,6 @@ namespace SneakersBase.Server
                 {
                     _dbContext.Database.Migrate();
                 }
-
-                if (!_dbContext.Sizes.Any())
-                {
-                    var sizes = GetSizes();
-                    _dbContext.Sizes.AddRange(sizes);
-                    _dbContext.SaveChanges();
-                }
-
-                if (!_dbContext.Products.Any())
-                {
-                    var products = GetProducts();
-                    _dbContext.Products.AddRange(products);
-                    _dbContext.SaveChanges();
-                }
-
-                if (!_dbContext.Roles.Any())
-                {
-                    var roles = GetRoles();
-                    _dbContext.Roles.AddRange(roles);
-                    _dbContext.SaveChanges();
-                }
-
             }
 
         }
