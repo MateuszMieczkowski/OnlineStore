@@ -3,14 +3,15 @@
 <nav class="navbar navbar-light bg-light border-bottom">
     <div class="container-fluid">
         <div class="nav">
-            <NavLink class="nav-item nav-link" href="@configuration["MainPageAddress"]" target="child">Home <span class="sr-only">(current)</span></NavLink>
+            @* <NavLink class="nav-item nav-link" href="@configuration["MainPageAddress"]" target="child">Home <span class="sr-only">(current)</span></NavLink> *@
+            <NavLink class="nav-item nav-link" href="">Home</NavLink>
         </div>
 
         <AuthorizeView>
             <Authorized>
                 <div class="nav" style="margin-right: auto;">
                     <NavLink class="nav-item nav-link" href="create">Add</NavLink>
-                    <NavLink class="nav-item nav-link" href="">Overview panel</NavLink>
+                    <NavLink class="nav-item nav-link" href="configuration">Overview panel</NavLink>
                     <NavLink class="nav-item nav-link" href="size">Sizes</NavLink>
                 </div>
                 <NavLink class="btn btn-outline-dark my-2 my-sm-0" href="users/logout">Logout</NavLink>

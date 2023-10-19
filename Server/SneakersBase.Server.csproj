@@ -29,7 +29,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Client\SneakersBase.Client.csproj" />
     <ProjectReference Include="..\Shared\SneakersBase.Shared.csproj" />
   </ItemGroup>
 
