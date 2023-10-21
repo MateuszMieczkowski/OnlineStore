@@ -1,8 +1,5 @@
-﻿@page "/"
+﻿@page "/configuration"
 @attribute [Authorize]
-@using SneakersBase.Client.Components
-@using SneakersBase.Shared.Models
-@*@inject HttpClient Http*@
 @inject ToastService Toast
 @inject IProductService ProductService
 @inject ISizeService SizeService
@@ -92,7 +89,6 @@
 
                 }
                 <button class="btn btn-dark" type="button" @onclick="() => AddProductSize(_editProduct)">Add new size</button>
-
             </div>
 
             <button type="button" @onclick="CancelEdit" class="btn btn-outline-dark">Cancel</button>

@@ -1,14 +1,11 @@
+using Azure.Storage.Blobs;
 using System.Reflection;
 using System.Text;
-using Azure.Identity;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Azure;
 using Microsoft.IdentityModel.Tokens;
 using NLog.Web;
-using SneakersBase.Client.Configurations;
 using SneakersBase.Server;
 using SneakersBase.Server.Authentication;
 using SneakersBase.Server.Entities;
@@ -54,6 +51,11 @@ builder.Services.AddRazorPages();
 builder.Services.AddDbContext<SneakersDbContext>(
     options => options.UseSqlServer(builder.Configuration.GetConnectionString("SneakersDbConnection")));
 
+var storageContainerName = builder.Configuration.GetValue<string>("BlobContainerName");
+var storageConnectionString = builder.Configuration.GetValue<string>("BlobConnectionString");
+var blobContainerClient = new BlobContainerClient(connectionString: storageConnectionString, blobContainerName:storageContainerName);
+blobContainerClient.CreateIfNotExists();
+
 builder.Services.AddScoped<SneakersSeeder>();
 builder.Services.AddScoped<ErrorHandlingMiddleware>();
 
@@ -77,8 +79,9 @@ builder.Services.AddCors(options =>
 
         p.AllowAnyMethod()
             .AllowAnyHeader()
-            .WithOrigins(builder.Configuration["AllowedOrigins"],
-                         builder.Configuration["ClientAddress"])
+            .AllowAnyOrigin()
+            // .WithOrigins(builder.Configuration["AllowedOrigins"],
+            //              builder.Configuration["ClientAddress"])
     );
 });
 
@@ -108,14 +111,11 @@ else
 
 app.UseCors("FrontEndClient");
 
-
-
 app.UseMiddleware<ErrorHandlingMiddleware>();
 
 app.UseAuthentication();
 
 app.UseHttpsRedirection();
-
 
 app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
