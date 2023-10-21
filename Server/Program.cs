@@ -1,3 +1,4 @@
+using Azure.Storage.Blobs;
 using System.Reflection;
 using System.Text;
 using FluentValidation;
@@ -50,7 +51,6 @@ builder.Services.AddRazorPages();
 builder.Services.AddDbContext<OnlineStoreDbContext>(
     options => options.UseSqlServer(builder.Configuration.GetConnectionString("SneakersDbConnection")));
 
-builder.Services.AddScoped<StoreSeeder>();
 builder.Services.AddScoped<ErrorHandlingMiddleware>();
 
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
@@ -72,8 +72,9 @@ builder.Services.AddCors(options =>
     options.AddPolicy("FrontEndClient", p =>
         p.AllowAnyMethod()
             .AllowAnyHeader()
-            .WithOrigins(builder.Configuration["AllowedOrigins"],
-                builder.Configuration["ClientAddress"])
+            .AllowAnyOrigin()
+            // .WithOrigins(builder.Configuration["AllowedOrigins"],
+            //              builder.Configuration["ClientAddress"])
     );
 });
 
@@ -103,12 +104,12 @@ else
 app.UseCors("FrontEndClient");
 
 
+
 app.UseMiddleware<ErrorHandlingMiddleware>();
 
 app.UseAuthentication();
 
 app.UseHttpsRedirection();
-
 
 app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();

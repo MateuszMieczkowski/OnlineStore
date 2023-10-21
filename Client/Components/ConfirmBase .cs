@@ -22,5 +22,5 @@ public class ConfirmBase : ComponentBase
     {
         ShowConfirmation = false;
         await ConfirmationChanged.InvokeAsync(value);
-    }
+        }
 }

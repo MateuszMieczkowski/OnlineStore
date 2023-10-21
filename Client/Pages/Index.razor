@@ -1,9 +1,9 @@
-﻿@page "/sneakers"
+﻿@page "/"
 @using OnlineStore.Shared.Models
 @inject IProductService ProductService
 @inject IConfiguration Configuration
 
-<PageTitle>Sneakers</PageTitle>
+<PageTitle>Home</PageTitle>
 
 <ProductsFilter Products="products" OnSearchStringChanged="Refresh"></ProductsFilter>
 
@@ -17,23 +17,23 @@ else
 
 		<div class="row">
 
-			@foreach (var product in products.Where(p => p.IsVisible))
-			{
-				<div class="col-md-2">
-					<div class="card mb-5 ml-2">
-						<img class="img-thumbnail" src="@storageUrl/@product.Id" alt="Sneaker image" @onclick="() => Toggle(product)">
-						<div class="card-body">
-							<p class="card-text">@product.Name</p>
-							<p class="card-text">@product.ReferenceNumber</p>
-							<p class="card-text">Quantity: @product.Quantity</p>
-							<button @onclick="() => Toggle(product)" type="button" class="btn btn-outline-dark show"> @(product.IsHidden ? "Details" : "Hide")</button>
-							<div id="info" hidden="@product.IsHidden">
-								<p class="card-text mt-2">Available sizes:</p>
-								<ul class="list-group">
-									@foreach (var size in product.AvailableSizes)
-									{
-										<li class="list-group-item">@size.Size x @size.Quantity</li>
-									}
+            @foreach (var product in products.Where(p => p.IsVisible))
+            {
+                <div class="col-md-2">
+                    <div class="card mb-5 ml-2">
+                        <img class="img-thumbnail" src="@storageUrl/@product.Id" alt="Product image" @onclick="() => Toggle(product)">
+                        <div class="card-body">
+                            <p class="card-text">@product.Name</p>
+                            <p class="card-text">@product.ReferenceNumber</p>
+                            <p class="card-text">Quantity: @product.Quantity</p>
+                            <button @onclick="() => Toggle(product)" type="button" class="btn btn-outline-dark show"> @(product.IsHidden ? "Details" : "Hide")</button>
+                            <div id="info" hidden="@product.IsHidden">
+                                <p class="card-text mt-2">Available sizes:</p>
+                                <ul class="list-group">
+                                    @foreach (var size in product.AvailableSizes)
+                                    {
+                                        <li class="list-group-item">@size.Size x @size.Quantity</li>
+                                    }
 
 								</ul>
 							</div>
@@ -60,14 +60,14 @@ else
 		products = await ProductService.GetAllAsync();
 	}
 
-	private void Toggle(ProductDto product)
-	{
-		product.IsHidden = !product.IsHidden;
-	}
+    private void Toggle(ProductDto product)
+    {
+        product.IsHidden = !product.IsHidden;
+    }
 
-	private void Refresh()
-	{
-		StateHasChanged();
-	}
+    private void Refresh()
+    {
+        StateHasChanged();
+    }
 
 }

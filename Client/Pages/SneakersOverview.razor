@@ -1,8 +1,7 @@
-﻿@page "/"
+﻿@page "/configuration"
 @using OnlineStore.Shared.Models
 @using OnlineStore.Client.Components
 @attribute [Authorize]
-@*@inject HttpClient Http*@
 @inject ToastService Toast
 @inject IProductService ProductService
 @inject ISizeService SizeService
@@ -85,13 +84,13 @@
 								<button type="button" class="btn btn-dark" @onclick="() => SubQuantity(_editProduct, productSize)">-</button>
 								<button type="button" class="btn btn-dark" @onclick="() => RemoveSize(_editProduct, productSize)">Remove size</button>
 
-							</div>
-						</div>
-					</EditForm>
-				}
-				<button class="btn btn-dark" type="button" @onclick="() => AddProductSize(_editProduct)">Add new size</button>
+                            </div>
+                        </div>
+                    </EditForm>
 
-			</div>
+                }
+                <button class="btn btn-dark" type="button" @onclick="() => AddProductSize(_editProduct)">Add new size</button>
+            </div>
 
 			<button type="button" @onclick="CancelEdit" class="btn btn-outline-dark">Cancel</button>
 			<button type="button" @onclick="SaveEdit" class="btn btn-dark">Save</button>
