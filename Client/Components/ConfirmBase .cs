@@ -1,36 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 
-namespace SneakersBase.Client.Components
+namespace OnlineStore.Client.Components;
+
+public class ConfirmBase : ComponentBase
 {
-    public class ConfirmBase : ComponentBase
+    protected bool ShowConfirmation { get; set; }
+
+    [Parameter] public string ConfirmationTitle { get; set; } = "Confirm Delete";
+
+    [Parameter] public string ConfirmationMessage { get; set; } = "Are you sure you want to delete";
+
+    [Parameter] public EventCallback<bool> ConfirmationChanged { get; set; }
+
+    public void Show()
     {
-        protected bool ShowConfirmation { get; set; }
-
-        [Parameter]
-        public string ConfirmationTitle { get; set; } = "Confirm Delete";
-
-        [Parameter]
-        public string ConfirmationMessage { get; set; } = "Are you sure you want to delete";
-
-        public void Show()
-        {
-            ShowConfirmation = true;
-            StateHasChanged();
-        }
-
-        [Parameter]
-        public EventCallback<bool> ConfirmationChanged { get; set; }
-
-        protected async Task OnConfirmationChange(bool value)
-        {
-            ShowConfirmation = false;
-            await ConfirmationChanged.InvokeAsync(value);
-
-        }
+        ShowConfirmation = true;
+        StateHasChanged();
     }
+
+    protected async Task OnConfirmationChange(bool value)
+    {
+        ShowConfirmation = false;
+        await ConfirmationChanged.InvokeAsync(value);
+        }
 }

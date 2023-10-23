@@ -1,33 +1,16 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using SneakersBase.Client.Services;
-using SneakersBase.Shared.Models;
+using OnlineStore.Client.Services;
+using OnlineStore.Shared.Models;
 
-namespace SneakersBase.Client.Pages;
+namespace OnlineStore.Client.Pages;
 
 public class SizeBase : ComponentBase
 {
-    #region Injections
-    [Inject]
-    protected ToastService Toast { get; set; }
-    [Inject]
-    protected ISizeService SizeService { get; set; }
-    [Inject]
-    protected IJSRuntime JsRuntime { get; set; }
-    #endregion
-
-    #region Properties
-    protected List<SizeDto>? sizes;
-    protected UpdateSizeDto? EditSize { get; set; }
-    protected SizeDto ConfirmSize { get; set; }
-    protected CreateSizeDto CreateSize { get; set; }
-    #endregion
-
-
     protected override async Task OnInitializedAsync()
     {
         sizes = await SizeService.GetAllAsync();
-        CreateSize = new();
+        CreateSize = new CreateSizeDto();
     }
 
     protected async void UpdateSize(SizeDto sizeDto)
@@ -35,7 +18,7 @@ public class SizeBase : ComponentBase
         try
         {
             ConfirmSize = sizeDto;
-            EditSize = new UpdateSizeDto()
+            EditSize = new UpdateSizeDto
             {
                 Name = sizeDto.Name
             };
@@ -46,8 +29,8 @@ public class SizeBase : ComponentBase
         {
             Toast.ShowToast(ex.Message, ToastLevel.Error);
         }
-        
     }
+
     protected async void SaveEdit(UpdateSizeDto updateSizeDto)
     {
         try
@@ -62,12 +45,10 @@ public class SizeBase : ComponentBase
         {
             Toast.ShowToast(ex.Message, ToastLevel.Error);
         }
-
     }
 
     protected async void RemoveSize(SizeDto sizeDto)
     {
-
         try
         {
             await SizeService.Remove(sizeDto.Id);
@@ -83,7 +64,6 @@ public class SizeBase : ComponentBase
     }
 
 
-
     protected async void AddSize(CreateSizeDto sizeDto)
     {
         try
@@ -92,7 +72,8 @@ public class SizeBase : ComponentBase
             sizes?.Add(newSize);
             Toast.ShowToast("Size added!", ToastLevel.Success);
 
-            sizeDto.Name = string.Empty; ;
+            sizeDto.Name = string.Empty;
+            ;
             StateHasChanged();
         }
         catch (Exception ex)
@@ -101,4 +82,22 @@ public class SizeBase : ComponentBase
         }
     }
 
+    #region Injections
+
+    [Inject] protected ToastService Toast { get; set; }
+
+    [Inject] protected ISizeService SizeService { get; set; }
+
+    [Inject] protected IJSRuntime JsRuntime { get; set; }
+
+    #endregion
+
+    #region Properties
+
+    protected List<SizeDto>? sizes;
+    protected UpdateSizeDto? EditSize { get; set; }
+    protected SizeDto ConfirmSize { get; set; }
+    protected CreateSizeDto CreateSize { get; set; }
+
+    #endregion
 }

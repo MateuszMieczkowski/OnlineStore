@@ -1,33 +1,32 @@
-﻿@page "/sneakers"
+﻿@page "/"
+@using OnlineStore.Shared.Models
 @inject IProductService ProductService
 @inject IConfiguration Configuration
-@using SneakersBase.Client.Components
-@using SneakersBase.Shared.Models
 
-<PageTitle>Sneakers</PageTitle>
+<PageTitle>Home</PageTitle>
 
 <ProductsFilter Products="products" OnSearchStringChanged="Refresh"></ProductsFilter>
 
 @if (products == null)
 {
-    <div class="spinner"></div>
+	<div class="spinner"></div>
 }
 else
 {
-    <div class="container" style="max-width: 90%">
+	<div class="container" style="max-width: 90%">
 
-        <div class="row">
+		<div class="row">
 
             @foreach (var product in products.Where(p => p.IsVisible))
             {
                 <div class="col-md-2">
                     <div class="card mb-5 ml-2">
-                        <img class="img-thumbnail" src="@storageUrl/@product.Id" alt="Sneaker image" @onclick="() => Toggle(product)">
+                        <img class="img-thumbnail" src="@storageUrl/@product.Id" alt="Product image" @onclick="() => Toggle(product)">
                         <div class="card-body">
                             <p class="card-text">@product.Name</p>
                             <p class="card-text">@product.ReferenceNumber</p>
                             <p class="card-text">Quantity: @product.Quantity</p>
-                            <button @onclick="() => Toggle(product)" type="button" class="btn btn-outline-dark show"> @(product.IsHidden  ? "Details" : "Hide")</button>
+                            <button @onclick="() => Toggle(product)" type="button" class="btn btn-outline-dark show"> @(product.IsHidden ? "Details" : "Hide")</button>
                             <div id="info" hidden="@product.IsHidden">
                                 <p class="card-text mt-2">Available sizes:</p>
                                 <ul class="list-group">
@@ -36,43 +35,39 @@ else
                                         <li class="list-group-item">@size.Size x @size.Quantity</li>
                                     }
 
-                                </ul>
-                            </div>
+								</ul>
+							</div>
 
 
-                        </div>
-                    </div>
-                </div>
-            }
+						</div>
+					</div>
+				</div>
+			}
 
-        </div>
+		</div>
 
-    </div>
-
+	</div>
 }
 
 @code {
 
-    private List<ProductDto>? products;
-    private string storageUrl;
+	private List<ProductDto>? products;
+	private string storageUrl;
 
-    protected override async Task OnInitializedAsync()
-    {
-        storageUrl = Configuration.GetValue<string>("StorageAddress");
-        products = await ProductService.GetAllAsync();
-    }
+	protected override async Task OnInitializedAsync()
+	{
+		storageUrl = Configuration.GetValue<string>("StorageAddress");
+		products = await ProductService.GetAllAsync();
+	}
 
     private void Toggle(ProductDto product)
     {
         product.IsHidden = !product.IsHidden;
     }
-  
+
     private void Refresh()
     {
         StateHasChanged();
     }
 
 }
-
-
-

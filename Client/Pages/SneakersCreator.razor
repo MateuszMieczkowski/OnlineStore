@@ -1,103 +1,99 @@
 ﻿@page "/create"
+@using OnlineStore.Shared.Models
 @attribute [Authorize]
 @inject IJSRuntime JsRuntime
 @inject IProductService ProductService
 @inject ToastService Toast
 @inject NavigationManager NavManager
 @inject ISizeService SizeService
-@using Microsoft.AspNetCore.Components
-@using Microsoft.IdentityModel.Tokens
-@using SneakersBase.Shared.Models
 <section role="main">
-    <div class="container mt-5">
+	<div class="container mt-5">
 
 
-        <h2>Add new products...</h2>
-        @*<button @onclick="AddTestProduct">Add test product</button>*@
-        <form>
-            @foreach (var product in _createdProductDtos)
-            {
-                <div class="border p-3 mb-3">
-                    <EditForm Model="@product" Context="productContext">
-                        <DataAnnotationsValidator />
+		<h2>Add new products...</h2>
+		@*<button @onclick="AddTestProduct">Add test product</button>*@
+		<form>
+			@foreach (var product in _createdProductDtos)
+			{
+				<div class="border p-3 mb-3">
+					<EditForm Model="@product" Context="productContext">
+						<DataAnnotationsValidator/>
 
-                        @AddEditForm(productContext)
+						@AddEditForm(productContext)
 
-                        <div class="form-group ">
+						<div class="form-group ">
 
-                            <label class="d-block">Model image</label>
-                            @if (!string.IsNullOrEmpty(product.ThumbnailPath))
-                            {
-                                <img class="d-block" src="data:image/png;base64,@product.ThumbnailPath" />
-                            }
-                            <InputFile id="formFile" class="form-control" OnChange="(e) => OnInputFileChange(e, product)" accept=".png" />
-                            <ValidationMessage For="@(() => product.ThumbnailPath)" />
-                            <br><br />
-                            <label class="d-block" for="InputProductName">Model</label>
-                            <InputText class="form-control" id="InputProductName" placeholder="Enter model" @bind-Value=product.Name autocomplete="off" />
-                            <ValidationMessage For="@(() => product.Name)" />
+							<label class="d-block">Model image</label>
+							@if (!string.IsNullOrEmpty(product.ThumbnailPath))
+							{
+								<img class="d-block" src="data:image/png;base64,@product.ThumbnailPath"/>
+							}
+							<InputFile id="formFile" class="form-control" OnChange="e => OnInputFileChange(e, product)" accept=".png"/>
+							<ValidationMessage For="@(() => product.ThumbnailPath)"/>
+							<br><br/>
+							<label class="d-block" for="InputProductName">Model</label>
+							<InputText class="form-control" id="InputProductName" placeholder="Enter model" @bind-Value=product.Name autocomplete="off"/>
+							<ValidationMessage For="@(() => product.Name)"/>
 
-                        </div>
-                        <div class="form-group">
-                            <label for="InputReferenceNumber">Reference number</label>
-                            <InputText class="form-control" id="InputReferenceNumber" placeholder="Enter reference number" @bind-Value="product.ReferenceNumber" autocomplete="off" />
-                            <ValidationMessage For="@(() => product.ReferenceNumber)" />
-                        </div>
-                        <ValidationMessage For="@(() => product.AvailableSizes)" />
+						</div>
+						<div class="form-group">
+							<label for="InputReferenceNumber">Reference number</label>
+							<InputText class="form-control" id="InputReferenceNumber" placeholder="Enter reference number" @bind-Value="product.ReferenceNumber" autocomplete="off"/>
+							<ValidationMessage For="@(() => product.ReferenceNumber)"/>
+						</div>
+						<ValidationMessage For="@(() => product.AvailableSizes)"/>
 
-                    </EditForm>
-
-
-                    <label>Available sizes</label>
-                    <div class="d-block">
-                        @foreach (var productSize in product.AvailableSizes)
-                        {
-
-                            <EditForm Model="@productSize" Context="editSize">
-                                <DataAnnotationsValidator />
-                                @AddEditForm(editSize)
-                                <div class="border p-3 mb-3">
-                                    <label class="mr-2" for="sizes">Choose size:</label>
-                                    <input list="sizes" @onchange="e => SetSize(productSize, e.Value.ToString())"/>
-                                    @if (_sizes == null)
-                                    {
-                                        <div class="spinner" />
-                                    }
-                                    else
-                                    {
-                                        <datalist id="sizes" name="sizes">
-                                            @foreach (var size in _sizes)
-                                            {
-                                                <option>@size.Name</option>
-                                            }
-                                        </datalist>
-                                    }
-
-                                    <label class="ml-2 mr-2" for="quantity" >Quantity:</label>
-                                    <input type="number" @bind="productSize.Quantity" onshow="this.value=''" id="quantity" min="0" max="1000"/>
-                                    <button type="button" class="btn btn-dark ml-2" @onclick="() => RemoveSize(product, productSize)" tabindex="-1">Remove size</button>
-                                    <ValidationMessage For="@(() => productSize.Quantity)" />
-                                    <ValidationMessage For="@(() => productSize.SizeId)" />
-
-                                </div>
-                            </EditForm>
-
-                        }
-                        <button type="button" class="btn btn-outline-dark" @onclick="() => Remove(product)" tabindex="-1">Remove product</button>
-                        <button type="button" class="btn btn-dark" @onclick="() => AddNewSize(product)">Add next size</button>
+					</EditForm>
 
 
-                    </div>
-                </div>
-            }
-        </form>
+					<label>Available sizes</label>
+					<div class="d-block">
+						@foreach (var productSize in product.AvailableSizes)
+						{
+							<EditForm Model="@productSize" Context="editSize">
+								<DataAnnotationsValidator/>
+								@AddEditForm(editSize)
+								<div class="border p-3 mb-3">
+									<label class="mr-2" for="sizes">Choose size:</label>
+									<input list="sizes" @onchange="e => SetSize(productSize, e.Value.ToString())"/>
+									@if (_sizes == null)
+									{
+										<div class="spinner"/>
+									}
+									else
+									{
+										<datalist id="sizes" name="sizes">
+											@foreach (var size in _sizes)
+											{
+												<option>@size.Name</option>
+											}
+										</datalist>
+									}
 
-        <div class="mt-3 mb-5">
-            <button type="button" class="btn btn-dark" @onclick="OnButtonClick">Add next product</button>
-            <button type="button" @onclick="Submit" class="btn btn-dark btn-lg btn-save-changes">Save new products</button>
+									<label class="ml-2 mr-2" for="quantity">Quantity:</label>
+									<input type="number" @bind="productSize.Quantity" onshow="this.value=''" id="quantity" min="0" max="1000"/>
+									<button type="button" class="btn btn-dark ml-2" @onclick="() => RemoveSize(product, productSize)" tabindex="-1">Remove size</button>
+									<ValidationMessage For="@(() => productSize.Quantity)"/>
+									<ValidationMessage For="@(() => productSize.SizeId)"/>
 
-        </div>
-    </div>
+								</div>
+							</EditForm>
+						}
+						<button type="button" class="btn btn-outline-dark" @onclick="() => Remove(product)" tabindex="-1">Remove product</button>
+						<button type="button" class="btn btn-dark" @onclick="() => AddNewSize(product)">Add next size</button>
+
+
+					</div>
+				</div>
+			}
+		</form>
+
+		<div class="mt-3 mb-5">
+			<button type="button" class="btn btn-dark" @onclick="OnButtonClick">Add next product</button>
+			<button type="button" @onclick="Submit" class="btn btn-dark btn-lg btn-save-changes">Save new products</button>
+
+		</div>
+	</div>
 
 </section>
 <div class="position-absolute">
@@ -106,198 +102,191 @@
 
 @code
 {
-    private const int MAX_ADDED_PRODUCT = 30;
-    private readonly List<CreateProductDto> _createdProductDtos = new();
-    private List<SizeDto> _sizes;
-    private EditForm _editForm;
-    private EditForm _editSizeForm;
-    private readonly List<EditContext> _editContexts = new();
+		private const int MAX_ADDED_PRODUCT = 30;
+	private readonly List<CreateProductDto> _createdProductDtos = new();
+	private List<SizeDto> _sizes;
+	private EditForm _editForm;
+	private EditForm _editSizeForm;
+	private readonly List<EditContext> _editContexts = new();
 
 
+	protected override async Task OnInitializedAsync()
+	{
+		_sizes = await SizeService.GetAllAsync();
+		AddNewProduct();
+	}
 
-    protected override async Task OnInitializedAsync()
-    {
-        _sizes = await SizeService.GetAllAsync();
-        AddNewProduct();
-    }
+	private void SetSize(CreateProductSizeDto createDto, string size)
+	{
+		if (string.IsNullOrEmpty(size))
+		{
+			createDto.SizeId = default;
+			return;
+		}
 
-    private void SetSize(CreateProductSizeDto createDto, string size)
-    {
-        if (string.IsNullOrEmpty(size))
-        {
-            createDto.SizeId = default;
-            return;
+		var selectedSize = _sizes.FirstOrDefault(s => s.Name == size);
+		createDto.Size = size;
 
-        }
+		if (selectedSize is null)
+		{
+			createDto.SizeId = default;
+			return;
+		}
 
-        var selectedSize = _sizes.FirstOrDefault(s => s.Name == size);
-        createDto.Size = size;
+		createDto.SizeId = selectedSize.Id;
+	}
 
-        if (selectedSize is null)
-        {
-            createDto.SizeId = default;
-            return;
+	private void AddNewProduct()
+	{
+		if (_createdProductDtos.Count == MAX_ADDED_PRODUCT)
+		{
+			Toast.ShowToast($"Maximum number of added products up to {MAX_ADDED_PRODUCT}!", ToastLevel.Warning);
+			return;
+		}
+		var newProduct = new CreateProductDto();
+		AddNewSize(newProduct);
+		_createdProductDtos.Add(newProduct);
+		StateHasChanged();
+	}
 
-        }
-
-        createDto.SizeId = selectedSize.Id;
-    }
-
-    private void AddNewProduct()
-    {
-        if (_createdProductDtos.Count == MAX_ADDED_PRODUCT)
-        {
-            Toast.ShowToast($"Maximum number of added products up to {MAX_ADDED_PRODUCT}!", ToastLevel.Warning);
-            return;
-        }
-        var newProduct = new CreateProductDto();
-        AddNewSize(newProduct);
-        _createdProductDtos.Add(newProduct);
-        StateHasChanged();
-    }
-
-    private void AddNewSize(CreateProductDto product)
-    {
-        product.AvailableSizes.Add(new CreateProductSizeDto());
-        StateHasChanged();
-
-    }
+	private void AddNewSize(CreateProductDto product)
+	{
+		product.AvailableSizes.Add(new CreateProductSizeDto());
+		StateHasChanged();
+	}
 
 
-    private async void OnButtonClick()
-    {
-        await Task.Run(AddNewProduct);
-        await JsRuntime.InvokeVoidAsync("OnScrollEvent");
-        StateHasChanged();
-    }
+	private async void OnButtonClick()
+	{
+		await Task.Run(AddNewProduct);
+		await JsRuntime.InvokeVoidAsync("OnScrollEvent");
+		StateHasChanged();
+	}
 
-    private async void Remove(CreateProductDto product)
-    {
-        if (_createdProductDtos.Count == 1)
-        {
-            Toast.ShowToast("There must be at least one product!", ToastLevel.Warning);
-            return;
-        }
-        await Task.Run(() => _createdProductDtos.Remove(product));
-        await InvokeAsync(StateHasChanged);
-    }
+	private async void Remove(CreateProductDto product)
+	{
+		if (_createdProductDtos.Count == 1)
+		{
+			Toast.ShowToast("There must be at least one product!", ToastLevel.Warning);
+			return;
+		}
+		await Task.Run(() => _createdProductDtos.Remove(product));
+		await InvokeAsync(StateHasChanged);
+	}
 
-    private async void RemoveSize(CreateProductDto product, CreateProductSizeDto size)
-    {
-        if (product.AvailableSizes.Count == 1)
-        {
-            Toast.ShowToast("There must be at least one size!", ToastLevel.Warning);
-            return;
-        }
-        await Task.Run(() => product.AvailableSizes.Remove(size));
-        await InvokeAsync(StateHasChanged);
-    }
+	private async void RemoveSize(CreateProductDto product, CreateProductSizeDto size)
+	{
+		if (product.AvailableSizes.Count == 1)
+		{
+			Toast.ShowToast("There must be at least one size!", ToastLevel.Warning);
+			return;
+		}
+		await Task.Run(() => product.AvailableSizes.Remove(size));
+		await InvokeAsync(StateHasChanged);
+	}
 
-    private async Task OnInputFileChange(InputFileChangeEventArgs e, CreateProductDto dto)
-    {
-        var fileFormat = "image/png";
-        int maxFileSizeInKB = 1024 * 100;
-        if (e.File.ContentType != fileFormat)
-        {
-            Toast.ShowToast("You can only add images in .png format!", ToastLevel.Error);
-            return;
-        }
-        if (e.File.Size > maxFileSizeInKB)
-        {
-            Toast.ShowToast("Max size of image is 100kB!", ToastLevel.Error);
-            return;
-        }
+	private async Task OnInputFileChange(InputFileChangeEventArgs e, CreateProductDto dto)
+	{
+		var fileFormat = "image/png";
+		var maxFileSizeInKB = 1024 * 100;
+		if (e.File.ContentType != fileFormat)
+		{
+			Toast.ShowToast("You can only add images in .png format!", ToastLevel.Error);
+			return;
+		}
+		if (e.File.Size > maxFileSizeInKB)
+		{
+			Toast.ShowToast("Max size of image is 100kB!", ToastLevel.Error);
+			return;
+		}
 
-        var buffer = new byte[e.File.Size];
+		var buffer = new byte[e.File.Size];
 
-        await e.File.OpenReadStream().ReadAsync(buffer);
-        dto.ThumbnailPath = Convert.ToBase64String(buffer);
-        this.StateHasChanged();
-    }
+		await e.File.OpenReadStream().ReadAsync(buffer);
+		dto.ThumbnailPath = Convert.ToBase64String(buffer);
+		StateHasChanged();
+	}
 
-    private async Task Submit()
-    {
-        try
-        {
-            bool isValidate = true;
-            foreach (var editContext in _editContexts)
-            {
-                if (!editContext.Validate())
-                {
-                    isValidate = false;
-                }
-            }
-            if (!isValidate)
-            {
-                throw new ArgumentException("Products doesn't passed validation!");
-            }
-
-
-            StateHasChanged();
-            var isCreated = await ProductService.CreateProducts(_createdProductDtos);
-            if (!isCreated)
-            {
-                Toast.ShowToast("There was an error during creating", ToastLevel.Error);
-                return;
-            }
-            Toast.ShowToast("Products created successfully!", ToastLevel.Success);
-            NavManager.NavigateTo("/");
-        }
-        catch (ArgumentException ex)
-        {
-            Toast.ShowToast($"{ex.Message}", ToastLevel.Warning);
-        }
-        catch (Exception ex)
-        {
-            Toast.ShowToast($"Something went wrong: {ex.Message}", ToastLevel.Error);
-            throw;
-        }
-
-    }
-
-    private string AddEditForm(EditContext? editContext)
-    {
-        if (editContext != null) _editContexts.Add(editContext);
-        return string.Empty;
-    }
-    private void AddTestProduct()
-    {
-        var testCreateDto = new CreateProductDto()
-            {
-                Name = "Nike Air Force 1 Low '07 White Black Pebbled Leather",
-                ReferenceNumber = "CT2302-100",
-                AvailableSizes = new List<CreateProductSizeDto>()
-                {
-            new CreateProductSizeDto()
-            {
-                Size = "9.5US",
-                Quantity = 7
-            },
-                new CreateProductSizeDto()
-            {
-                Size = "10US",
-                Quantity = 7
-            },
-                new CreateProductSizeDto()
-            {
-                Size = "10.5US",
-                Quantity = 15
-            },
-                new CreateProductSizeDto()
-            {
-                Size = "11US",
-                Quantity = 17
-            },
-                new CreateProductSizeDto()
-            {
-                Size = "11.5US",
-                Quantity = 2
-            }
-        },
-
-            };
-        _createdProductDtos.Add(testCreateDto);
+	private async Task Submit()
+	{
+		try
+		{
+			var isValidate = true;
+			foreach (var editContext in _editContexts)
+			{
+				if (!editContext.Validate())
+				{
+					isValidate = false;
+				}
+			}
+			if (!isValidate)
+			{
+				throw new ArgumentException("Products doesn't passed validation!");
+			}
 
 
-    }
+			StateHasChanged();
+			var isCreated = await ProductService.CreateProducts(_createdProductDtos);
+			if (!isCreated)
+			{
+				Toast.ShowToast("There was an error during creating", ToastLevel.Error);
+				return;
+			}
+			Toast.ShowToast("Products created successfully!", ToastLevel.Success);
+			NavManager.NavigateTo("/");
+		}
+		catch (ArgumentException ex)
+		{
+			Toast.ShowToast($"{ex.Message}", ToastLevel.Warning);
+		}
+		catch (Exception ex)
+		{
+			Toast.ShowToast($"Something went wrong: {ex.Message}", ToastLevel.Error);
+			throw;
+		}
+	}
+
+	private string AddEditForm(EditContext? editContext)
+	{
+		if (editContext != null) _editContexts.Add(editContext);
+		return string.Empty;
+	}
+
+	private void AddTestProduct()
+	{
+		var testCreateDto = new CreateProductDto
+		{
+			Name = "Nike Air Force 1 Low '07 White Black Pebbled Leather",
+			ReferenceNumber = "CT2302-100",
+			AvailableSizes = new List<CreateProductSizeDto>
+			{
+				new()
+				{
+					Size = "9.5US",
+					Quantity = 7
+				},
+				new()
+				{
+					Size = "10US",
+					Quantity = 7
+				},
+				new()
+				{
+					Size = "10.5US",
+					Quantity = 15
+				},
+				new()
+				{
+					Size = "11US",
+					Quantity = 17
+				},
+				new()
+				{
+					Size = "11.5US",
+					Quantity = 2
+				}
+			}
+		};
+		_createdProductDtos.Add(testCreateDto);
+	}
 }

@@ -4,13 +4,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using OnlineStore.Server;
 using SneakersBase.Server;
 
 #nullable disable
 
 namespace SneakersBase.Server.Migrations
 {
-    [DbContext(typeof(SneakersDbContext))]
+    [DbContext(typeof(OnlineStoreDbContext))]
     partial class SneakersDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

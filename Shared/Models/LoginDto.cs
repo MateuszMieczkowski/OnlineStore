@@ -1,12 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SneakersBase.Shared.Models
+namespace OnlineStore.Shared.Models;
+
+public class LoginDto
 {
-    public class LoginDto
-    {
-        [Required]
-        public string Login { get; set; }
-        [Required]
-        public string Password { get; set; }
-    }
+    [Required] public string Login { get; set; }
+
+    [Required] public string Password { get; set; }
 }

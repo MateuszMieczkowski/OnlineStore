@@ -1,8 +1,7 @@
-﻿@page "/"
+﻿@page "/configuration"
+@using OnlineStore.Shared.Models
+@using OnlineStore.Client.Components
 @attribute [Authorize]
-@using SneakersBase.Client.Components
-@using SneakersBase.Shared.Models
-@*@inject HttpClient Http*@
 @inject ToastService Toast
 @inject IProductService ProductService
 @inject ISizeService SizeService
@@ -11,80 +10,79 @@
 <PageTitle>Sneakers overview</PageTitle>
 
 <div class="container">
-    <ModalDialog @ref="DeleteDialog" Title="Are you sure?"
-                 DialogType="ModelDialogBase.ModalDialogType.DeleteCancel"
-                 Text="Do you want to delete this?"
-                 OnClose="@OnRemoveDialogClose">
-    </ModalDialog>
+	<ModalDialog @ref="DeleteDialog" Title="Are you sure?"
+	             DialogType="ModelDialogBase.ModalDialogType.DeleteCancel"
+	             Text="Do you want to delete this?"
+	             OnClose="@OnRemoveDialogClose">
+	</ModalDialog>
 
-    @if (_editProduct != null)
-    {
-        <div class="border p-3 mb-3">
-            <EditForm Model="_editProduct" @ref="editFormProduct">
-                <DataAnnotationsValidator />
-                <div class="form-group ">
+	@if (_editProduct != null)
+	{
+		<div class="border p-3 mb-3">
+			<EditForm Model="_editProduct" @ref="editFormProduct">
+				<DataAnnotationsValidator/>
+				<div class="form-group ">
 
-                    <label class="d-block">Model image</label>
-                    @if (!string.IsNullOrEmpty(_editProduct.ThumbnailPath))
-                    {
-                        <ValidationMessage For="@(() => _editProduct.ThumbnailPath)" />
-                        <img class="d-block" style="max-width: 20rem" src="data:image/png;base64,@_editProduct.ThumbnailPath" />
-                    }
-                    else
-                    {
-                        <img class="d-block" style="max-width: 20rem" src="@storageUrl/@_confirmEditProduct.Id" />
-                    }
-                    <InputFile OnChange="(e) => OnInputFileChange(e, _editProduct)" accept=".png" />
+					<label class="d-block">Model image</label>
+					@if (!string.IsNullOrEmpty(_editProduct.ThumbnailPath))
+					{
+						<ValidationMessage For="@(() => _editProduct.ThumbnailPath)"/>
+						<img class="d-block" style="max-width: 20rem" src="data:image/png;base64,@_editProduct.ThumbnailPath"/>
+					}
+					else
+					{
+						<img class="d-block" style="max-width: 20rem" src="@storageUrl/@_confirmEditProduct.Id"/>
+					}
+					<InputFile OnChange="e => OnInputFileChange(e, _editProduct)" accept=".png"/>
 
 
-                    <br><br />
-                    <label class="d-block" for="InputProductName">Model</label>
-                    <InputText class="form-control" id="InputProductName" placeholder="Enter model" @bind-Value=_editProduct.Name autocomplete="off"/>
-                    <ValidationMessage For="@(() => _editProduct.Name)" />
+					<br><br/>
+					<label class="d-block" for="InputProductName">Model</label>
+					<InputText class="form-control" id="InputProductName" placeholder="Enter model" @bind-Value=_editProduct.Name autocomplete="off"/>
+					<ValidationMessage For="@(() => _editProduct.Name)"/>
 
-                </div>
-                <div class="form-group">
-                    <label for="InputReferenceNumber">Reference number</label>
-                    <InputText class="form-control" id="InputReferenceNumber" placeholder="Enter reference number" @bind-Value="_editProduct.ReferenceNumber" autocomplete="off"/>
-                    <ValidationMessage For="@(() => _editProduct.ReferenceNumber)" />
-                </div>
-                <ValidationMessage For="@(() => _editProduct.AvailableSizes)" />
-            </EditForm>
+				</div>
+				<div class="form-group">
+					<label for="InputReferenceNumber">Reference number</label>
+					<InputText class="form-control" id="InputReferenceNumber" placeholder="Enter reference number" @bind-Value="_editProduct.ReferenceNumber" autocomplete="off"/>
+					<ValidationMessage For="@(() => _editProduct.ReferenceNumber)"/>
+				</div>
+				<ValidationMessage For="@(() => _editProduct.AvailableSizes)"/>
+			</EditForm>
 
-            <div class="form-control">
+			<div class="form-control">
 
-                <p class="card-text mt-2">Available sizes:</p>
+				<p class="card-text mt-2">Available sizes:</p>
 
-                @foreach (var productSize in _editProduct.AvailableSizes)
-                {
-                    <EditForm Model="productSize" @ref="editFormProductSize">
-                        <DataAnnotationsValidator />
-                        <div class="col">
-                            <ValidationMessage For="@(() => productSize.Quantity)" />
-                            <ValidationMessage For="@(() => productSize.SizeId)" />
-                            <label class="mr-2" for="sizes">Size:</label>
+				@foreach (var productSize in _editProduct.AvailableSizes)
+				{
+					<EditForm Model="productSize" @ref="editFormProductSize">
+						<DataAnnotationsValidator/>
+						<div class="col">
+							<ValidationMessage For="@(() => productSize.Quantity)"/>
+							<ValidationMessage For="@(() => productSize.SizeId)"/>
+							<label class="mr-2" for="sizes">Size:</label>
 
-                            <input value="@productSize.Size" list="sizes" @onchange="e => SetSize(productSize, e.Value.ToString())" />
-                            <datalist id="sizes" name="sizes">
-                                @foreach (var size in _sizes)
-                                {
-                                    if (size.Id == productSize.SizeId)
-                                    {
-                                        <option>@size.Name</option>
-
-                                    }
-                                    else
-                                    {
-                                        <option>@size.Name</option>
-                                    }
-                                }
-                            </datalist>
-                            <label class="mr-2 ml-2" for="quantity">Quantity:</label>
-                            <input id="quantity" type="number" min="0" max="1000" @oninput="(e) => UpdateProductQuantity(_editProduct, productSize, e)" @bind-value="productSize.Quantity" />
-                            <div class="btn-group mt-1 mb-1" role="group">
-                                <button type="button" class="btn btn-dark" @onclick="() => AddQuantity(_editProduct, productSize)">+</button>
-                                <button type="button" class="btn btn-dark" @onclick="() => SubQuantity(_editProduct, productSize)">-</button>
-                                <button type="button" class="btn btn-dark" @onclick="() => RemoveSize(_editProduct, productSize)">Remove size</button>
+							<input value="@productSize.Size" list="sizes" @onchange="e => SetSize(productSize, e.Value.ToString())"/>
+							<datalist id="sizes" name="sizes">
+								@foreach (var size in _sizes)
+								{
+									if (size.Id == productSize.SizeId)
+									{
+										<option>@size.Name</option>
+									}
+									else
+									{
+										<option>@size.Name</option>
+									}
+								}
+							</datalist>
+							<label class="mr-2 ml-2" for="quantity">Quantity:</label>
+							<input id="quantity" type="number" min="0" max="1000" @oninput="e => UpdateProductQuantity(_editProduct, productSize, e)" @bind-value="productSize.Quantity"/>
+							<div class="btn-group mt-1 mb-1" role="group">
+								<button type="button" class="btn btn-dark" @onclick="() => AddQuantity(_editProduct, productSize)">+</button>
+								<button type="button" class="btn btn-dark" @onclick="() => SubQuantity(_editProduct, productSize)">-</button>
+								<button type="button" class="btn btn-dark" @onclick="() => RemoveSize(_editProduct, productSize)">Remove size</button>
 
                             </div>
                         </div>
@@ -92,294 +90,298 @@
 
                 }
                 <button class="btn btn-dark" type="button" @onclick="() => AddProductSize(_editProduct)">Add new size</button>
-
             </div>
 
-            <button type="button" @onclick="CancelEdit" class="btn btn-outline-dark">Cancel</button>
-            <button type="button" @onclick="SaveEdit" class="btn btn-dark">Save</button>
+			<button type="button" @onclick="CancelEdit" class="btn btn-outline-dark">Cancel</button>
+			<button type="button" @onclick="SaveEdit" class="btn btn-dark">Save</button>
 
-        </div>
-    }
-    <ProductsFilter Products="products" OnSearchStringChanged="Refresh"></ProductsFilter>
-    @if (products == null)
-    {
-        //  <p><em>Loading...</em></p>
-        <div class="spinner"></div>
-    }
-    else
-    {
-        <table class="table table-bordered table-hover">
-            <thead class="thead-dark">
-                <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Reference Number</th>
-                    <th scope="col">Quantity</th>
-                    <th scope="col">Options</th>
-                </tr>
-            </thead>
-            <tbody>
+		</div>
+	}
+	<ProductsFilter Products="products" OnSearchStringChanged="Refresh"></ProductsFilter>
+	@if (products == null)
+	{
+		//  <p><em>Loading...</em></p>
+		<div class="spinner"></div>
+	}
+	else
+	{
+		<table class="table table-bordered table-hover">
+			<thead class="thead-dark">
+			<tr>
+				<th scope="col">Name</th>
+				<th scope="col">Reference Number</th>
+				<th scope="col">Quantity</th>
+				<th scope="col">Options</th>
+			</tr>
+			</thead>
+			<tbody>
 
-                @foreach (var product in products.Where(p => p.IsVisible))
-                {
-                    <tr>
-
-
-                        <td>@product.Name</td>
-                        <td>@product.ReferenceNumber</td>
-                        <td>@product.Quantity</td>
-                        <td>
-                            <div class="btn-group justify-content-center" role="group" aria-label="Basic example">
-                                <button @onclick="() => Toggle(product)" type="button" class="btn btn-outline-dark show"> @(product.IsHidden ? "Details" : "Hide")</button>
-                                <button type="submit" @onclick="() => EditProduct(product)" class="btn btn-dark">Edit</button>
-                                <button @onclick="() => OpenDeleteDialog(product)" type="button" class="btn btn-dark">Remove</button>
-                            </div>
-                        </td>
+			@foreach (var product in products.Where(p => p.IsVisible))
+			{
+				<tr>
 
 
-                    </tr>
+					<td>@product.Name</td>
+					<td>@product.ReferenceNumber</td>
+					<td>@product.Quantity</td>
+					<td>
+						<div class="btn-group justify-content-center" role="group" aria-label="Basic example">
+							<button @onclick="() => Toggle(product)" type="button" class="btn btn-outline-dark show"> @(product.IsHidden ? "Details" : "Hide")</button>
+							<button type="submit" @onclick="() => EditProduct(product)" class="btn btn-dark">Edit</button>
+							<button @onclick="() => OpenDeleteDialog(product)" type="button" class="btn btn-dark">Remove</button>
+						</div>
+					</td>
 
-                    <div id="info" style="width: 198%" hidden="@product.IsHidden">
-                        <div class="form-row">
-                            <div class="form-control col-3">
 
-                                <p class="card-text mt-2">Available sizes:</p>
-                                <table class="table">
-                                    <thead class="thead-dark">
-                                        <tr>
-                                            <th scope="col">Size</th>
-                                            <th scope="col">Quantity</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var productSize in product.AvailableSizes)
-                                        {
-                                            <tr>
-                                                <td>@productSize.Size</td>
-                                                <td>@productSize.Quantity</td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
+				</tr>
 
-                            </div>
+				<div id="info" style="width: 198%" hidden="@product.IsHidden">
+					<div class="form-row">
+						<div class="form-control col-3">
 
-                            <div class="form-control col-9">
-                                <label class="d-flex">Model image</label>
-                                @if (!string.IsNullOrEmpty(product.ImgUrl))
-                                {
-                                    <img class="d-flex" style="max-width: 20rem" src="data:image/png;base64,@product.ImgUrl" />
-                                }
-                                else
-                                {
-                                    <img class="d-flex" style="max-width: 20rem" src="@storageUrl/@product.Id" />
-                                }
-                            </div>
-                        </div>
-                    </div>
-                }
+							<p class="card-text mt-2">Available sizes:</p>
+							<table class="table">
+								<thead class="thead-dark">
+								<tr>
+									<th scope="col">Size</th>
+									<th scope="col">Quantity</th>
+								</tr>
+								</thead>
+								<tbody>
+								@foreach (var productSize in product.AvailableSizes)
+								{
+									<tr>
+										<td>@productSize.Size</td>
+										<td>@productSize.Quantity</td>
+									</tr>
+								}
+								</tbody>
+							</table>
 
-            </tbody>
-        </table>
-    }
+						</div>
+
+						<div class="form-control col-9">
+							<label class="d-flex">Model image</label>
+							@if (!string.IsNullOrEmpty(product.ImgUrl))
+							{
+								<img class="d-flex" style="max-width: 20rem" src="data:image/png;base64,@product.ImgUrl"/>
+							}
+							else
+							{
+								<img class="d-flex" style="max-width: 20rem" src="@storageUrl/@product.Id"/>
+							}
+						</div>
+					</div>
+				</div>
+			}
+
+			</tbody>
+		</table>
+	}
 </div>
 
 @code
 {
-    private List<ProductDto>? products;
-    private List<SizeDto>? _sizes;
-    private UpdateProductDto? _editProduct;
-    private ProductDto? _confirmEditProduct;
-    private EditForm editFormProduct;
-    private EditForm editFormProductSize;
-    private ProductDto _productToDelete { get; set; }
-    private string storageUrl;
+	private List<ProductDto>? products;
+	private List<SizeDto>? _sizes;
+	private UpdateProductDto? _editProduct;
+	private ProductDto? _confirmEditProduct;
+	private EditForm editFormProduct;
+	private EditForm editFormProductSize;
+	private ProductDto _productToDelete { get; set; }
+	private string storageUrl;
 
 
-    private ModelDialogBase DeleteDialog { get; set; }
+	private ModelDialogBase DeleteDialog { get; set; }
 
-    protected override async Task OnInitializedAsync()
-    {
-        storageUrl = Configuration.GetValue<string>("StorageAddress");
-        products = await ProductService.GetAllAsync();
-        _sizes = await SizeService.GetAllAsync();
-        DeleteDialog.Close();
-    }
-    private void Toggle(ProductDto product)
-    {
-        product.IsHidden = !product.IsHidden;
-    }
-    private void SetSize(UpdateProductSizeDto updateDto, string size)
-    {
-        if (string.IsNullOrEmpty(size))
-        {
-            updateDto.SizeId = default;
-            return;
+	protected override async Task OnInitializedAsync()
+	{
+		storageUrl = Configuration.GetValue<string>("StorageAddress");
+		products = await ProductService.GetAllAsync();
+		_sizes = await SizeService.GetAllAsync();
+		DeleteDialog.Close();
+	}
 
-        }
+	private void Toggle(ProductDto product)
+	{
+		product.IsHidden = !product.IsHidden;
+	}
 
-        updateDto.Size = size;
-        var selectedSize = _sizes.FirstOrDefault(s => s.Name == size);
+	private void SetSize(UpdateProductSizeDto updateDto, string size)
+	{
+		if (string.IsNullOrEmpty(size))
+		{
+			updateDto.SizeId = default;
+			return;
+		}
 
-        if (selectedSize is null)
-        {
-            updateDto.SizeId = default;
-            return;
+		updateDto.Size = size;
+		var selectedSize = _sizes.FirstOrDefault(s => s.Name == size);
 
-        }
+		if (selectedSize is null)
+		{
+			updateDto.SizeId = default;
+			return;
+		}
 
-        updateDto.SizeId = selectedSize.Id;
-        updateDto.Size = selectedSize.Name;
-    }
+		updateDto.SizeId = selectedSize.Id;
+		updateDto.Size = selectedSize.Name;
+	}
 
-    private void OpenDeleteDialog(ProductDto productToDelete)
-    {
-        if (productToDelete is null)
-        {
-            throw new Exception("Something went wrong during deleting");
-        }
-        _productToDelete = productToDelete;
-        DeleteDialog.Show();
-    }
-    protected async void OnRemoveDialogClose(bool deleteConfirmed)
-    {
-        if (deleteConfirmed)
-        {
-            try
-            {
-                bool isRemoved = await ProductService.Remove(_productToDelete.Id);
-                if (isRemoved)
-                {
-                    _productToDelete.IsVisible = false;
-                    products.Remove(_productToDelete);
-                    _productToDelete = null;
+	private void OpenDeleteDialog(ProductDto productToDelete)
+	{
+		if (productToDelete is null)
+		{
+			throw new Exception("Something went wrong during deleting");
+		}
+		_productToDelete = productToDelete;
+		DeleteDialog.Show();
+	}
 
-                    StateHasChanged();
-                    Toast.ShowToast("Removed successfully", ToastLevel.Success);
-                }
-                else
-                {
-                    Toast.ShowToast("Something went wrong during removing", ToastLevel.Error);
-                }
-            }
-            catch (Exception ex)
-            {
-                Toast.ShowToast("Something went wrong: " + ex.Message, ToastLevel.Error);
-            }
-        }
-    }
-    private void AddQuantity(UpdateProductDto product, UpdateProductSizeDto productSize)
-    {
-        if (productSize.Quantity == 1000)
-            return;
-        product.Quantity++;
-        productSize.Quantity++;
-    }
-    private void SubQuantity(UpdateProductDto product, UpdateProductSizeDto productSize)
-    {
-        if (productSize.Quantity == 0)
-            return;
-        product.Quantity--;
-        productSize.Quantity--;
-    }
+	protected async void OnRemoveDialogClose(bool deleteConfirmed)
+	{
+		if (deleteConfirmed)
+		{
+			try
+			{
+				var isRemoved = await ProductService.Remove(_productToDelete.Id);
+				if (isRemoved)
+				{
+					_productToDelete.IsVisible = false;
+					products.Remove(_productToDelete);
+					_productToDelete = null;
 
-    private void UpdateProductQuantity(UpdateProductDto product, UpdateProductSizeDto productSize, ChangeEventArgs e)
-    {
-        int value = 0;
-        if (!string.IsNullOrWhiteSpace(e.Value.ToString()))
-        {
-            value = int.Parse(e.Value.ToString());
-        }
-        productSize.Quantity = value;
-        product.Quantity = product.AvailableSizes.Sum(s => s.Quantity);
-    }
+					StateHasChanged();
+					Toast.ShowToast("Removed successfully", ToastLevel.Success);
+				}
+				else
+				{
+					Toast.ShowToast("Something went wrong during removing", ToastLevel.Error);
+				}
+			}
+			catch (Exception ex)
+			{
+				Toast.ShowToast("Something went wrong: " + ex.Message, ToastLevel.Error);
+			}
+		}
+	}
 
-    private void RemoveSize(UpdateProductDto product, UpdateProductSizeDto productSize)
-    {
-        product.Quantity -= productSize.Quantity;
-        product.AvailableSizes.Remove(productSize);
-    }
+	private void AddQuantity(UpdateProductDto product, UpdateProductSizeDto productSize)
+	{
+		if (productSize.Quantity == 1000)
+			return;
+		product.Quantity++;
+		productSize.Quantity++;
+	}
 
-    private void AddProductSize(UpdateProductDto product)
-    {
-        product.AvailableSizes.Add(new UpdateProductSizeDto());
-    }
-    private async Task OnInputFileChange(InputFileChangeEventArgs e, UpdateProductDto dto)
-    {
-        var fileFormat = "image/png";
-        int maxFileSizeInKB = 1024 * 100;
-        if (e.File.ContentType != fileFormat)
-        {
-            Toast.ShowToast("You can only add images in .png format!", ToastLevel.Error);
-            return;
-        }
-        if (e.File.Size > maxFileSizeInKB)
-        {
-            Toast.ShowToast("Max size of image is 100kB!", ToastLevel.Error);
-            return;
-        }
+	private void SubQuantity(UpdateProductDto product, UpdateProductSizeDto productSize)
+	{
+		if (productSize.Quantity == 0)
+			return;
+		product.Quantity--;
+		productSize.Quantity--;
+	}
 
-        var buffer = new byte[e.File.Size];
-        await e.File.OpenReadStream().ReadAsync(buffer);
-        dto.ThumbnailPath = Convert.ToBase64String(buffer);
-        this.StateHasChanged();
-    }
+	private void UpdateProductQuantity(UpdateProductDto product, UpdateProductSizeDto productSize, ChangeEventArgs e)
+	{
+		var value = 0;
+		if (!string.IsNullOrWhiteSpace(e.Value.ToString()))
+		{
+			value = int.Parse(e.Value.ToString());
+		}
+		productSize.Quantity = value;
+		product.Quantity = product.AvailableSizes.Sum(s => s.Quantity);
+	}
 
-    private async void EditProduct(ProductDto editProduct)
-    {
-        _confirmEditProduct = editProduct;
-        _editProduct = new UpdateProductDto()
-            {
-                Name = editProduct.Name,
-                ReferenceNumber = editProduct.ReferenceNumber,
-                AvailableSizes = editProduct.AvailableSizes.Select(s => new UpdateProductSizeDto()
-                {
-                    Quantity = s.Quantity,
-                    SizeId = s.SizeId,
-                    Size = s.Size
-                }).ToList()
-            };
-        await JsRuntime.InvokeVoidAsync("ScrollTop");
-    }
-    private void CancelEdit()
-    {
-        _confirmEditProduct = null;
-        _editProduct = null;
-    }
+	private void RemoveSize(UpdateProductDto product, UpdateProductSizeDto productSize)
+	{
+		product.Quantity -= productSize.Quantity;
+		product.AvailableSizes.Remove(productSize);
+	}
 
-    private async void SaveEdit()
-    {
-        if (_confirmEditProduct == null || _editProduct == null)
-            return;
-        if (editFormProductSize.EditContext != null && editFormProduct.EditContext != null && (!editFormProduct.EditContext.Validate() || !editFormProductSize.EditContext.Validate()))
-        {
-            return;
-            ;
-        }
-        try
-        {
-            var updatedDto = await ProductService.Update(_confirmEditProduct.Id, _editProduct);
+	private void AddProductSize(UpdateProductDto product)
+	{
+		product.AvailableSizes.Add(new UpdateProductSizeDto());
+	}
 
-            _confirmEditProduct.Name = updatedDto.Name;
-            _confirmEditProduct.ReferenceNumber = updatedDto.ReferenceNumber;
-            _confirmEditProduct.Quantity = updatedDto.Quantity;
-            _confirmEditProduct.AvailableSizes = updatedDto.AvailableSizes;
-            if (!string.IsNullOrEmpty(_editProduct.ThumbnailPath))
-            {
-                _confirmEditProduct.ImgUrl = _editProduct.ThumbnailPath;
-            }
-            CancelEdit();
-            StateHasChanged();
+	private async Task OnInputFileChange(InputFileChangeEventArgs e, UpdateProductDto dto)
+	{
+		var fileFormat = "image/png";
+		var maxFileSizeInKB = 1024 * 100;
+		if (e.File.ContentType != fileFormat)
+		{
+			Toast.ShowToast("You can only add images in .png format!", ToastLevel.Error);
+			return;
+		}
+		if (e.File.Size > maxFileSizeInKB)
+		{
+			Toast.ShowToast("Max size of image is 100kB!", ToastLevel.Error);
+			return;
+		}
 
-            Toast.ShowToast("Updated successfully", ToastLevel.Success);
-        }
-        catch (Exception ex)
-        {
-            Toast.ShowToast("Something went wrong: " + ex.Message, ToastLevel.Error);
-        }
-    }
+		var buffer = new byte[e.File.Size];
+		await e.File.OpenReadStream().ReadAsync(buffer);
+		dto.ThumbnailPath = Convert.ToBase64String(buffer);
+		StateHasChanged();
+	}
 
-    private void Refresh()
-    {
-        StateHasChanged();
-    }
+	private async void EditProduct(ProductDto editProduct)
+	{
+		_confirmEditProduct = editProduct;
+		_editProduct = new UpdateProductDto
+		{
+			Name = editProduct.Name,
+			ReferenceNumber = editProduct.ReferenceNumber,
+			AvailableSizes = editProduct.AvailableSizes.Select(s => new UpdateProductSizeDto
+			{
+				Quantity = s.Quantity,
+				SizeId = s.SizeId,
+				Size = s.Size
+			}).ToList()
+		};
+		await JsRuntime.InvokeVoidAsync("ScrollTop");
+	}
+
+	private void CancelEdit()
+	{
+		_confirmEditProduct = null;
+		_editProduct = null;
+	}
+
+	private async void SaveEdit()
+	{
+		if (_confirmEditProduct == null || _editProduct == null)
+			return;
+		if (editFormProductSize.EditContext != null && editFormProduct.EditContext != null && (!editFormProduct.EditContext.Validate() || !editFormProductSize.EditContext.Validate()))
+		{
+			return;
+			;
+		}
+		try
+		{
+			var updatedDto = await ProductService.Update(_confirmEditProduct.Id, _editProduct);
+
+			_confirmEditProduct.Name = updatedDto.Name;
+			_confirmEditProduct.ReferenceNumber = updatedDto.ReferenceNumber;
+			_confirmEditProduct.Quantity = updatedDto.Quantity;
+			_confirmEditProduct.AvailableSizes = updatedDto.AvailableSizes;
+			if (!string.IsNullOrEmpty(_editProduct.ThumbnailPath))
+			{
+				_confirmEditProduct.ImgUrl = _editProduct.ThumbnailPath;
+			}
+			CancelEdit();
+			StateHasChanged();
+
+			Toast.ShowToast("Updated successfully", ToastLevel.Success);
+		}
+		catch (Exception ex)
+		{
+			Toast.ShowToast("Something went wrong: " + ex.Message, ToastLevel.Error);
+		}
+	}
+
+	private void Refresh()
+	{
+		StateHasChanged();
+	}
 }
