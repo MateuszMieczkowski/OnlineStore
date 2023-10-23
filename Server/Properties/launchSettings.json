@@ -8,7 +8,7 @@
     }
   },
   "profiles": {
-    "SneakersBase.Server": {
+    "OnlineStore.Server": {
       "commandName": "Project",
       "launchBrowser": false,
       "environmentVariables": {

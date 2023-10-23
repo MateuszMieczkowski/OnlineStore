@@ -1,25 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SneakersBase.Shared.Models;
+﻿using OnlineStore.Shared.Models;
 
-namespace SneakersBase.Client.Brokers.API
+namespace OnlineStore.Client.Brokers.API;
+
+public partial class ApiBroker
 {
-    public partial class ApiBroker
+    private const string SizeRelativeUrl = "api/size";
+
+    public async Task<List<SizeDto>> GetSizesAsync()
     {
-        private const string SizeRelativeUrl = "api/size";
+        return await GetWithAuthAsync<List<SizeDto>>(SizeRelativeUrl);
+    }
 
-        public async Task<List<SizeDto>> GetSizesAsync() => await GetWithAuthAsync<List<SizeDto>>(SizeRelativeUrl);
+    public async Task<SizeDto> PostSizeAsync(CreateSizeDto dto)
+    {
+        return await PostAsync<CreateSizeDto, SizeDto>(SizeRelativeUrl, dto);
+    }
 
-        public async Task<SizeDto> PostSizeAsync(CreateSizeDto dto) =>
-            await PostAsync<CreateSizeDto, SizeDto>(SizeRelativeUrl, dto);
+    public async Task<SizeDto> UpdateSizeAsync(Guid id, UpdateSizeDto dto)
+    {
+        return await PutAsync<UpdateSizeDto, SizeDto>(SizeRelativeUrl + $"/{id}", dto);
+    }
 
-        public async Task<SizeDto> UpdateSizeAsync(Guid id, UpdateSizeDto dto) =>
-            await PutAsync<UpdateSizeDto, SizeDto>(SizeRelativeUrl + $"/{id}", dto);
-
-        public async Task<bool> RemoveSizeAsync(Guid id) =>
-            await DeleteAsync(SizeRelativeUrl + $"/{id}");
+    public async Task<bool> RemoveSizeAsync(Guid id)
+    {
+        return await DeleteAsync(SizeRelativeUrl + $"/{id}");
     }
 }

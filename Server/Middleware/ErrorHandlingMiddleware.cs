@@ -1,50 +1,43 @@
-﻿using System;
-using System.Buffers;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SneakersBase.Server.Services.Exceptions;
+﻿using OnlineStore.Server.Services.Exceptions;
 
-namespace SneakersBase.Server.Middleware
+namespace OnlineStore.Server.Middleware;
+
+public class ErrorHandlingMiddleware : IMiddleware
 {
-    public class ErrorHandlingMiddleware : IMiddleware
+    private readonly ILogger<ErrorHandlingMiddleware> _logger;
+
+    public ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> logger)
     {
-        private readonly ILogger<ErrorHandlingMiddleware> _logger;
+        _logger = logger;
+    }
 
-        public ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> logger)
+    public async Task InvokeAsync(HttpContext context, RequestDelegate next)
+    {
+        try
         {
-            _logger = logger;
+            await next.Invoke(context);
         }
-        public async Task InvokeAsync(HttpContext context, RequestDelegate next)
+        catch (BadRequestException badRequestException)
         {
-            try
-            {
-                await next.Invoke(context);
-            }
-            catch (BadRequestException badRequestException)
-            {
-                context.Response.StatusCode = 400;
-                await context.Response.WriteAsync(badRequestException.Message);
-            }
-            catch (NotFoundException notFoundException)
-            {
-                context.Response.StatusCode = 404;
-                await context.Response.WriteAsync(notFoundException.Message);
-            }
-            catch (DuplicateException duplicateException)
-            {
-                context.Response.StatusCode = 409;
-                await context.Response.WriteAsync(duplicateException.Message);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, e.Message);
+            context.Response.StatusCode = 400;
+            await context.Response.WriteAsync(badRequestException.Message);
+        }
+        catch (NotFoundException notFoundException)
+        {
+            context.Response.StatusCode = 404;
+            await context.Response.WriteAsync(notFoundException.Message);
+        }
+        catch (DuplicateException duplicateException)
+        {
+            context.Response.StatusCode = 409;
+            await context.Response.WriteAsync(duplicateException.Message);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, e.Message);
 
-                context.Response.StatusCode = 500;
-                await context.Response.WriteAsync(e.Message);
-            }
+            context.Response.StatusCode = 500;
+            await context.Response.WriteAsync(e.Message);
         }
     }
 }
-

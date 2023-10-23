@@ -22,9 +22,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Client\SneakersBase.Client.csproj" />
-    <ProjectReference Include="..\Server\SneakersBase.Server.csproj" />
-    <ProjectReference Include="..\Shared\SneakersBase.Shared.csproj" />
+    <ProjectReference Include="..\Client\OnlineStore.Client.csproj" />
+    <ProjectReference Include="..\Server\OnlineStore.Server.csproj" />
+    <ProjectReference Include="..\Shared\OnlineStore.Shared.csproj" />
   </ItemGroup>
 
 </Project>

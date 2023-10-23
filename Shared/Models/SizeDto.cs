@@ -1,8 +1,7 @@
-﻿namespace SneakersBase.Shared.Models
+﻿namespace OnlineStore.Shared.Models;
+
+public class SizeDto
 {
-    public class SizeDto
-    {
-        public Guid Id { get; set; }
-        public string Name { get; set; }
-    }
+    public Guid Id { get; set; }
+    public string Name { get; set; }
 }

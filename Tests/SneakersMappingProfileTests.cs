@@ -1,5 +1,6 @@
 
 using AutoMapper;
+using OnlineStore.Shared.Models;
 using SneakersBase.Server;
 
 namespace SneakerBaseTests

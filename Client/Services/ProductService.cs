@@ -1,40 +1,42 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SneakersBase.Client.Brokers.API;
-using SneakersBase.Shared.Models;
+﻿using OnlineStore.Client.Brokers.API;
+using OnlineStore.Shared.Models;
 
-namespace SneakersBase.Client.Services
+namespace OnlineStore.Client.Services;
+
+public interface IProductService
 {
-    public interface IProductService
+    Task<List<ProductDto>> GetAllAsync();
+    Task<bool> CreateProducts(List<CreateProductDto> dtos);
+    Task<ProductDto> Update(int id, UpdateProductDto dto);
+    Task<bool> Remove(int id);
+}
+
+public class ProductService : IProductService
+{
+    private readonly IApiBroker _broker;
+
+    public ProductService(IApiBroker broker)
     {
-        Task<List<ProductDto>> GetAllAsync();
-        Task<bool> CreateProducts(List<CreateProductDto> dtos);
-        Task<ProductDto> Update(int id, UpdateProductDto dto);
-        Task<bool> Remove(int id);
+        _broker = broker;
     }
 
-    public class ProductService : IProductService
+    public async Task<List<ProductDto>> GetAllAsync()
     {
-        private readonly IApiBroker _broker;
+        return await _broker.GetProductsAsync();
+    }
 
-        public ProductService(IApiBroker broker)
-        {
-            _broker = broker;
-        }
+    public async Task<bool> CreateProducts(List<CreateProductDto> dtos)
+    {
+        return await _broker.PostProductsAsync(dtos);
+    }
 
-        public async Task<List<ProductDto>> GetAllAsync() =>
-            await _broker.GetProductsAsync();
+    public async Task<ProductDto> Update(int id, UpdateProductDto dto)
+    {
+        return await _broker.UpdateProductAsync(id, dto);
+    }
 
-        public async Task<bool> CreateProducts(List<CreateProductDto> dtos) =>
-            await _broker.PostProductsAsync(dtos);
-
-        public async Task<ProductDto> Update(int id, UpdateProductDto dto) =>
-            await _broker.UpdateProductAsync(id, dto);
-
-        public async Task<bool> Remove(int id) =>
-            await _broker.RemoveProductAsync(id);
+    public async Task<bool> Remove(int id)
+    {
+        return await _broker.RemoveProductAsync(id);
     }
 }
