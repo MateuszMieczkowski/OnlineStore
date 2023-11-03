@@ -38,7 +38,7 @@ public class AccountService : IAccountService
     {
         var newUser = new User
         {
-            Login = dto.Login,
+            Email = dto.Login,
             RoleId = dto.RoleId
         };
         newUser.PasswordHash = _passwordHasher.HashPassword(newUser, dto.Password);
@@ -51,7 +51,7 @@ public class AccountService : IAccountService
     {
         var user = _context.Users
             .Include(u => u.Role)
-            .FirstOrDefault(x => x.Login == dto.Login);
+            .FirstOrDefault(x => x.Email == dto.Login);
         if (user is null) throw new BadRequestException("Invalid username or password");
 
         var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, dto.Password);
@@ -62,7 +62,7 @@ public class AccountService : IAccountService
         var claims = new List<Claim>
         {
             new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new(ClaimTypes.Name, user.Login),
+            new(ClaimTypes.Name, user.Email),
             new(ClaimTypes.Role, user.Role.Name)
         };
 

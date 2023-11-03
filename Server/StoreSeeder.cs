@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using OnlineStore.Server.Authentication;
 using OnlineStore.Server.Entities;
 
 namespace OnlineStore.Server;
@@ -6,89 +8,84 @@ namespace OnlineStore.Server;
 public class StoreSeeder
 {
     private readonly OnlineStoreDbContext _dbContext;
+    private readonly IPasswordHasher<User> _passwordHasher;
 
-    public StoreSeeder(OnlineStoreDbContext dbContext)
+    public StoreSeeder(OnlineStoreDbContext dbContext, IPasswordHasher<User> passwordHasher)
     {
         _dbContext = dbContext;
+        _passwordHasher = passwordHasher;
     }
 
-    public void SeedProduction()
+    public void Seed()
     {
-        if (_dbContext.Database.CanConnect())
-        {
-            var pendingMigrations = _dbContext.Database.GetPendingMigrations();
-            if (pendingMigrations.Any()) _dbContext.Database.Migrate();
+        if (!_dbContext.Database.CanConnect()) return;
 
-            if (!_dbContext.Roles.Any())
+        var pendingMigrations = _dbContext.Database.GetPendingMigrations();
+        if (pendingMigrations.Any()) _dbContext.Database.Migrate();
+
+        if (!_dbContext.TaxRates.Any())
+        {
+            var taxRates = GetTaxRates();
+            _dbContext.TaxRates.AddRange(taxRates);
+            _dbContext.SaveChanges();
+        }
+
+        if (!_dbContext.Roles.Any())
+        {
+            var roles = GetRoles();
+            _dbContext.Roles.AddRange(roles);
+            _dbContext.SaveChanges();
+        }
+
+        if (!_dbContext.Users.Any(x => x.Role.Name == UserRoles.Admin))
+        {
+            var roleId = _dbContext.Roles.First(x => x.Name == UserRoles.Admin).Id;
+            var admin = new User()
             {
-                var roles = GetRoles();
-                _dbContext.Roles.AddRange(roles);
-                _dbContext.SaveChanges();
-            }
+                Email = "admin@onlinestore.pl",
+                RoleId = roleId
+            };
+            var password = _passwordHasher.HashPassword(admin, "admin123");
+            admin.PasswordHash = password;
+            _dbContext.Add(admin);
+            _dbContext.SaveChanges();
         }
     }
 
-    public void SeedDebug()
+    private IEnumerable<TaxRate> GetTaxRates()
     {
-        if (_dbContext.Database.CanConnect())
+        return new[]
         {
-            var pendingMigrations = _dbContext.Database.GetPendingMigrations();
-            if (pendingMigrations.Any()) _dbContext.Database.Migrate();
-
-            if (!_dbContext.Sizes.Any())
+            new TaxRate()
             {
-                var sizes = GetSizes();
-                _dbContext.Sizes.AddRange(sizes);
-                _dbContext.SaveChanges();
-            }
-
-            if (!_dbContext.Products.Any())
+                Amount = 23,
+                Description = "23%"
+            },
+            new TaxRate()
             {
-                var products = GetProducts();
-                _dbContext.Products.AddRange(products);
-                _dbContext.SaveChanges();
-            }
-
-            if (!_dbContext.Roles.Any())
+                Amount = 8,
+                Description = "8%"
+            },
+            new TaxRate()
             {
-                var roles = GetRoles();
-                _dbContext.Roles.AddRange(roles);
-                _dbContext.SaveChanges();
+                Amount = 5,
+                Description = "5%",
+            },
+            new TaxRate() {
+                Amount = 0,
+                Description = "0%"
+            },
+            new TaxRate() {
+                Amount = 0,
+                Description = "ZW"
+            },
+            new TaxRate() {
+                Amount = 0,
+                Description = "NP"
             }
-        }
+        };
     }
 
-
-    public IEnumerable<Product> GetProducts()
-    {
-        var random = new Random();
-        var size = _dbContext.Sizes.First();
-        var list = Enumerable.Range(1, 100).Select(index => new Product
-        {
-            Name = $"Jordan 1 Mid Triple White 2.0 ({Random.Shared.Next(2012, 2022)})",
-            ReferenceNumber = $"{Random.Shared.Next(111111, 9999999)}-{Random.Shared.Next(100, 999)}",
-            AvailableSizes = new List<ProductSize>
-            {
-                new()
-                {
-                    Quantity = Random.Shared.Next(10, 55),
-                    Size = size
-                }
-            }
-        }).ToList();
-
-        return list;
-    }
-
-    private IEnumerable<Size> GetSizes()
-    {
-        var list = Enumerable.Range(1, 5).Select(index => new Size
-        {
-            Name = $"{Random.Shared.Next(35, 46)}"
-        }).ToList();
-
-        return list;
-    }
 
     private IEnumerable<Role> GetRoles()
     {
@@ -96,15 +93,11 @@ public class StoreSeeder
         {
             new()
             {
-                Name = "User"
+                Name = UserRoles.Admin
             },
             new()
             {
-                Name = "Manager"
-            },
-            new()
-            {
-                Name = "Admin"
+                Name = UserRoles.User
             }
         };
 

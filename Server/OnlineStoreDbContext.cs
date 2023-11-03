@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Reflection;
+using Microsoft.EntityFrameworkCore;
 using OnlineStore.Server.Entities;
 
 namespace OnlineStore.Server;
@@ -9,45 +10,23 @@ public class OnlineStoreDbContext : DbContext
     {
     }
 
-    public DbSet<Product> Products { get; set; }
-    public DbSet<Size> Sizes { get; set; }
-    public DbSet<ProductSize> ProductSizes { get; set; }
-    public DbSet<User> Users { get; set; }
-    public DbSet<Role> Roles { get; set; }
+    public DbSet<Product> Products { get; set; } = null!;
+    public DbSet<ProductCategory> ProductCategories { get; set; } = null!;
+    public DbSet<ProductFile> ProductFiles { get; set; } = null!;
+    public DbSet<Order> Orders { get; set; } = null!;
+    public DbSet<OrderItem> OrdersItems { get; set; } = null!;
+    public DbSet<OrderAddress> OrdersAddresses { get; set; } = null!;
+    public DbSet<Email> Emails { get; set; } = null!;
+    public DbSet<EmailTemplate> EmailTemplates { get; set; } = null!;
+    public DbSet<RemindPasswordRequest> RemindPasswordRequests { get; set; } = null!;
+    public DbSet<TaxRate> TaxRates { get; set; } = null!;
+    public DbSet<UserPreference> UserPreferences { get; set; } = null!;
+    public DbSet<User> Users { get; set; } = null!;
+    public DbSet<Role> Roles { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Product>(eb =>
-        {
-            eb.Property(p => p.Name)
-                .IsRequired()
-                .HasMaxLength(100);
-            eb.Property(p => p.Name)
-                .IsRequired()
-                .HasMaxLength(100);
-        });
-
-
-        modelBuilder.Entity<Product>()
-            .Property(p => p.ReferenceNumber)
-            .IsRequired()
-            .HasMaxLength(50);
-
-        modelBuilder.Entity<Size>()
-            .Property(s => s.Name)
-            .IsRequired();
-
-
-        modelBuilder.Entity<ProductSize>()
-            .Property(p => p.Quantity)
-            .IsRequired();
-
-        modelBuilder.Entity<User>()
-            .Property(u => u.Login)
-            .IsRequired();
-
-        modelBuilder.Entity<Role>()
-            .Property(r => r.Name)
-            .IsRequired();
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
 }
