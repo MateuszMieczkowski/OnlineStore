@@ -12,7 +12,7 @@ using OnlineStore.Server;
 namespace OnlineStore.Server.Migrations
 {
     [DbContext(typeof(OnlineStoreDbContext))]
-    [Migration("20231103211820_InitialMigration")]
+    [Migration("20231104194144_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -95,6 +95,12 @@ namespace OnlineStore.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("ClientId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ClientId1")
+                        .HasColumnType("int");
+
                     b.Property<int>("OrderAddressId")
                         .HasColumnType("int");
 
@@ -107,14 +113,13 @@ namespace OnlineStore.Server.Migrations
                     b.Property<decimal>("TotalNet")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("OrderAddressId");
+                    b.HasIndex("ClientId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("ClientId1");
+
+                    b.HasIndex("OrderAddressId");
 
                     b.ToTable("Orders");
                 });
@@ -279,6 +284,10 @@ namespace OnlineStore.Server.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<string>("FileName")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -316,24 +325,6 @@ namespace OnlineStore.Server.Migrations
                     b.ToTable("RemindPasswordRequests");
                 });
 
-            modelBuilder.Entity("OnlineStore.Server.Entities.Role", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Roles");
-                });
-
             modelBuilder.Entity("OnlineStore.Server.Entities.TaxRate", b =>
                 {
                     b.Property<int>("Id")
@@ -363,6 +354,10 @@ namespace OnlineStore.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -373,23 +368,28 @@ namespace OnlineStore.Server.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<int>("RoleId")
+                    b.Property<int>("UserRole")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RoleId");
-
                     b.ToTable("Users");
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("User");
+
+                    b.UseTphMappingStrategy();
                 });
 
-            modelBuilder.Entity("OnlineStore.Server.Entities.UserPreference", b =>
+            modelBuilder.Entity("OnlineStore.Server.Entities.UserPreferences", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("DisplayedPrice")
+                        .HasColumnType("int");
 
                     b.Property<int>("UITheme")
                         .HasColumnType("int");
@@ -405,23 +405,34 @@ namespace OnlineStore.Server.Migrations
                     b.ToTable("UserPreferences");
                 });
 
+            modelBuilder.Entity("OnlineStore.Server.Entities.Client", b =>
+                {
+                    b.HasBaseType("OnlineStore.Server.Entities.User");
+
+                    b.HasDiscriminator().HasValue("Client");
+                });
+
             modelBuilder.Entity("OnlineStore.Server.Entities.Order", b =>
                 {
+                    b.HasOne("OnlineStore.Server.Entities.Client", "Client")
+                        .WithMany()
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("OnlineStore.Server.Entities.Client", null)
+                        .WithMany("Orders")
+                        .HasForeignKey("ClientId1");
+
                     b.HasOne("OnlineStore.Server.Entities.OrderAddress", "Address")
                         .WithMany()
                         .HasForeignKey("OrderAddressId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("OnlineStore.Server.Entities.User", "User")
-                        .WithMany("Orders")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Address");
 
-                    b.Navigation("User");
+                    b.Navigation("Client");
                 });
 
             modelBuilder.Entity("OnlineStore.Server.Entities.OrderItem", b =>
@@ -487,22 +498,11 @@ namespace OnlineStore.Server.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("OnlineStore.Server.Entities.User", b =>
-                {
-                    b.HasOne("OnlineStore.Server.Entities.Role", "Role")
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Role");
-                });
-
-            modelBuilder.Entity("OnlineStore.Server.Entities.UserPreference", b =>
+            modelBuilder.Entity("OnlineStore.Server.Entities.UserPreferences", b =>
                 {
                     b.HasOne("OnlineStore.Server.Entities.User", "User")
                         .WithOne()
-                        .HasForeignKey("OnlineStore.Server.Entities.UserPreference", "UserId")
+                        .HasForeignKey("OnlineStore.Server.Entities.UserPreferences", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -524,7 +524,7 @@ namespace OnlineStore.Server.Migrations
                     b.Navigation("Products");
                 });
 
-            modelBuilder.Entity("OnlineStore.Server.Entities.User", b =>
+            modelBuilder.Entity("OnlineStore.Server.Entities.Client", b =>
                 {
                     b.Navigation("Orders");
                 });

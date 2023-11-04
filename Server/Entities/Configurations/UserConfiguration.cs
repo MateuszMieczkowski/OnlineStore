@@ -16,18 +16,6 @@ namespace OnlineStore.Server.Entities.Configurations
             builder.Property(e => e.PasswordHash)
                 .IsRequired()
                 .HasMaxLength(255);
-
-            builder.HasOne(e => e.Role)
-                .WithMany()
-                .HasForeignKey(e => e.RoleId)
-                .IsRequired()
-                .OnDelete(DeleteBehavior.Cascade);
-
-            builder.HasMany(e => e.Orders)
-                .WithOne(e => e.User)
-                .HasForeignKey(e => e.UserId)
-                .IsRequired()
-                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

@@ -27,9 +27,9 @@ namespace OnlineStore.Server.Entities.Configurations
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasOne(e => e.User)
+            builder.HasOne(e => e.Client)
                 .WithMany()
-                .HasForeignKey(e => e.UserId)
+                .HasForeignKey(e => e.ClientId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
 

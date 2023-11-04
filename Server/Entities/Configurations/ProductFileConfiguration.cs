@@ -25,6 +25,9 @@ namespace OnlineStore.Server.Entities.Configurations
                 .HasForeignKey(e => e.ProductId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Property(x => x.Description)
+                .HasMaxLength(500);
         }
     }
 }

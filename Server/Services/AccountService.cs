@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using OnlineStore.Server.Authentication;
 using OnlineStore.Server.Entities;
+using OnlineStore.Server.Enums;
 using OnlineStore.Server.Services.Exceptions;
 using OnlineStore.Shared.Models;
 
@@ -39,7 +40,7 @@ public class AccountService : IAccountService
         var newUser = new User
         {
             Email = dto.Login,
-            RoleId = dto.RoleId
+            UserRole = UserRole.User
         };
         newUser.PasswordHash = _passwordHasher.HashPassword(newUser, dto.Password);
         _context.Users.Add(newUser);
@@ -50,7 +51,6 @@ public class AccountService : IAccountService
     public AuthResponse Login(LoginDto dto)
     {
         var user = _context.Users
-            .Include(u => u.Role)
             .FirstOrDefault(x => x.Email == dto.Login);
         if (user is null) throw new BadRequestException("Invalid username or password");
 
@@ -63,7 +63,7 @@ public class AccountService : IAccountService
         {
             new(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new(ClaimTypes.Name, user.Email),
-            new(ClaimTypes.Role, user.Role.Name)
+            new(ClaimTypes.Role, user.UserRole.ToString())
         };
 
 

@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using OnlineStore.Server.Authentication;
 using OnlineStore.Server.Entities;
+using OnlineStore.Server.Enums;
 
 namespace OnlineStore.Server;
 
@@ -30,20 +31,13 @@ public class StoreSeeder
             _dbContext.SaveChanges();
         }
 
-        if (!_dbContext.Roles.Any())
-        {
-            var roles = GetRoles();
-            _dbContext.Roles.AddRange(roles);
-            _dbContext.SaveChanges();
-        }
 
-        if (!_dbContext.Users.Any(x => x.Role.Name == UserRoles.Admin))
+        if (!_dbContext.Users.Any(x => x.UserRole == UserRole.Admin))
         {
-            var roleId = _dbContext.Roles.First(x => x.Name == UserRoles.Admin).Id;
             var admin = new User()
             {
                 Email = "admin@onlinestore.pl",
-                RoleId = roleId
+                UserRole = UserRole.Admin
             };
             var password = _passwordHasher.HashPassword(admin, "admin123");
             admin.PasswordHash = password;
@@ -84,23 +78,5 @@ public class StoreSeeder
                 Description = "NP"
             }
         };
-    }
-
-
-    private IEnumerable<Role> GetRoles()
-    {
-        var roles = new List<Role>
-        {
-            new()
-            {
-                Name = UserRoles.Admin
-            },
-            new()
-            {
-                Name = UserRoles.User
-            }
-        };
-
-        return roles;
     }
 }

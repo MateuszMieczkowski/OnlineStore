@@ -20,9 +20,9 @@ public class OnlineStoreDbContext : DbContext
     public DbSet<EmailTemplate> EmailTemplates { get; set; } = null!;
     public DbSet<RemindPasswordRequest> RemindPasswordRequests { get; set; } = null!;
     public DbSet<TaxRate> TaxRates { get; set; } = null!;
-    public DbSet<UserPreference> UserPreferences { get; set; } = null!;
+    public DbSet<UserPreferences> UserPreferences { get; set; } = null!;
     public DbSet<User> Users { get; set; } = null!;
-    public DbSet<Role> Roles { get; set; } = null!;
+    public DbSet<Entities.Client> Clients { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
