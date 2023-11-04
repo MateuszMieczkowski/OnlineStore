@@ -11,4 +11,6 @@ public class Email
     public string HtmlContent { get; set; } = string.Empty;
     public EmailStatus Status { get; set; }
     public int AttemptCount { get; set; }
+    public string Subject { get; set; } = string.Empty;
+    public DateTime? SentDate { get; set; }
 }
