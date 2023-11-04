@@ -9,7 +9,9 @@ public class Order
     public decimal TotalGross { get; set; }
     public OrderStatus Status { get; set; }
     public int ClientId { get; set; }
-    public int OrderAddressId {get; set; }
+    public int OrderAddressId { get; set; }
+    public DateTime CreatedDate { get; set; }
+    public DateTime ModifiedDate { get; set; }
 
     public OrderAddress Address { get; set; } = default!;
     public Client Client { get; set; } = default!;
