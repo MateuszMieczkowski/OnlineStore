@@ -46,23 +46,19 @@ builder.Services.AddAuthentication(option =>
 // Add services to the container.
 
 builder.Services.AddControllersWithViews();
-builder.Services.AddRazorPages();
 
 builder.Services.AddDbContext<OnlineStoreDbContext>(
-    options => options.UseSqlServer(builder.Configuration.GetConnectionString("SneakersDbConnection")));
+    options => options.UseSqlServer(builder.Configuration.GetConnectionString("OnlineStoreDbConnection")));
 
 builder.Services.AddScoped<ErrorHandlingMiddleware>();
 
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
-
-builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<ISizeService, SizeService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator>();
-
+builder.Services.AddScoped<StoreSeeder>();
 builder.Services.AddScoped<IBlobStorage, AzureStorage>();
 
 builder.Services.AddSwaggerGen();
@@ -79,12 +75,19 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var seeder = scope.ServiceProvider.GetRequiredService<StoreSeeder>();
+    seeder.Seed();
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseWebAssemblyDebugging();
     app.UseSwagger();
-    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sneakers API"));
+    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "OnlineStoreApi API"));
 }
 else
 {
@@ -101,15 +104,12 @@ app.UseAuthentication();
 
 app.UseHttpsRedirection();
 
-app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
 
 app.UseRouting();
 
 app.UseAuthorization();
 
-app.MapRazorPages();
 app.MapControllers();
-app.MapFallbackToFile("index.html");
 
 app.Run();
