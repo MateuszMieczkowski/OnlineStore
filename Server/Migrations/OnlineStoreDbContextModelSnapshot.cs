@@ -95,9 +95,6 @@ namespace OnlineStore.Server.Migrations
                     b.Property<int>("ClientId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ClientId1")
-                        .HasColumnType("int");
-
                     b.Property<int>("OrderAddressId")
                         .HasColumnType("int");
 
@@ -113,8 +110,6 @@ namespace OnlineStore.Server.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ClientId");
-
-                    b.HasIndex("ClientId1");
 
                     b.HasIndex("OrderAddressId");
 
@@ -221,9 +216,6 @@ namespace OnlineStore.Server.Migrations
                     b.Property<int?>("ProductCategoryId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ProductCategoryId1")
-                        .HasColumnType("int");
-
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
@@ -242,8 +234,6 @@ namespace OnlineStore.Server.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ProductCategoryId");
-
-                    b.HasIndex("ProductCategoryId1");
 
                     b.HasIndex("TaxRateId");
 
@@ -412,14 +402,10 @@ namespace OnlineStore.Server.Migrations
             modelBuilder.Entity("OnlineStore.Server.Entities.Order", b =>
                 {
                     b.HasOne("OnlineStore.Server.Entities.Client", "Client")
-                        .WithMany()
+                        .WithMany("Orders")
                         .HasForeignKey("ClientId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("OnlineStore.Server.Entities.Client", null)
-                        .WithMany("Orders")
-                        .HasForeignKey("ClientId1");
 
                     b.HasOne("OnlineStore.Server.Entities.OrderAddress", "Address")
                         .WithMany()
@@ -454,13 +440,9 @@ namespace OnlineStore.Server.Migrations
             modelBuilder.Entity("OnlineStore.Server.Entities.Product", b =>
                 {
                     b.HasOne("OnlineStore.Server.Entities.ProductCategory", "ProductCategory")
-                        .WithMany()
+                        .WithMany("Products")
                         .HasForeignKey("ProductCategoryId")
                         .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("OnlineStore.Server.Entities.ProductCategory", null)
-                        .WithMany("Products")
-                        .HasForeignKey("ProductCategoryId1");
 
                     b.HasOne("OnlineStore.Server.Entities.TaxRate", "TaxRate")
                         .WithMany()

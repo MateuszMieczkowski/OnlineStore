@@ -44,12 +44,6 @@ namespace OnlineStore.Server.Entities.Configurations
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasOne(e => e.ProductCategory)
-                .WithMany()
-                .HasForeignKey(e => e.ProductCategoryId)
-                .IsRequired(false) 
-                .OnDelete(DeleteBehavior.SetNull);
-
             builder.HasMany(e => e.ProductFiles)
                 .WithOne(pf => pf.Product)
                 .HasForeignKey(pf => pf.ProductId)

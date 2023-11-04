@@ -118,8 +118,7 @@ namespace OnlineStore.Server.Migrations
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
                     TaxRateId = table.Column<int>(type: "int", nullable: false),
-                    ProductCategoryId = table.Column<int>(type: "int", nullable: true),
-                    ProductCategoryId1 = table.Column<int>(type: "int", nullable: true)
+                    ProductCategoryId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -130,11 +129,6 @@ namespace OnlineStore.Server.Migrations
                         principalTable: "ProductCategories",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
-                    table.ForeignKey(
-                        name: "FK_Products_ProductCategories_ProductCategoryId1",
-                        column: x => x.ProductCategoryId1,
-                        principalTable: "ProductCategories",
-                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Products_TaxRates_TaxRateId",
                         column: x => x.TaxRateId,
@@ -153,8 +147,7 @@ namespace OnlineStore.Server.Migrations
                     TotalGross = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     ClientId = table.Column<int>(type: "int", nullable: false),
-                    OrderAddressId = table.Column<int>(type: "int", nullable: false),
-                    ClientId1 = table.Column<int>(type: "int", nullable: true)
+                    OrderAddressId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -171,11 +164,6 @@ namespace OnlineStore.Server.Migrations
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Orders_Users_ClientId1",
-                        column: x => x.ClientId1,
-                        principalTable: "Users",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -275,11 +263,6 @@ namespace OnlineStore.Server.Migrations
                 column: "ClientId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Orders_ClientId1",
-                table: "Orders",
-                column: "ClientId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Orders_OrderAddressId",
                 table: "Orders",
                 column: "OrderAddressId");
@@ -303,11 +286,6 @@ namespace OnlineStore.Server.Migrations
                 name: "IX_Products_ProductCategoryId",
                 table: "Products",
                 column: "ProductCategoryId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Products_ProductCategoryId1",
-                table: "Products",
-                column: "ProductCategoryId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Products_TaxRateId",
