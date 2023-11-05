@@ -18,7 +18,6 @@ public class EmailTemplateConfiguration : IEntityTypeConfiguration<EmailTemplate
             .HasMaxLength(255);
 
         builder.Property(e => e.HtmlContent)
-            .IsRequired()
-            .HasMaxLength(4000);
+            .IsRequired();
     }
 }
