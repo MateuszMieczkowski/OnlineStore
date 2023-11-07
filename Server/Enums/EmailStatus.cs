@@ -2,4 +2,7 @@
 
 public enum EmailStatus
 {
+    ToSend,
+    Failed,
+    Sent
 }
