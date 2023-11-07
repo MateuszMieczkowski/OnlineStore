@@ -61,7 +61,10 @@ builder.Services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator
 builder.Services.AddScoped<StoreSeeder>();
 builder.Services.AddScoped<IBlobStorage, AzureStorage>();
 
+builder.Services.Configure<SmtpOptions>(builder.Configuration.GetSection("Smtp"));
 builder.Services.AddSwaggerGen();
+
+builder.Services.RegisterQuartzJobs();
 
 builder.Services.AddCors(options =>
 {
