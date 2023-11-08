@@ -14,5 +14,17 @@ public class ClientConfiguration : IEntityTypeConfiguration<Client>
             .HasForeignKey(e => e.ClientId)
             .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Property(e => e.FirstName)
+            .IsRequired()
+            .HasMaxLength(100);
+
+        builder.Property(e => e.LastName)
+            .IsRequired()
+            .HasMaxLength(100);
+
+        builder.Property(e => e.PhoneNumber)
+            .IsRequired()
+            .HasMaxLength(20);
     }
 }
