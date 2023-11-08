@@ -2,7 +2,7 @@
 
 namespace OnlineStore.Server.Jobs
 {
-    public static class JobExtensions
+    public static class JobsDiExtensions
     {
         public static IServiceCollection RegisterQuartzJobs(this IServiceCollection services)
         {
