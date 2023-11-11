@@ -1,4 +1,4 @@
-﻿namespace OnlineStore.Server.Emails.TemplateDefinitions;
+﻿namespace OnlineStore.Server.Emails.EmailDefinitions;
 
 public abstract class EmailDefinition
 {
@@ -19,4 +19,3 @@ public abstract class EmailDefinition
 }
 
 public record EmailReplacement(string Key, string Value);
-

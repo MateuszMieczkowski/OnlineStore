@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zmiana Stanu Zamówienia</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #333;
+        }
+        .order-details {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f8f8f8;
+            border-radius: 4px;
+        }
+
+        .footer {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+	    <h2>Zmiana Stanu Zamówienia #{{OrderId}}</h2>
+        <p>Szanowny Kliencie,</p>
+        <p>Chcieliśmy Cię poinformować, że stan zamówienia o numerze #{{OrderId}} uległ zmianie.</p>
+
+        <div class="order-details">
+            <p><strong>Data utworzenia:</strong> {{OrderCreatedDate}}</p>
+            <p><strong>Data ostatniej modyfikacji:</strong> {{OrderModifiedDate}}</p>
+            <p><strong>Łączna wartość netto:</strong> {{OrderTotalNet}} PLN</p>
+            <p><strong>Łączna wartość brutto:</strong> {{OrderTotalGross}} PLN</p>
+	        <p><strong>Adres dostawy:</strong> {{OrderAddressStreet}}, {{OrderAddressStreetNumber}}, {{OrderAddressPostalCode}}, {{OrderAddressCity}}, {{OrderAddressCountry}}</p>
+            <p><strong>Aktualny stan zamówienia:</strong> {{OrderStatus}}</p>
+        </div>
+
+        <p>Prosimy o sprawdzenie szczegółów w swoim panelu klienta.</p>
+        <p>Dziękujemy za skorzystanie z naszych usług.</p>
+
+        <div class="footer">
+            <p>Z poważaniem,</p>
+            <p>Zespół Obsługi Klienta</p>
+        </div>
+    </div>
+</body>
+</html>

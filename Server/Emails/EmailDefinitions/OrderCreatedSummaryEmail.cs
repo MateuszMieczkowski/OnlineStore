@@ -1,13 +1,13 @@
 ﻿using System.Text;
 using OnlineStore.Server.Entities;
 
-namespace OnlineStore.Server.Emails.TemplateDefinitions;
+namespace OnlineStore.Server.Emails.EmailDefinitions;
 
 public class OrderCreatedSummaryEmail : EmailDefinition
 {
     private readonly Order _order;
 
-    public OrderCreatedSummaryEmail(Order order, string recipientEmail, string? recipientName, string? senderEmail) 
+    public OrderCreatedSummaryEmail(Order order, string recipientEmail, string? recipientName, string? senderEmail)
         : base(recipientEmail, recipientName, senderEmail)
     {
         _order = order;
@@ -15,9 +15,10 @@ public class OrderCreatedSummaryEmail : EmailDefinition
 
     public override string Subject => "Zamówienie zostało złożone";
     public override string TemplateName => "OrderCreatedSummary";
+
     public override ICollection<EmailReplacement> GetReplacements()
     {
-        var replacements = new List<EmailReplacement>()
+        var replacements = new List<EmailReplacement>
         {
             new("{{OrderId}}", _order.Id.ToString()),
             new("{{OrderCreatedDate}}", _order.CreatedDate.ToShortDateString()),
@@ -30,7 +31,7 @@ public class OrderCreatedSummaryEmail : EmailDefinition
             new("{{OrderAddressCountry}}", _order.Address.Country),
             new("{{OrderItemsRows}}", GetOrderItemsHtmlRows()),
             new("{{OrderTotalGross}}", _order.TotalGross + "zł"),
-            new("{{OrderTotalNet}}", _order.TotalNet + "zł"),
+            new("{{OrderTotalNet}}", _order.TotalNet + "zł")
         };
 
         return replacements;
