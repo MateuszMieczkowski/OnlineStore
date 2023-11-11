@@ -1,0 +1,56 @@
+﻿<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Podsumowanie zamówienia - E-mail</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .order-details {
+            margin-bottom: 20px;
+        }
+
+        .order-item {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Podsumowanie utworzonego zamówienia</h2>
+        </div>
+        <div class="order-details">
+            <h3>Szczegóły zamówienia:</h3>
+            <p><strong>Numer zamówienia:</strong> {{OrderId}}</p>
+            <p><strong>Data utworzenia:</strong> {{OrderCreatedDate}}</p>
+            <p><strong>Imię i nazwisko klienta:</strong> {{ClientName}}</p>
+            <p><strong>Adres e-mail klienta:</strong> {{ClientEmail}}</p>
+            <p><strong>Adres dostawy:</strong> {{OrderAddressStreet}}, {{OrderAddressStreetNumber}}, {{OrderAddressPostalCode}}, {{OrderAddressCity}}, {{OrderAddressCountry}}</p>
+            <h3>Zamówione produkty:</h3>
+			{{OrderItemsRows}}
+        <p><strong>Suma (Netto):</strong> {{OrderTotalGross}}</p>
+        <p><strong>Suma (Brutto):</strong> {{OrderTotalNet}}</p>
+        </div>
+        <div class="footer">
+            <p>Dziękujemy za złożenie zamówienia! W razie pytań prosimy o kontakt z naszym działem obsługi klienta.</p>
+        </div>
+    </div>
+</body>
+</html>
