@@ -40,5 +40,11 @@
 	  <Folder Include="Migrations\" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <None Update="Emails\Html\*.html">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+
 
 </Project>
