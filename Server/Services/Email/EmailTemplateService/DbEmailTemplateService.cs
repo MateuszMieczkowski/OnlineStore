@@ -25,14 +25,18 @@ public class DbEmailTemplateService : IEmailTemplateService
         return template;
     }
 
-    public async Task AddEmailTemplateAsync(string templateName, string templateContent,
+    public async Task AddOrUpdateEmailTemplateAsync(string templateName, string templateContent,
         CancellationToken cancellationToken = default)
     {
-        _dbContext.EmailTemplates.Add(new EmailTemplate
-        {
-            Name = templateName,
-            HtmlContent = templateContent
-        });
+        var template = await _dbContext.EmailTemplates
+            .AsNoTracking()
+            .FirstOrDefaultAsync(e => e.Name == templateName, cancellationToken)
+            ?? new EmailTemplate();
+
+        template.Name = templateName;
+        template.HtmlContent = templateContent;
+
+        _dbContext.EmailTemplates.Update(template);
 
         await _dbContext.SaveChangesAsync(cancellationToken);
     }

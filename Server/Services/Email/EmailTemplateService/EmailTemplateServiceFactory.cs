@@ -1,4 +1,6 @@
-﻿namespace OnlineStore.Server.Services.Email.EmailTemplateService;
+﻿using Microsoft.Extensions.Caching.Memory;
+
+namespace OnlineStore.Server.Services.Email.EmailTemplateService;
 
 public interface IEmailTemplateServiceFactory
 {
@@ -17,6 +19,10 @@ public class EmailTemplateServiceFactory : IEmailTemplateServiceFactory
 
     public IEmailTemplateService Create()
     {
-        return _serviceProvider.GetRequiredService<CachedEmailTemplateService>();
+        var dbContext = _serviceProvider.GetRequiredService<OnlineStoreDbContext>();
+        var memoryCache = _serviceProvider.GetRequiredService<IMemoryCache>();
+        var dbEmailTemplateService = new DbEmailTemplateService(dbContext);
+
+        return new CachedEmailTemplateService(memoryCache, dbEmailTemplateService);
     }
 }

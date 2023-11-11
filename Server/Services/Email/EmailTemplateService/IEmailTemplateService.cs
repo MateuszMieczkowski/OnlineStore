@@ -4,6 +4,6 @@ public interface IEmailTemplateService
 {
     Task<string> GetEmailTemplateAsync(string templateName, CancellationToken cancellationToken = default);
 
-    Task AddEmailTemplateAsync(string templateName, string templateContent,
+    Task AddOrUpdateEmailTemplateAsync(string templateName, string templateContent,
         CancellationToken cancellationToken = default);
 }

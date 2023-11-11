@@ -28,9 +28,9 @@ public class CachedEmailTemplateService : IEmailTemplateService
         return template;
     }
 
-    public async Task AddEmailTemplateAsync(string templateName, string templateContent,
+    public async Task AddOrUpdateEmailTemplateAsync(string templateName, string templateContent,
         CancellationToken cancellationToken = default)
     {
-        await _dbEmailTemplateService.AddEmailTemplateAsync(templateName, templateContent, cancellationToken);
+        await _dbEmailTemplateService.AddOrUpdateEmailTemplateAsync(templateName, templateContent, cancellationToken);
     }
 }
