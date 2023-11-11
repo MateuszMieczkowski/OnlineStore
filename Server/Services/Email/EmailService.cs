@@ -1,4 +1,5 @@
 ﻿using OnlineStore.Server.Emails.TemplateDefinitions;
+using OnlineStore.Server.Services.Email.Builder;
 
 namespace OnlineStore.Server.Services.Email
 {
@@ -13,12 +14,12 @@ namespace OnlineStore.Server.Services.Email
             _emailBuilderFactory = emailBuilderFactory;
         }
 
-        public async Task SendEmailFromTemplateAsync(EmailTemplateDefinition templateDefinition,
+        public async Task SendEmailFromTemplateAsync(EmailDefinition definition,
             CancellationToken cancellationToken = default)
         {
             var builder = _emailBuilderFactory.Create();
 
-            var email = await builder.FromTemplate(templateDefinition)
+            var email = await builder.FromTemplate(definition)
                 .BuildAsync(cancellationToken);
 
             _dbContext.Emails.Add(email);

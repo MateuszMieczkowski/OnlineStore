@@ -4,6 +4,6 @@ namespace OnlineStore.Server.Services.Email
 {
     public interface IEmailService
     {
-        public Task SendEmailFromTemplateAsync(EmailTemplateDefinition templateDefinition, CancellationToken cancellationToken = default);
+        public Task SendEmailFromTemplateAsync(EmailDefinition definition, CancellationToken cancellationToken = default);
     }
 }
