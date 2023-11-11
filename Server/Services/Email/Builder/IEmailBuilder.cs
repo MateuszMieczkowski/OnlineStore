@@ -1,4 +1,4 @@
-﻿using OnlineStore.Server.Emails.TemplateDefinitions;
+﻿using OnlineStore.Server.Emails.EmailDefinitions;
 
 namespace OnlineStore.Server.Services.Email.Builder;
 

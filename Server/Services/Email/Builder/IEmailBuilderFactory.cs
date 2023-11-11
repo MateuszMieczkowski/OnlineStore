@@ -18,7 +18,7 @@ public class EmailBuilderFactory : IEmailBuilderFactory
 
     public IEmailBuilder Create()
     {
-        var emailTemplateServiceFactory =  _serviceProvider.GetRequiredService<IEmailTemplateServiceFactory>();
+        var emailTemplateServiceFactory = _serviceProvider.GetRequiredService<IEmailTemplateServiceFactory>();
         return new EmailBuilder(emailTemplateServiceFactory);
     }
 }

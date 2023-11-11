@@ -16,11 +16,11 @@ public class DbEmailTemplateService : IEmailTemplateService
     public async Task<string> GetEmailTemplateAsync(string templateName, CancellationToken cancellationToken = default)
     {
         var template = await _dbContext.EmailTemplates
-            .AsNoTracking()
-            .Where(e => e.Name == templateName)
-            .Select(e => e.HtmlContent)
-            .FirstOrDefaultAsync(cancellationToken) ??
-                throw new NotFoundException($"Email template with name {templateName} not found");
+                           .AsNoTracking()
+                           .Where(e => e.Name == templateName)
+                           .Select(e => e.HtmlContent)
+                           .FirstOrDefaultAsync(cancellationToken) ??
+                       throw new NotFoundException($"Email template with name {templateName} not found");
 
         return template;
     }
@@ -29,9 +29,9 @@ public class DbEmailTemplateService : IEmailTemplateService
         CancellationToken cancellationToken = default)
     {
         var template = await _dbContext.EmailTemplates
-            .AsNoTracking()
-            .FirstOrDefaultAsync(e => e.Name == templateName, cancellationToken)
-            ?? new EmailTemplate();
+                           .AsNoTracking()
+                           .FirstOrDefaultAsync(e => e.Name == templateName, cancellationToken)
+                       ?? new EmailTemplate();
 
         template.Name = templateName;
         template.HtmlContent = templateContent;

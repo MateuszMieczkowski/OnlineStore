@@ -1,4 +1,4 @@
-﻿using OnlineStore.Server.Emails.TemplateDefinitions;
+﻿using OnlineStore.Server.Emails.EmailDefinitions;
 using OnlineStore.Server.Services.Email.EmailTemplateService;
 
 namespace OnlineStore.Server.Services.Email.Builder;
@@ -64,7 +64,7 @@ public class EmailBuilder : IEmailBuilder
 
     private async Task<Entities.Email> BuildFromTemplateAsync(CancellationToken cancellationToken)
     {
-        _email = new Entities.Email()
+        _email = new Entities.Email
         {
             Subject = _templateDefinition!.Subject,
             RecipientEmail = _templateDefinition.RecipientEmail,
@@ -72,7 +72,8 @@ public class EmailBuilder : IEmailBuilder
             SenderEmail = _templateDefinition.SenderEmail
         };
 
-        var template = await _emailTemplateService.GetEmailTemplateAsync(_templateDefinition!.TemplateName, cancellationToken);
+        var template =
+            await _emailTemplateService.GetEmailTemplateAsync(_templateDefinition!.TemplateName, cancellationToken);
         var replacements = _templateDefinition.GetReplacements();
 
         foreach (var (key, value) in replacements)

@@ -18,10 +18,7 @@ public class CachedEmailTemplateService : IEmailTemplateService
 
     public async Task<string> GetEmailTemplateAsync(string templateName, CancellationToken cancellationToken = default)
     {
-        if (_memoryCache.TryGetValue(templateName, out string? template))
-        {
-            return template!;
-        }
+        if (_memoryCache.TryGetValue(templateName, out string? template)) return template!;
 
         template ??= await _dbEmailTemplateService.GetEmailTemplateAsync(templateName, cancellationToken);
         _memoryCache.Set(templateName, template, _cacheExpiration);

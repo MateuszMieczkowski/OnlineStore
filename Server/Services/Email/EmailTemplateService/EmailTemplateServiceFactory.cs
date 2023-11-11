@@ -7,7 +7,6 @@ public interface IEmailTemplateServiceFactory
     IEmailTemplateService Create();
 }
 
-
 public class EmailTemplateServiceFactory : IEmailTemplateServiceFactory
 {
     private readonly IServiceProvider _serviceProvider;
