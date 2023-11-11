@@ -14,12 +14,12 @@ public class EmailService : IEmailService
         _emailBuilderFactory = emailBuilderFactory;
     }
 
-    public async Task SendEmailFromTemplateAsync(EmailDefinition definition,
+    public async Task SendEmailFromDefinitionAsync(EmailDefinition definition,
         CancellationToken cancellationToken = default)
     {
         var builder = _emailBuilderFactory.Create();
 
-        var email = await builder.FromTemplate(definition)
+        var email = await builder.FromDefinition(definition)
             .BuildAsync(cancellationToken);
 
         _dbContext.Emails.Add(email);

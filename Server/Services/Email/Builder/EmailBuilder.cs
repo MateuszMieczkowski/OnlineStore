@@ -46,7 +46,7 @@ public class EmailBuilder : IEmailBuilder
     }
 
 
-    public IEmailBuilder FromTemplate(EmailDefinition emailDefinition)
+    public IEmailBuilder FromDefinition(EmailDefinition emailDefinition)
     {
         _templateDefinition = emailDefinition;
         return this;

@@ -9,6 +9,6 @@ public interface IEmailBuilder
     IEmailBuilder AddRecipientName(string name);
     IEmailBuilder AddSenderEmail(string email);
     IEmailBuilder AddHtmlBody(string htmlBody);
-    IEmailBuilder FromTemplate(EmailDefinition emailDefinition);
+    IEmailBuilder FromDefinition(EmailDefinition emailDefinition);
     Task<Entities.Email> BuildAsync(CancellationToken cancellationToken = default);
 }
