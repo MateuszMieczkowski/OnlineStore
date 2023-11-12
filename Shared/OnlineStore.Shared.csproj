@@ -9,4 +9,8 @@
   <ItemGroup>
     <SupportedPlatform Include="browser" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ModelsV2\" />
+  </ItemGroup>
 </Project>

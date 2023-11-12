@@ -9,7 +9,6 @@ namespace OnlineStore.Server.Services;
 public interface IProductService
 {
     Task<IEnumerable<ProductDto>> GetAllAsync();
-    Task<IEnumerable<ProductDto>> GetAllTest();
     Task<IEnumerable<ProductDto>> GetBySerachAsync(string filter);
     Task<List<Product>> CreateManyAsync(IEnumerable<CreateProductDto> dtos);
     void RemoveById(int id);
@@ -21,15 +20,12 @@ public class ProductService : IProductService
     private readonly OnlineStoreDbContext _dbContext;
     private readonly ILogger<ProductService> _logger;
     private readonly IMapper _mapper;
-    private readonly ISizeService _sizeService;
 
-    public ProductService(OnlineStoreDbContext dbContext, IMapper mapper, ILogger<ProductService> logger,
-        ISizeService sizeService)
+    public ProductService(OnlineStoreDbContext dbContext, IMapper mapper, ILogger<ProductService> logger)
     {
         _dbContext = dbContext;
         _mapper = mapper;
         _logger = logger;
-        _sizeService = sizeService;
     }
 
     public async Task<IEnumerable<ProductDto>> GetAllAsync()
@@ -75,11 +71,9 @@ public class ProductService : IProductService
 
     public async Task<List<Product>> CreateManyAsync(IEnumerable<CreateProductDto> dtos)
     {
-        var newSizes = await _sizeService.GetNewSizesAsync(dtos);
 
         var products = _mapper.Map<List<Product>>(dtos);
 
-        _dbContext.Sizes.AddRange(newSizes);
         _dbContext.Products.AddRange(products);
 
         await _dbContext.SaveChangesAsync();

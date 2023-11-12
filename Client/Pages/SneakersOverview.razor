@@ -1,10 +1,10 @@
 ﻿@page "/configuration"
+@using OnlineStore.Client.Components;
 @using OnlineStore.Shared.Models
-@using OnlineStore.Client.Components
+@using OnlineStore.Client.Components.Abstract
 @attribute [Authorize]
 @inject ToastService Toast
 @inject IProductService ProductService
-@inject ISizeService SizeService
 @inject IJSRuntime JsRuntime
 @inject IConfiguration Configuration
 <PageTitle>Sneakers overview</PageTitle>
@@ -198,7 +198,7 @@
 	{
 		storageUrl = Configuration.GetValue<string>("StorageAddress");
 		products = await ProductService.GetAllAsync();
-		_sizes = await SizeService.GetAllAsync();
+		// _sizes = await SizeService.GetAllAsync();
 		DeleteDialog.Close();
 	}
 

@@ -1,0 +1,19 @@
+@if (ChildContent is null)
+{
+    <div class="spinner"></div>
+}
+else
+{
+    <div class="container" style="max-width: 90%">
+        <div class="row">
+            @ChildContent
+        </div>
+    </div>
+}
+
+@code {
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+}

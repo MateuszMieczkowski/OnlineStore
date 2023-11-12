@@ -57,7 +57,6 @@ builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
 
 builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<ISizeService, SizeService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
