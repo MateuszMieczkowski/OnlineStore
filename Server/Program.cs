@@ -1,4 +1,3 @@
-using Azure.Storage.Blobs;
 using System.Reflection;
 using System.Text;
 using FluentValidation;
@@ -58,9 +57,7 @@ builder.Services.AddScoped<ErrorHandlingMiddleware>();
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
 
-builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
-
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator>();
 builder.Services.AddScoped<StoreSeeder>();
