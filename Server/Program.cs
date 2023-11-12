@@ -9,8 +9,11 @@ using NLog.Web;
 using OnlineStore.Server;
 using OnlineStore.Server.Authentication;
 using OnlineStore.Server.Entities;
+using OnlineStore.Server.Jobs;
 using OnlineStore.Server.Middleware;
+using OnlineStore.Server.Options;
 using OnlineStore.Server.Services;
+using OnlineStore.Server.Services.Email;
 using OnlineStore.Server.Validators;
 using OnlineStore.Shared.Models;
 
@@ -46,10 +49,9 @@ builder.Services.AddAuthentication(option =>
 // Add services to the container.
 
 builder.Services.AddControllersWithViews();
-builder.Services.AddRazorPages();
 
 builder.Services.AddDbContext<OnlineStoreDbContext>(
-    options => options.UseSqlServer(builder.Configuration.GetConnectionString("SneakersDbConnection")));
+    options => options.UseSqlServer(builder.Configuration.GetConnectionString("OnlineStoreDbConnection")));
 
 builder.Services.AddScoped<ErrorHandlingMiddleware>();
 
@@ -61,10 +63,16 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator>();
-
+builder.Services.AddScoped<StoreSeeder>();
 builder.Services.AddScoped<IBlobStorage, AzureStorage>();
+builder.Services.AddSingleton<IClock, Clock>();
+builder.Services.AddMemoryCache();
 
+builder.Services.Configure<SmtpOptions>(builder.Configuration.GetSection("Smtp"));
 builder.Services.AddSwaggerGen();
+
+builder.Services.RegisterQuartzJobs();
+builder.Services.RegisterEmailServices();
 
 builder.Services.AddCors(options =>
 {
@@ -78,12 +86,23 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+
+using (var scope = app.Services.CreateScope())
+{
+    var dbSeeder = scope.ServiceProvider.GetRequiredService<StoreSeeder>();
+    dbSeeder.Seed();
+
+    var templateSeeder = scope.ServiceProvider.GetRequiredService<EmailTemplateSeeder>();
+    await templateSeeder.SeedAsync();
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseWebAssemblyDebugging();
     app.UseSwagger();
-    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sneakers API"));
+    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "OnlineStoreApi API"));
 }
 else
 {

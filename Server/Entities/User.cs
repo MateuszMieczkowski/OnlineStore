@@ -1,10 +1,11 @@
-﻿namespace OnlineStore.Server.Entities;
+﻿using OnlineStore.Server.Enums;
+
+namespace OnlineStore.Server.Entities;
 
 public class User
 {
     public int Id { get; set; }
-    public string Login { get; set; }
-    public string PasswordHash { get; set; }
-    public int RoleId { get; set; }
-    public virtual Role Role { get; set; }
+    public string Email { get; set; } = string.Empty;
+    public string PasswordHash { get; set; } = string.Empty;
+    public UserRole UserRole { get; set; }
 }

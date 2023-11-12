@@ -18,8 +18,8 @@ public class RegisterUserDtoValidator : AbstractValidator<RegisterUserDto>
         RuleFor(x => x.Login)
             .Custom((value, context) =>
             {
-                var emailInUse = dbContext.Users.Any(u => u.Login == value);
-                if (emailInUse) context.AddFailure("Login", "That login is taken");
+                var emailInUse = dbContext.Users.Any(u => u.Email == value);
+                if (emailInUse) context.AddFailure("Email", "That login is taken");
             });
     }
 }
