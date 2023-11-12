@@ -23,14 +23,7 @@ public class ProductController : ControllerBase
     {
         return Ok();
     }
-
-    [HttpGet("test")]
-    [AllowAnonymous]
-    public async Task<ActionResult<IEnumerable<ProductDto>>> GetAllTest()
-    {
-        return Ok();
-    }
-
+    
     [HttpGet("search")]
     [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<ProductDto>>> GetBySerach([FromQuery] string filter)

@@ -56,8 +56,8 @@ builder.Services.AddScoped<ErrorHandlingMiddleware>();
 
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
-builder.Services.AddScoped<IAccountService, AccountService>();
 
+builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator>();
 builder.Services.AddScoped<StoreSeeder>();
@@ -116,12 +116,15 @@ app.UseAuthentication();
 
 app.UseHttpsRedirection();
 
+app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
 
 app.UseRouting();
 
 app.UseAuthorization();
 
+app.MapRazorPages();
 app.MapControllers();
+app.MapFallbackToFile("index.html");
 
 app.Run();
