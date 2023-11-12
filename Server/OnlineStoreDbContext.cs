@@ -1,13 +1,17 @@
 ﻿using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using OnlineStore.Server.Entities;
+using OnlineStore.Server.Entities.Abstractions;
+using OnlineStore.Server.Services;
 
 namespace OnlineStore.Server;
 
 public class OnlineStoreDbContext : DbContext
 {
-    public OnlineStoreDbContext(DbContextOptions<OnlineStoreDbContext> options) : base(options)
+    private readonly IClock _clock;
+    public OnlineStoreDbContext(DbContextOptions<OnlineStoreDbContext> options, IClock clock) : base(options)
     {
+        _clock = clock;
     }
 
     public DbSet<Product> Products { get; set; } = null!;
@@ -28,5 +32,29 @@ public class OnlineStoreDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+    }
+
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
+    {
+        UpdateTimedEntities();
+
+        return base.SaveChangesAsync(cancellationToken);
+    }
+
+    private void UpdateTimedEntities()
+    {
+        var addedEntries = ChangeTracker.Entries<ITimeCreated>()
+            .Where(x => x.State == EntityState.Added);
+        foreach (var entry in addedEntries)
+        {
+            entry.Property(x => x.CreatedDate).CurrentValue = _clock.UtcNow.UtcDateTime;
+        }
+
+        var modifiedEntries = ChangeTracker.Entries<ITimeModified>()
+            .Where(x => x.State == EntityState.Modified);
+        foreach (var entry in modifiedEntries)
+        {
+            entry.Property(x => x.ModifiedDate).CurrentValue = _clock.UtcNow.UtcDateTime;
+        }
     }
 }

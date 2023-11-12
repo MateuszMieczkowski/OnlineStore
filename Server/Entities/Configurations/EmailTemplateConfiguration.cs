@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace OnlineStore.Server.Entities.Configurations;
 
@@ -18,7 +18,6 @@ public class EmailTemplateConfiguration : IEntityTypeConfiguration<EmailTemplate
             .HasMaxLength(255);
 
         builder.Property(e => e.HtmlContent)
-            .IsRequired()
-            .HasMaxLength(4000);
+            .IsRequired();
     }
 }

@@ -14,7 +14,6 @@ public class EmailConfiguration : IEntityTypeConfiguration<Email>
             .UseIdentityColumn();
 
         builder.Property(e => e.SenderEmail)
-            .IsRequired()
             .HasMaxLength(255);
 
         builder.Property(e => e.RecipientEmail)
@@ -22,8 +21,7 @@ public class EmailConfiguration : IEntityTypeConfiguration<Email>
             .HasMaxLength(255);
 
         builder.Property(e => e.HtmlContent)
-            .IsRequired()
-            .HasMaxLength(4000);
+            .IsRequired();
 
         builder.Property(e => e.Status)
             .IsRequired();

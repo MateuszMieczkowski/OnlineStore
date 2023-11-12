@@ -37,8 +37,7 @@ namespace OnlineStore.Server.Migrations
 
                     b.Property<string>("HtmlContent")
                         .IsRequired()
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RecipientEmail")
                         .IsRequired()
@@ -49,12 +48,18 @@ namespace OnlineStore.Server.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SenderEmail")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
+                    b.Property<DateTime?>("SentDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -71,8 +76,7 @@ namespace OnlineStore.Server.Migrations
 
                     b.Property<string>("HtmlContent")
                         .IsRequired()
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -94,6 +98,12 @@ namespace OnlineStore.Server.Migrations
 
                     b.Property<int>("ClientId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("OrderAddressId")
                         .HasColumnType("int");
@@ -176,6 +186,9 @@ namespace OnlineStore.Server.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -395,6 +408,24 @@ namespace OnlineStore.Server.Migrations
             modelBuilder.Entity("OnlineStore.Server.Entities.Client", b =>
                 {
                     b.HasBaseType("OnlineStore.Server.Entities.User");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("IsSubscribedToNewsletter")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.HasDiscriminator().HasValue("Client");
                 });

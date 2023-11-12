@@ -2,5 +2,7 @@
 
 public enum OrderStatus
 {
-
+    Created,
+    Processing,
+    Completed
 }
