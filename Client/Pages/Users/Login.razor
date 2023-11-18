@@ -5,17 +5,17 @@
 @inject ToastService Toast
 
 <div class="container p-5">
-	<EditForm Model="loginDto" OnValidSubmit="HandleLogin">
+	<EditForm Model="_authenticateUser" OnValidSubmit="HandleLogin">
 		<DataAnnotationsValidator></DataAnnotationsValidator>
 		<div class="form-group">
-			<label for="exampleInputLogin1">Login</label>
-			<input @bind="loginDto.Login" type="text" class="form-control" id="exampleInputLogin1" aria-describedby="loginHelp" placeholder="Enter login">
-			<ValidationMessage For="@(() => loginDto.Login)"/>
+			<label for="email">E-mail</label>
+			<input @bind="_authenticateUser.Email" type="email" class="form-control" id="email" aria-describedby="loginHelp" placeholder="Wpisz">
+			<ValidationMessage For="@(() => _authenticateUser.Email)"/>
 		</div>
 		<div class="form-group">
-			<label for="exampleInputPassword1">Password</label>
-			<input @bind="loginDto.Password" type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
-			<ValidationMessage For="@(() => loginDto.Password)"/>
+			<label for="password">Hasło</label>
+			<input @bind="_authenticateUser.Password" type="password" class="form-control" id="password" placeholder="Wpisz">
+			<ValidationMessage For="@(() => _authenticateUser.Password)"/>
 		</div>
 
 		<button type="submit" class="btn btn-dark">Submit</button>
@@ -24,26 +24,29 @@
 
 @code
 {
-	private readonly LoginDto loginDto = new();
+	private readonly AuthenticateUser _authenticateUser = new();
 
 	private async void HandleLogin()
 	{
+		var loginFailedMessage = "Nie udało się zalogować. Spróbuj ponownie";
+		var loginSuccessMessage = "Zalogowano pomyślnie.";
+		
 		try
 		{
-			var isAuthenticated = await AccountService.AuthenticateAsync(loginDto);
+			var isAuthenticated = await AccountService.AuthenticateAsync(_authenticateUser);
 			if (isAuthenticated)
 			{
-				Toast.ShowToast("Login succesfully", ToastLevel.Success);
+				Toast.ShowToast(loginSuccessMessage, ToastLevel.Success);
 				NavManager.NavigateTo("");
 			}
 			else
 			{
-				Toast.ShowToast("Login failed try again", ToastLevel.Error);
+				Toast.ShowToast(loginFailedMessage, ToastLevel.Error);
 			}
 		}
 		catch (Exception ex)
 		{
-			Toast.ShowToast("Login failed try again", ToastLevel.Error);
+			Toast.ShowToast(ex.Message, ToastLevel.Error);
 		}
 	}
 }

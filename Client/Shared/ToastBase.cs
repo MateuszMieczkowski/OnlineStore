@@ -49,7 +49,7 @@ public class ToastBase : ComponentBase, IDisposable
             case ToastLevel.Success:
                 BackgroundCssClass = "bg-success";
                 IconCssClass = "check";
-                Heading = "Success";
+                Heading = "Operacja zaakceptowana";
                 break;
             case ToastLevel.Warning:
                 BackgroundCssClass = "bg-warning";
@@ -59,7 +59,7 @@ public class ToastBase : ComponentBase, IDisposable
             case ToastLevel.Error:
                 BackgroundCssClass = "bg-danger";
                 IconCssClass = "times";
-                Heading = "Error";
+                Heading = "Wystąpił błąd";
                 break;
         }
 

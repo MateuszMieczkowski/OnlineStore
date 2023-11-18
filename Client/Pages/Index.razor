@@ -7,9 +7,9 @@
 
 <ProductsFilter Products="products" OnSearchStringChanged="Refresh"></ProductsFilter>
 
-@if (products == null)
+@if (products == null)	
 {
-	<div class="spinner"></div>
+	@* <div class="spinner"></div> *@
 }
 else
 {
@@ -27,18 +27,8 @@ else
                             <p class="card-text">@product.ReferenceNumber</p>
                             <p class="card-text">Quantity: @product.Quantity</p>
                             <button @onclick="() => Toggle(product)" type="button" class="btn btn-outline-dark show"> @(product.IsHidden ? "Details" : "Hide")</button>
-                            <div id="info" hidden="@product.IsHidden">
-                                <p class="card-text mt-2">Available sizes:</p>
-                                <ul class="list-group">
-                                    @foreach (var size in product.AvailableSizes)
-                                    {
-                                        <li class="list-group-item">@size.Size x @size.Quantity</li>
-                                    }
-
-								</ul>
-							</div>
-
-
+       @*                      <div id="info" hidden="@product.IsHidden"> *@
+							@* </div> *@
 						</div>
 					</div>
 				</div>
@@ -51,13 +41,13 @@ else
 
 @code {
 
-	private List<ProductDto>? products;
+	private List<ProductDto> products = new();
 	private string storageUrl;
 
 	protected override async Task OnInitializedAsync()
 	{
 		storageUrl = Configuration.GetValue<string>("StorageAddress");
-		products = await ProductService.GetAllAsync();
+		// products = await ProductService.GetAllAsync();
 	}
 
     private void Toggle(ProductDto product)

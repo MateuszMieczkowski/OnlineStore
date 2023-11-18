@@ -10,16 +10,18 @@
         <AuthorizeView>
             <Authorized>
                 <div class="nav" style="margin-right: auto;">
-                    <NavLink class="nav-item nav-link" href="create">Add</NavLink>
-                    <NavLink class="nav-item nav-link" href="configuration">Overview panel</NavLink>
-                    <NavLink class="nav-item nav-link" href="size">Sizes</NavLink>
+                    <NavLink class="nav-item nav-link" href="create">Dodaj produkt</NavLink>
+                    <NavLink class="nav-item nav-link" href="configuration">Zarządzanie produktami</NavLink>
                 </div>
-                <NavLink class="btn btn-outline-dark my-2 my-sm-0" href="users/logout">Logout</NavLink>
+                <NavLink class="btn btn-outline-dark my-2 my-sm-0" href="users/logout">Wyloguj</NavLink>
             </Authorized>
             <NotAuthorized>
-                <NavLink class="btn btn-outline-dark my-2 my-sm-0" href="users/login">Login</NavLink>
+                <div>
+                    <NavLink class="btn btn-outline-dark my-2 my-sm-0" href="accounts/register">Rejestracja</NavLink>
+                    <NavLink class="btn btn-outline-dark my-2 my-sm-0" href="users/login">Zaloguj</NavLink>
+                </div>
             </NotAuthorized>
         </AuthorizeView>
 
-	</div>
+    </div>
 </nav>

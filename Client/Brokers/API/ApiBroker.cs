@@ -27,7 +27,6 @@ public partial class ApiBroker : IApiBroker
         return await _httpClient.GetFromJsonAsync<T>(relativeUrl);
     }
 
-
     public async Task<bool> PostAsync<T>(string relativeUrl, T content)
     {
         using var response = await _httpClient.PostAsJsonAsync(relativeUrl, content);
@@ -63,16 +62,17 @@ public partial class ApiBroker : IApiBroker
         return await Validate(response);
     }
 
-
     private async Task<bool> Validate(HttpResponseMessage? response)
     {
         if (!response.IsSuccessStatusCode)
         {
-            var exceptionMessage = await response.Content.ReadAsStringAsync();
+            var exceptionDetails = await response.Content.ReadFromJsonAsync<ErrorMessageDetails>();
 
-            throw new Exception("Something went wrong: " + exceptionMessage);
+            throw new Exception(exceptionDetails?.Message);
         }
 
         return true;
     }
 }
+
+public record ErrorMessageDetails(string ExceptionType, int StatusCode, string Message);

@@ -42,7 +42,7 @@ public class ToastService
     {
         if (Countdown == null)
         {
-            Countdown = new Timer(1500);
+            Countdown = new Timer(3000);
             Countdown.Elapsed += HideToast;
             Countdown.AutoReset = false;
         }

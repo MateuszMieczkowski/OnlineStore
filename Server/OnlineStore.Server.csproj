@@ -12,6 +12,8 @@
 		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
 		<PackageReference Include="Azure.Storage.Blobs" Version="12.13.0" />
 		<PackageReference Include="FluentValidation.AspNetCore" Version="11.1.2" />
+		<PackageReference Include="MediatR" Version="12.1.1" />
+		<PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.1.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.7" />
 		<PackageReference Include="Microsoft.AspNetCore.Authorization" Version="6.0.7" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="6.0.6" />
@@ -46,5 +48,11 @@
 	  </None>
 	</ItemGroup>
 
+
+	<ItemGroup>
+	  <Content Update="appsettings.Development.json">
+	    <DependentUpon>appsettings.json</DependentUpon>
+	  </Content>
+	</ItemGroup>
 
 </Project>

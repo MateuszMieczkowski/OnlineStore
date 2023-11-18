@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using OnlineStore.Server.Services;
+﻿using MediatR;
+using Microsoft.AspNetCore.Mvc;
+using OnlineStore.Shared.Accounts;
 using OnlineStore.Shared.Models;
 
 namespace OnlineStore.Server.Controllers;
@@ -8,24 +9,26 @@ namespace OnlineStore.Server.Controllers;
 [Route("api/account")]
 public class AccountController : ControllerBase
 {
-    private readonly IAccountService _accountService;
+    private readonly IMediator _mediator;
 
-    public AccountController(IAccountService accountService)
+    public AccountController(IMediator mediator)
     {
-        _accountService = accountService;
+        _mediator = mediator;
     }
 
     [HttpPost("register")]
-    public ActionResult RegisterUser([FromBody] RegisterUserDto dto)
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    public async Task<CreatedResult> RegisterUser([FromBody] RegisterUser command)
     {
-        _accountService.RegisterUser(dto);
-        return Ok();
+        await _mediator.Send(command);
+        return Created("/users", null);
     }
 
     [HttpPost("login")]
-    public ActionResult<AuthResponse> Login([FromBody] LoginDto dto)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<AuthResponse> Login([FromBody] AuthenticateUser request)
     {
-        var authResponse = _accountService.Login(dto);
-        return Ok(authResponse);
+        var response = await _mediator.Send(request);
+        return response;
     }
 }

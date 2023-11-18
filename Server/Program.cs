@@ -14,12 +14,11 @@ using OnlineStore.Server.Options;
 using OnlineStore.Server.Services;
 using OnlineStore.Server.Services.Email;
 using OnlineStore.Server.Validators;
+using OnlineStore.Shared.Accounts;
 using OnlineStore.Shared.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// NLog: Setup NLog for Dependency injection
-//builder.Logging.ClearProviders();
 builder.Host.UseNLog();
 
 // Add authentication
@@ -55,11 +54,13 @@ builder.Services.AddDbContext<OnlineStoreDbContext>(
 builder.Services.AddScoped<ErrorHandlingMiddleware>();
 
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+builder.Services.AddValidatorsFromAssembly(typeof(AbstractValidator<>).Assembly);
 
 builder.Services.AddScoped<IAccountService, AccountService>();
 
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
-builder.Services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator>();
+builder.Services.AddScoped<IValidator<RegisterUser>, RegisterUserDtoValidator>();
 builder.Services.AddScoped<StoreSeeder>();
 builder.Services.AddScoped<IBlobStorage, AzureStorage>();
 builder.Services.AddSingleton<IClock, Clock>();

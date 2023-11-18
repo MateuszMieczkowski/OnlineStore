@@ -1,4 +1,5 @@
 ﻿using OnlineStore.Server.Services.Exceptions;
+using System.Text.Json;
 
 namespace OnlineStore.Server.Middleware;
 
@@ -19,25 +20,39 @@ public class ErrorHandlingMiddleware : IMiddleware
         }
         catch (BadRequestException badRequestException)
         {
-            context.Response.StatusCode = 400;
-            await context.Response.WriteAsync(badRequestException.Message);
+            await HandleExceptionAsync(context, badRequestException, 400);
         }
         catch (NotFoundException notFoundException)
         {
-            context.Response.StatusCode = 404;
-            await context.Response.WriteAsync(notFoundException.Message);
+            await HandleExceptionAsync(context, notFoundException, 404);
         }
         catch (DuplicateException duplicateException)
         {
-            context.Response.StatusCode = 409;
-            await context.Response.WriteAsync(duplicateException.Message);
+            await HandleExceptionAsync(context, duplicateException, 409);
         }
         catch (Exception e)
         {
             _logger.LogError(e, e.Message);
 
-            context.Response.StatusCode = 500;
-            await context.Response.WriteAsync(e.Message);
+            await HandleExceptionAsync(context, e, 500);
         }
     }
+    
+    private static async Task HandleExceptionAsync(HttpContext httpContext, Exception exception, int statusCode)
+    {
+        var response = new
+        {
+            exceptionType = GetExceptionType(exception),
+            statusCode,
+            message = exception.Message,
+        };
+
+        httpContext.Response.ContentType = "application/json";
+
+        httpContext.Response.StatusCode = statusCode;
+
+        await httpContext.Response.WriteAsync(JsonSerializer.Serialize(response));
+    }
+
+    private static string GetExceptionType(Exception exception) => exception.GetType().Name;
 }
