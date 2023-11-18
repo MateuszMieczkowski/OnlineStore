@@ -1,0 +1,25 @@
+@using OnlineStore.Shared.Models
+@inject IConfiguration Configuration
+
+<div class="col-md-2">
+    <div class="card mb-5 ml-2">
+        <img class="img-thumbnail" src="@StorageUrl/@Product?.Id" alt="Product image">
+        <div class="card-body">
+            <p class="card-text">Nazwa: @Product?.Name</p>
+            <p class="card-text">Nr. ref: @Product?.ReferenceNumber</p>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public ProductDto? Product { get; set; }
+    
+    private string? StorageUrl { get; set; }
+
+    protected override void OnInitialized()
+    {
+        StorageUrl = Configuration.GetValue<string>("StorageAddress");
+    }
+}

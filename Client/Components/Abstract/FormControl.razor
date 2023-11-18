@@ -1,0 +1,26 @@
+@inherits InputBase<string>
+
+<label class="d-block" for="@InputId">@Label</label>
+<InputText class="form-control" id="@InputId" placeholder="@Placeholder" @bind-Value="CurrentValue" autocomplete="off" />
+<ValidationMessage For="@ValueExpression" />
+
+@code {
+    [Parameter] public string Label { get; set; }
+    [Parameter] public string InputId { get; set; }
+    [Parameter] public string Placeholder { get; set; }
+
+    protected override bool TryParseValueFromString(string? value, out string result, out string? validationErrorMessage)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            result = string.Empty;
+            validationErrorMessage = null;
+            return true;
+        }
+        
+        result = value;
+        validationErrorMessage = null;
+        return true;
+    }
+
+}

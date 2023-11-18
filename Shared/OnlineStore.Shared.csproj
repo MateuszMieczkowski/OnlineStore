@@ -13,4 +13,10 @@
   <ItemGroup>
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.1.0" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ModelsV2\" />
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
 </Project>

@@ -23,7 +23,6 @@ builder.Services.AddScoped<AuthenticationStateProvider>(p =>
 builder.Services.AddScoped<IApiBroker, ApiBroker>();
 
 builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<ISizeService, SizeService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 
 var url = builder.Configuration.Get<Configuration>().BaseAddress;
