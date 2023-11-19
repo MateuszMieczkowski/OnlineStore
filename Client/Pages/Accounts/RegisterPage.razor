@@ -1,0 +1,53 @@
+@page "/accounts/register"
+@using OnlineStore.Shared.Accounts
+@inject NavigationManager NavManager
+@inject IAccountService AccountService
+@inject ToastService Toast
+
+<div class="container p-5">
+    <EditForm Model="RegisterUserDto" OnInvalidSubmit="OnInvalidSubmit" OnValidSubmit="OnSubmit">
+        <DataAnnotationsValidator></DataAnnotationsValidator>
+        <div class="form-group">
+            <label for="email">E-mail</label>
+            <input @bind="RegisterUserDto.Email" type="text" class="form-control" id="email" aria-describedby="loginHelp" placeholder="Wpisz">
+            <ValidationMessage For="@(() => RegisterUserDto.Email)"/>
+        </div>
+        <div class="form-group">
+            <label for="password">Hasło</label>
+            <input @bind="RegisterUserDto.Password" type="password" class="form-control" id="password" placeholder="Wpisz">
+            <ValidationMessage For="@(() => RegisterUserDto.Password)"/>
+        </div>
+
+        <div class="form-group">
+            <label for="confirmPassword">Potwierdź hasło</label>
+            <input @bind="RegisterUserDto.ConfirmPassword" type="password" class="form-control" id="confirmPassword" placeholder="Wpisz">
+            <ValidationMessage For="@(() => RegisterUserDto.ConfirmPassword)"/>
+        </div>
+
+        <button type="submit" class="btn btn-dark">Zajerestruj</button>
+    </EditForm>
+</div>
+
+@code
+{
+    public RegisterUser RegisterUserDto { get; set; } = new();
+
+    private void OnInvalidSubmit()
+    {
+        Toast.ShowToast("Proszę poprawić formularz", ToastLevel.Error);
+    }
+    
+    private async Task OnSubmit()
+    {
+        try
+        {
+            await AccountService.RegisterUser(RegisterUserDto);
+            Toast.ShowToast("Zajerestrowano użytkownika", ToastLevel.Success);
+            NavManager.NavigateTo("/users/login");
+        }
+        catch (Exception ex)
+        {
+            Toast.ShowToast($"Nie udało się zajerestrować: {ex.Message}", ToastLevel.Error);
+        }
+    }
+}

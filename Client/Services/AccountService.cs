@@ -2,13 +2,17 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using OnlineStore.Client.Brokers.API;
 using OnlineStore.Client.Providers;
+using OnlineStore.Shared.Accounts;
 using OnlineStore.Shared.Models;
 
 namespace OnlineStore.Client.Services;
 
 public interface IAccountService
 {
-    Task<bool> AuthenticateAsync(LoginDto loginDto);
+    Task<bool> AuthenticateAsync(AuthenticateUser authenticateUser);
+    
+    Task RegisterUser(RegisterUser registerUser);
+    
     Task Logout();
 }
 
@@ -26,14 +30,19 @@ public class AccountService : IAccountService
         _authenticationStateProvider = authenticationStateProvider;
     }
 
-    public async Task<bool> AuthenticateAsync(LoginDto loginDto)
+    public async Task<bool> AuthenticateAsync(AuthenticateUser authenticateUser)
     {
-        var response = await _broker.LoginAsync(loginDto);
+        var response = await _broker.LoginAsync(authenticateUser);
 
         await _localStorage.SetItemAsync("accessToken", response.Token);
 
         await ((ApiAuthenticationStateProvider)_authenticationStateProvider).LoggedIn();
         return true;
+    }
+
+    public async Task RegisterUser(RegisterUser registerUser)
+    {
+        await _broker.RegisterAsync(registerUser);
     }
 
     public async Task Logout()

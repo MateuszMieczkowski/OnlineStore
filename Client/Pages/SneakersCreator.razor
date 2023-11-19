@@ -1,0 +1,167 @@
+﻿@* @page "/create" *@
+@* @using OnlineStore.Shared.Models *@
+@* @attribute [Authorize] *@
+@* @inject IJSRuntime JsRuntime *@
+@* @inject IProductService ProductService *@
+@* @inject ToastService Toast *@
+@* @inject NavigationManager NavManager *@
+@* <section role="main"> *@
+@*     <div class="container mt-5"> *@
+@*         <h2>Add new products...</h2> *@
+@*         <form> *@
+@*             @foreach (var product in _createdProductDtos) *@
+@*             { *@
+@*                 <div class="border p-3 mb-3"> *@
+@*                     <EditForm Model="@product" Context="productContext"> *@
+@*                         <DataAnnotationsValidator/> *@
+@* *@
+@*                         @AddEditForm(productContext) *@
+@*                          *@
+@*                         <div class="form-group "> *@
+@*                             <label class="d-block">Model image</label> *@
+@*                             @if (!string.IsNullOrEmpty(product.ThumbnailPath)) *@
+@*                             { *@
+@*                                 <img class="d-block" src="data:image/png;base64,@product.ThumbnailPath"/> *@
+@*                             } *@
+@*                             <InputFile id="formFile" class="form-control" OnChange="e => OnInputFileChange(e, product)" accept=".png"/> *@
+@*                             <ValidationMessage For="@(() => product.ThumbnailPath)"/> *@
+@*                             <br><br/> *@
+@*                             <label class="d-block" for="InputProductName">Model</label> *@
+@*                             <InputText class="form-control" id="InputProductName" placeholder="Enter model" @bind-Value=product.Name autocomplete="off"/> *@
+@*                             <ValidationMessage For="@(() => product.Name)"/> *@
+@* *@
+@*                         </div> *@
+@*                         $1$ <div class="form-group"> #1# *@
+@*                         $1$     <label for="InputReferenceNumber">Reference number</label> #1# *@
+@*                         $1$     <InputText class="form-control" id="InputReferenceNumber" placeholder="Enter reference number" @bind-Value="product.ReferenceNumber" autocomplete="off"/> #1# *@
+@*                         $1$     <ValidationMessage For="@(() => product.ReferenceNumber)"/> #1# *@
+@*                         $1$ </div> #1# *@
+@* *@
+@*                     </EditForm> *@
+@* *@
+@*                     <button type="button" class="btn btn-outline-dark" @onclick="() => Remove(product)" tabindex="-1">Remove product</button> *@
+@* *@
+@*                 </div> *@
+@*             } *@
+@*         </form> *@
+@* *@
+@*         <div class="mt-3 mb-5"> *@
+@*             <button type="button" class="btn btn-dark" @onclick="OnButtonClick">Add next product</button> *@
+@*             <button type="button" @onclick="Submit" class="btn btn-dark btn-lg btn-save-changes">Save new products</button> *@
+@* *@
+@*         </div> *@
+@*     </div> *@
+@* *@
+@* </section> *@
+@* <div class="position-absolute"> *@
+@* </div> *@
+@* *@
+@* *@
+@* @code *@
+@* { *@
+@*         private const int MAX_ADDED_PRODUCT = 30; *@
+@*     private readonly List<CreateProductDto> _createdProductDtos = new(); *@
+@*     private readonly List<EditContext> _editContexts = new(); *@
+@* *@
+@*     protected override async Task OnInitializedAsync() *@
+@*     { *@
+@*         // AddNewProduct(); *@
+@*     } *@
+@* *@
+@*     private void AddNewProduct() *@
+@*     { *@
+@*         if (_createdProductDtos.Count == MAX_ADDED_PRODUCT) *@
+@*         { *@
+@*             Toast.ShowToast($"Maximum number of added products up to {MAX_ADDED_PRODUCT}!", ToastLevel.Warning); *@
+@*             return; *@
+@*         } *@
+@*         var newProduct = new CreateProductDto(); *@
+@*         _createdProductDtos.Add(newProduct); *@
+@*         StateHasChanged(); *@
+@*     } *@
+@*      *@
+@* *@
+@*     private async void OnButtonClick() *@
+@*     { *@
+@*         await Task.Run(AddNewProduct); *@
+@*         await JsRuntime.InvokeVoidAsync("OnScrollEvent"); *@
+@*         StateHasChanged(); *@
+@*     } *@
+@* *@
+@*     private async void Remove(CreateProductDto product) *@
+@*     { *@
+@*         if (_createdProductDtos.Count == 1) *@
+@*         { *@
+@*             Toast.ShowToast("There must be at least one product!", ToastLevel.Warning); *@
+@*             return; *@
+@*         } *@
+@*         await Task.Run(() => _createdProductDtos.Remove(product)); *@
+@*         await InvokeAsync(StateHasChanged); *@
+@*     } *@
+@*      *@
+@*     private async Task OnInputFileChange(InputFileChangeEventArgs e, CreateProductDto dto) *@
+@*     { *@
+@*         var fileFormat = "image/png"; *@
+@*         var maxFileSizeInKB = 1024 * 100; *@
+@*         if (e.File.ContentType != fileFormat) *@
+@*         { *@
+@*             Toast.ShowToast("You can only add images in .png format!", ToastLevel.Error); *@
+@*             return; *@
+@*         } *@
+@*         if (e.File.Size > maxFileSizeInKB) *@
+@*         { *@
+@*             Toast.ShowToast("Max size of image is 100kB!", ToastLevel.Error); *@
+@*             return; *@
+@*         } *@
+@* *@
+@*         var buffer = new byte[e.File.Size]; *@
+@* *@
+@*         await e.File.OpenReadStream().ReadAsync(buffer); *@
+@*         dto.ThumbnailPath = Convert.ToBase64String(buffer); *@
+@*         StateHasChanged(); *@
+@*     } *@
+@* *@
+@*     private async Task Submit() *@
+@*     { *@
+@*         try *@
+@*         { *@
+@*             var isValidate = true; *@
+@*             foreach (var editContext in _editContexts) *@
+@*             { *@
+@*                 if (!editContext.Validate()) *@
+@*                 { *@
+@*                     isValidate = false; *@
+@*                 } *@
+@*             } *@
+@*             if (!isValidate) *@
+@*             { *@
+@*                 throw new ArgumentException("Products doesn't passed validation!"); *@
+@*             } *@
+@* *@
+@*             StateHasChanged(); *@
+@*             var isCreated = await ProductService.CreateProducts(_createdProductDtos); *@
+@*             if (!isCreated) *@
+@*             { *@
+@*                 Toast.ShowToast("There was an error during creating", ToastLevel.Error); *@
+@*                 return; *@
+@*             } *@
+@*             Toast.ShowToast("Products created successfully!", ToastLevel.Success); *@
+@*             NavManager.NavigateTo("/"); *@
+@*         } *@
+@*         catch (ArgumentException ex) *@
+@*         { *@
+@*             Toast.ShowToast($"{ex.Message}", ToastLevel.Warning); *@
+@*         } *@
+@*         catch (Exception ex) *@
+@*         { *@
+@*             Toast.ShowToast($"Something went wrong: {ex.Message}", ToastLevel.Error); *@
+@*             throw; *@
+@*         } *@
+@*     } *@
+@* *@
+@*     private string AddEditForm(EditContext? editContext) *@
+@*     { *@
+@*         if (editContext != null) _editContexts.Add(editContext); *@
+@*         return string.Empty; *@
+@*     } *@
+@* } *@

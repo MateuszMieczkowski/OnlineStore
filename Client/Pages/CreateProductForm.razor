@@ -20,13 +20,13 @@
 
                         <div class="form-group ">
 
-                            <label class="d-block">Zdjęcia:</label>
-                            @if (!string.IsNullOrEmpty(product.ThumbnailPath))
-                            {
-                                <img alt="Product image" class="d-block" src="data:image/png;base64,@product.ThumbnailPath"/>
-                            }
-                            <InputFile id="formFile" class="form-control" OnChange="e => OnInputFileChange(e, product)" accept=".png"/>
-                            <ValidationMessage For="@(() => product.ThumbnailPath)"/>
+                            @* <label class="d-block">Zdjęcia:</label> *@
+                            @* @if (!string.IsNullOrEmpty(product.ThumbnailPath)) *@
+                            @* { *@
+                            @*     <img alt="Product image" class="d-block" src="data:image/png;base64,@product.ThumbnailPath"/> *@
+                            @* } *@
+                            @* <InputFile id="formFile" class="form-control" OnChange="e => OnInputFileChange(e, product)" accept=".png"/> *@
+                            @* <ValidationMessage For="@(() => product.ThumbnailPath)"/> *@
                             <br><br/>
                            <FormControl Label="Nazwa" InputId="Name" Placeholder="Wprowadź nazwę" @bind-Value=product.Name />
                         </div>

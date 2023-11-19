@@ -5,7 +5,8 @@
 			<div class="col-sm-8">
 				<div class="form-group">
 					<label for="inputSearchFilter">Search:</label>
-					<input class="form-control" id="inputSearchFilter" type="text" value="@_searchString" @oninput="SearchStringChanged">
+					<input class="form-control" id="inputSearchFilter" type="text" value="@_searchString"/>
+					       @* @oninput="SearchStringChanged"> *@
 				</div>
 				<button type="button" @onclick="Reset" class="btn btn-outline-dark">Clear</button>
 			</div>

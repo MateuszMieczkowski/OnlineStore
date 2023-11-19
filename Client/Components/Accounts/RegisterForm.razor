@@ -1,0 +1,46 @@
+@using OnlineStore.Shared.Accounts
+@inherits InputBase<RegisterUser>
+
+<EditForm Model="@UserModel" OnSubmit="@SubmitForm">
+      <DataAnnotationsValidator />
+   
+       <div class="mb-3">
+           <label for="Email" class="form-label">Email:</label>
+           <InputText id="Email" class="form-control" @bind-Value="Email" />
+           <ValidationMessage For="@(() => Email)" />
+       </div>
+   
+       <div class="mb-3">
+           <label for="Password" class="form-label">Hasło:</label>
+           <InputText id="Password" class="form-control" @bind-Value="Password" type="password" />
+           <ValidationMessage For="@(() => Password)" />
+       </div>
+   
+      <div class="mb-3">
+          <label for="ConfirmPassword" class="form-label">Potwierdź hasło:</label>
+          <InputText id="ConfirmPassword" class="form-control" @bind-Value="ConfirmPassword" type="password" />
+          <ValidationMessage For="@(() => ConfirmPassword)" />
+      </div>
+      
+       <button type="submit" class="btn btn-primary">Zarejestruj</button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public EventCallback<RegisterUser> OnSubmit { get; set; }
+
+    public RegisterUser UserModel { get; set; }
+    
+    private string Email { get; set; } = "";
+
+    private string Password { get; set; } = "";
+
+    private string ConfirmPassword { get; set; } = "";
+    
+    private async Task SubmitForm()
+    {
+        await OnSubmit.InvokeAsync();
+    }
+
+    protected override bool TryParseValueFromString(string? value, out RegisterUser result, out string? validationErrorMessage) => throw new NotImplementedException();
+}
