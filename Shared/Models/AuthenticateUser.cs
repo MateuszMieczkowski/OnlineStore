@@ -1,11 +1,12 @@
 ﻿using MediatR;
+using OnlineStore.Shared.Infrastructure;
 using System.ComponentModel.DataAnnotations;
 
 namespace OnlineStore.Shared.Models;
 
-public class AuthenticateUser : IRequest<AuthResponse>
+public class AuthenticateUser : IQuery<AuthResponse>
 {
-    [Required][EmailAddress] public string Email { get; set; }
+    [Required (ErrorMessage = "E-mail jest wymagany")][EmailAddress (ErrorMessage = "Podano nieprawidłowy adres e-mail")] public string Email { get; set; }
 
-    [Required] public string Password { get; set; }
+    [Required (ErrorMessage = "Hasło jest wymagane")] public string Password { get; set; }
 }

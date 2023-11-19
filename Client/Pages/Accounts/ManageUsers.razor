@@ -1,0 +1,63 @@
+﻿@page "/accounts/manage"
+@using OnlineStore.Shared.Accounts
+@using OnlineStore.Shared.Infrastructure
+@inject IAccountService AccountService
+@attribute [Authorize(Roles = "Admin")]
+
+<h3>Lista administratorów</h3>
+
+<a class="btn btn-primary mb-2" href="/accounts/register">Dodaj nowego administratotra</a>
+
+@if (items.Any())
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Email</th>
+            <th>Akcje</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var user in items)
+        {
+            <tr>
+                <td>@user.Email</td>
+                <td>
+                    <button class="btn btn-warning" @onclick="() => EditUser(user.Id)">Edytuj</button>
+                    <button class="btn btn-danger" @onclick="() => DeleteUser(user.Id)">Usuń</button>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Brak użytkowników.</p>
+}
+
+@code {
+    private IReadOnlyCollection<UserDto> items = new List<UserDto>();
+    private PagedResult<UserDto> userListResponse;
+
+    private int PageSize { get; set; } = 20;
+
+    private int PageNumber { get; set; } = 1;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var userListDto = await AccountService.GetUserList(PageNumber, PageSize);
+        items = userListDto.Items;
+    }
+
+    private void EditUser(int userId)
+    {
+    // Napisz kod do przenoszenia do strony edycji użytkownika, np. navigationManager.NavigateTo($"/users/edit/{userId}");
+    }
+
+    private void DeleteUser(int userId)
+    {
+    // Napisz kod do usuwania użytkownika, np. httpClient.DeleteAsync($"api/users/{userId}")
+    // Po usunięciu użytkownika odśwież stronę lub listę użytkowników
+    }
+}

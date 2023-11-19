@@ -4,7 +4,7 @@ using OnlineStore.Shared.Models;
 
 namespace OnlineStore.Server.Validators;
 
-public class RegisterUserDtoValidator : AbstractValidator<RegisterUser>
+public class RegisterUserDtoValidator : AbstractValidator<RegisterAdmin>
 {
     public RegisterUserDtoValidator()
     {

@@ -14,7 +14,7 @@ namespace OnlineStore.Server.Emails.EmailDefinitions
         public override string TemplateName => "ResetPassword";
         public override ICollection<EmailReplacement> GetReplacements()
         {
-          var replacements = new List<EmailReplacement>()
+          var replacements = new List<EmailReplacement>
           { 
               new("{{ResetLink}}", _resetLink),
               new ("{{UserEmail}}", RecipientEmail),

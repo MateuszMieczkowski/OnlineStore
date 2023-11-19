@@ -1,0 +1,63 @@
+@page "/clients/register"
+
+@using OnlineStore.Shared.Clients
+@inject NavigationManager NavManager
+@inject IClientService ClientService
+@inject ToastService Toast
+
+<h3>Zarejestruj się</h3>
+<EditForm Model="RegisterClientDto" OnInvalidSubmit="OnInvalidSubmit" OnValidSubmit="OnSubmit">
+    <DataAnnotationsValidator></DataAnnotationsValidator>
+
+    <div class="form-group">
+        <MudTextField @bind-Value="RegisterClientDto.FirstName" Label="Imię" Placeholder="Wpisz" For="@(() => RegisterClientDto.FirstName)"/>
+    </div>
+
+    <div class="form-group">
+        <MudTextField @bind-Value="RegisterClientDto.LastName" Label="Nazwisko" Placeholder="Wpisz" For="@(() => RegisterClientDto.LastName)"/>
+    </div>
+
+    <div class="form-group">
+        <MudTextField @bind-Value="RegisterClientDto.Email" Label="E-mail" Placeholder="Wpisz" For="@(() => RegisterClientDto.Email)"/>
+    </div>
+
+    <div class="form-group">
+        <MudTextField @bind-Value="RegisterClientDto.PhoneNumber" Label="Numer telefonu" Placeholder="Wpisz" For="@(() => RegisterClientDto.PhoneNumber)"/>
+    </div>
+
+    <div class="form-group">
+        <MudTextField @bind-Value="RegisterClientDto.Password" Label="Hasło" Placeholder="Wpisz" InputType="InputType.Password" For="@(() => RegisterClientDto.Password)"/>
+    </div>
+
+    <div class="form-group">
+        <MudTextField @bind-Value="RegisterClientDto.ConfirmPassword" Label="Potwierdź hasło" Placeholder="Wpisz" InputType="InputType.Password" For="@(() => RegisterClientDto.ConfirmPassword)"/>
+    </div>
+
+    <MudCheckBox  @bind-Checked="RegisterClientDto.IsSubscribedToNewsletter">Subskrybcja do newslettera</MudCheckBox>
+
+    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Zarejestruj</MudButton>
+</EditForm>
+
+@code
+{
+    public RegisterClient RegisterClientDto { get; set; } = new();
+
+    private void OnInvalidSubmit()
+    {
+        Toast.ShowToast("Proszę poprawić formularz", ToastLevel.Error);
+    }
+
+    private async Task OnSubmit()
+    {
+        try
+        {
+            await ClientService.Regiser(RegisterClientDto);
+            Toast.ShowToast("Zajerestrowano użytkownika", ToastLevel.Success);
+            NavManager.NavigateTo("/users/login");
+        }
+        catch (Exception ex)
+        {
+            Toast.ShowToast($"Nie udało się zajerestrować: {ex.Message}", ToastLevel.Error);
+        }
+    }
+}

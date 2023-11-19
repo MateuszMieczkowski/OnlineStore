@@ -1,9 +1,8 @@
-﻿using MediatR;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace OnlineStore.Shared.Accounts;
 
-public class RegisterUser : IRequest
+public class RegisterAdmin : IRegisterUserCommand
 {
     [Required(ErrorMessage = "E-mail jest wymagany")]
     [EmailAddress(ErrorMessage = "Wprowadzono niepoprawny adres e-mail")]

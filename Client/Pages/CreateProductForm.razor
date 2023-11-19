@@ -1,7 +1,7 @@
 ﻿@page "/create"
 @using OnlineStore.Shared.Models
 @using OnlineStore.Client.Components.Abstract
-@attribute [Authorize]
+@attribute [Authorize(Roles = "Admin")]
 @inject IJSRuntime JsRuntime
 @inject IProductService ProductService
 @inject ToastService Toast

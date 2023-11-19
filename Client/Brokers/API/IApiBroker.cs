@@ -3,7 +3,6 @@
 public partial interface IApiBroker
 {
     Task<T> GetAsync<T>(string relativeUrl);
-    Task<T> GetWithAuthAsync<T>(string relativeUrl);
 
     Task<bool> PostAsync<T>(string relativeUrl, T content);
     Task<TDto> PostAsync<TPostDto, TDto>(string relativeUrl, TPostDto content);

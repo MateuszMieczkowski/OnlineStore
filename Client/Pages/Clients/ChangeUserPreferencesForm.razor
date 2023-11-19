@@ -1,0 +1,96 @@
+@using OnlineStore.Shared.Enums
+@using OnlineStore.Client.Extensions
+@using OnlineStore.Client.Models
+@using OnlineStore.Client.Shared
+@using Blazored.LocalStorage
+@using OnlineStore.Shared.Clients
+@inject ToastService Toast
+@inject IClientService ClientService
+@inject ILocalStorageService LocalStorageService
+
+<AuthorizeView>
+    <Authorized>
+        <MudCard>
+            <MudCardHeader>
+                <MudText Typo="Typo.h6">Preferencje użytkownika</MudText>
+            </MudCardHeader>
+            <MudCardContent>
+                <EditForm Context="_" Model="Model" OnValidSubmit="OnChangePreferencesSubmit">
+                    <div class="form-group">
+                        <label>Motyw:</label>
+                        <MudRadioGroup T="UIThemeDto" SelectedOptionChanged="ChangeTheme" SelectedOption="Model.UiTheme">
+                            @foreach (var value in Enum.GetValues<UIThemeDto>())
+                            {
+                                <MudRadio Option="@value" Color="Color.Secondary" Size="Size.Medium">@EnumHelper.GetDescription(value)</MudRadio>
+                            }
+                        </MudRadioGroup>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Wyświetlana cena:</label>
+
+                        <MudRadioGroup T="DisplayedPriceDto" @bind-SelectedOption="@Model.DisplayedPrice">
+                            @foreach (var value in Enum.GetValues<DisplayedPriceDto>())
+                            {
+                                <MudRadio Option="@value" Color="Color.Secondary" Size="Size.Medium">@EnumHelper.GetDescription(value)</MudRadio>
+                            }
+                        </MudRadioGroup>
+                    </div>
+
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Zapisz preferencje</MudButton>
+                </EditForm>
+            </MudCardContent>
+        </MudCard>
+    </Authorized>
+</AuthorizeView>
+
+
+@code {
+
+    public ChangePreferencesModel Model { get; set; } = new();
+
+    // private MudTheme _theme = new();
+
+    [CascadingParameter]
+    MainLayout MainLayout { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var userPreferences = await LocalStorageService.GetItemAsync<UserPreferencesDto>("preferences");
+            Console.WriteLine(userPreferences.DisplayedPrice);
+            if (userPreferences is null)
+            {
+                Model.UiTheme = UIThemeDto.Light;
+                Model.DisplayedPrice = DisplayedPriceDto.Gross;
+            }
+            else
+            {
+                Model.UiTheme = userPreferences.UiTheme;
+                Model.DisplayedPrice = userPreferences.DisplayedPrice;
+            }
+            StateHasChanged();
+        }
+    }
+
+    private async Task OnChangePreferencesSubmit()
+    {
+        try
+        {
+            await ClientService.ChangeUserPreferences(Model);
+            Toast.ShowToast("Zaktualizowano preferencje", ToastLevel.Success);
+        }
+        catch (Exception ex)
+        {
+            Toast.ShowToast(ex.Message, ToastLevel.Error);
+        }
+    }
+
+    private async Task ChangeTheme(UIThemeDto uiTheme)
+    {
+        Model.UiTheme = uiTheme;
+        await MainLayout.OnSystemThemeChanged(Model.UiTheme == UIThemeDto.Dark);
+        StateHasChanged();
+    }
+}

@@ -8,5 +8,5 @@ public class UserPreferences
     public UITheme UITheme { get; set; }
     public DisplayedPrice DisplayedPrice { get; set; }
     public int UserId { get; set; }
-    public User User { get; set; } = default!;
+    public User? User { get; set; } 
 }
