@@ -27,9 +27,10 @@ public record ProductDto(
     int Quantity,
     decimal PriceNet,
     bool IsHidden,
-    string TaxRateAmout,
-    int TaxRateId,
+    TaxRateDto TaxRate,
     IReadOnlyCollection<ProductFileDto> ProductFiles) : ICommand;
+
+public record TaxRateDto(int TaxRateId, int Amount, string Description);
 
 public record ProductFileDto(int Id, string FileName, string BlobUri, string? Description);
 
