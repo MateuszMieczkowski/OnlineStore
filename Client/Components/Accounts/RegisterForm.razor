@@ -1,7 +1,7 @@
 @using OnlineStore.Shared.Accounts
-@inherits InputBase<RegisterUser>
+@inherits InputBase<RegisterAdmin>
 
-<EditForm Model="@UserModel" OnSubmit="@SubmitForm">
+<EditForm Model="@AdminModel" OnSubmit="@SubmitForm">
       <DataAnnotationsValidator />
    
        <div class="mb-3">
@@ -27,9 +27,9 @@
 
 @code {
     [Parameter]
-    public EventCallback<RegisterUser> OnSubmit { get; set; }
+    public EventCallback<RegisterAdmin> OnSubmit { get; set; }
 
-    public RegisterUser UserModel { get; set; }
+    public RegisterAdmin AdminModel { get; set; }
     
     private string Email { get; set; } = "";
 
@@ -42,5 +42,5 @@
         await OnSubmit.InvokeAsync();
     }
 
-    protected override bool TryParseValueFromString(string? value, out RegisterUser result, out string? validationErrorMessage) => throw new NotImplementedException();
+    protected override bool TryParseValueFromString(string? value, out RegisterAdmin result, out string? validationErrorMessage) => throw new NotImplementedException();
 }

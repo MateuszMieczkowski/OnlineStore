@@ -2,7 +2,7 @@
 {
     public enum DisplayedPrice
     {
-        Gross,
-        Net
+        Gross = 1,
+        Net = 2,
     }
 }

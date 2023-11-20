@@ -1,27 +1,117 @@
-﻿@inject IConfiguration configuration
+﻿@using Blazored.LocalStorage
+@using System.Security.Claims
+@inject AuthenticationStateProvider AuthenticationStateProvider 
+@inject NavigationManager NavigationManager
 
-<nav class="navbar navbar-light bg-light border-bottom">
+<nav class="navbar border-bottom">
     <div class="container-fluid">
         <div class="nav">
-            @* <NavLink class="nav-item nav-link" href="@configuration["MainPageAddress"]" target="child">Home <span class="sr-only">(current)</span></NavLink> *@
-            <NavLink class="nav-item nav-link" href="">Home</NavLink>
+              <MudButton Variant="Variant.Text" Href="/">Home</MudButton>
         </div>
 
-        <AuthorizeView>
-            <Authorized>
-                <div class="nav" style="margin-right: auto;">
-                    <NavLink class="nav-item nav-link" href="create">Dodaj produkt</NavLink>
-                    <NavLink class="nav-item nav-link" href="configuration">Zarządzanie produktami</NavLink>
-                </div>
-                <NavLink class="btn btn-outline-dark my-2 my-sm-0" href="users/logout">Wyloguj</NavLink>
-            </Authorized>
-            <NotAuthorized>
-                <div>
-                    <NavLink class="btn btn-outline-dark my-2 my-sm-0" href="accounts/register">Rejestracja</NavLink>
-                    <NavLink class="btn btn-outline-dark my-2 my-sm-0" href="users/login">Zaloguj</NavLink>
-                </div>
-            </NotAuthorized>
-        </AuthorizeView>
+        <div class="nav" style="margin-right: auto;">
+            <AuthorizeView Roles="Admin">
+                <Authorized>
+                    @* <NavLink class="nav-item nav-link" href="create">Dodaj produkt</NavLink> *@
+                     <MudIconButton Icon="@Icons.Material.Outlined.Add" href="create">Dodaj produkt</MudIconButton> 
+                    <MudButton Variant="Variant.Text" Href="/configuration">Zarządzanie produktami</MudButton>
+                    <MudButton Variant="Variant.Text" Href="/accounts/manage">Zarządzanie użytkownikami</MudButton>
+                </Authorized>
+            </AuthorizeView>
+        </div>
 
-	</div>
+        <div class="nav">
+            <AuthorizeView>
+                <Authorized>
+                    <MudButton Variant="Variant.Text" Href="/clients/settings">Ustawienia</MudButton>
+                </Authorized>
+            </AuthorizeView>
+            <AuthorizeView >
+                <Authorized>
+                    <div>
+                        <b>@Email</b>
+                         <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="users/logout">Wyloguj</MudButton>
+                    </div>
+                </Authorized>
+                <NotAuthorized>
+                    <div>
+                        <MudButton Class="mr-2" Variant="Variant.Filled" Color="Color.Primary" Href="clients/register">Rejestracja</MudButton>
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="users/login">Zaloguj</MudButton>
+                    </div>
+                </NotAuthorized>
+            </AuthorizeView>
+        </div>
+    </div>
 </nav>
+@* <MudAppBar> *@
+@*     $1$ <MudPaper Elevation="25"> #1# *@
+@*     <MudToolBar> *@
+@*         <MudNavLink Href="/home">Strona główna</MudNavLink> *@
+@* *@
+@*         <AuthorizeView Roles="Admin"> *@
+@*             <Authorized> *@
+@*                 <MudIconButton Icon="@Icons.Material.Outlined.Add" href="create">Dodaj produkt</MudIconButton> *@
+@*                 <MudNavLink Href="/configuration">Zarządzanie produktami</MudNavLink> *@
+@*                 <MudNavLink Href="/accounts/manage">Zarządzanie administratorami</MudNavLink> *@
+@*             </Authorized> *@
+@*         </AuthorizeView> *@
+@* *@
+@*         <MudSpacer/> *@
+@* *@
+@*         <AuthorizeView Roles="User"> *@
+@*             <Authorized> *@
+@*                 <MudNavLink Href="/clients/settings">Ustawienia</MudNavLink> *@
+@*             </Authorized> *@
+@*         </AuthorizeView> *@
+@* *@
+@*         <AuthorizeView> *@
+@*             <Authorized> *@
+@*                 <MudTypography Edge="Edge.End" Variant="Typo.body2"> *@
+@*                     <strong>@Email</strong> *@
+@*                 </MudTypography> *@
+@*                 <MudButton Variant="Variant.Filled" Edge="Edge.End" href="users/logout">Wyloguj</MudButton> *@
+@*             </Authorized> *@
+@*             <NotAuthorized> *@
+@*                 <MudButton Variant="Variant.Filled" Href="clients/register">Rejestracja</MudButton> *@
+@*                 <MudButton Variant="Variant.Filled" Href="users/login">Zaloguj</MudButton> *@
+@*                 <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit"/> *@
+@*             </NotAuthorized> *@
+@*         </AuthorizeView> *@
+@*     </MudToolBar> *@
+@*     $1$ </MudPaper> #1# *@
+@* </MudAppBar> *@
+
+@code{
+
+    private string Email { get; set; } = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        HandleAuthenticationState(authState);
+
+        AuthenticationStateProvider.AuthenticationStateChanged += HandleAuthenticationStateChanged;
+    }
+
+    private void HandleAuthenticationStateChanged(Task<AuthenticationState> authStateTask)
+    {
+        var authState = authStateTask.Result;
+        HandleAuthenticationState(authState);
+    }
+
+    private void HandleAuthenticationState(AuthenticationState authState)
+    {
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            Email = user.Identity?.Name ?? "";
+        }
+        else
+        {
+            Email = string.Empty;
+        }
+
+        StateHasChanged();
+    }
+}

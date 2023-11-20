@@ -1,40 +1,86 @@
-﻿@inherits LayoutComponentBase
+﻿@using OnlineStore.Shared.Clients
+@using Blazored.LocalStorage
+@using MudBlazor.Extensions
+@using OnlineStore.Shared.Enums
+@using System.Linq.Expressions
+@inherits LayoutComponentBase
 @inject ToastService Toast;
+@inject ILocalStorageService LocalStorage
+
 <Toast></Toast>
 <div class="page">
-	<div class="sidebar">
-		<NavMenu/>
-	</div>
+    <div class="sidebar">
+        <NavMenu/>
+    </div>
 
-	<main>
-		<ErrorBoundary @ref="errorBoundary">
-			<ChildContent>
-				@Body
-			</ChildContent>
-			<ErrorContent Context="ex">
-				@if (HandleError(ex))
-				{
-					<p>@ex.Message</p>
-				}
-			</ErrorContent>
-		</ErrorBoundary>
-	</main>
+    <main>
+        <MudContainer class="p-4">
+            <ErrorBoundary @ref="errorBoundary">
+                <ChildContent>
+                    <MudThemeProvider @ref="@_mudThemeProvider" @bind-IsDarkMode="@_isDarkMode" DefaultScrollbar="true"/>
+                    <MudDialogProvider/>
+                    <MudSnackbarProvider/>
+                    <CascadingValue Value="this">
+                        @Body
+                    </CascadingValue>
+                </ChildContent>
+                <ErrorContent Context="ex">
+                    @if (HandleError(ex))
+                    {
+                        <p>@ex.Message</p>
+                    }
+                </ErrorContent>
+            </ErrorBoundary>
+        </MudContainer>
+    </main>
 </div>
 
 @code
 {
-	ErrorBoundary errorBoundary;
+    ErrorBoundary errorBoundary;
 
-	protected override void OnParametersSet()
-	{
-		errorBoundary?.Recover();
-	}
+    private bool _isDarkMode;
+    private MudThemeProvider _mudThemeProvider;
 
-	private bool HandleError(Exception ex)
-	{
-		var msg = ex.Message;
-		var trace = ex.StackTrace;
-		Toast.ShowToast($"Something went wrong: {ex.Message}", ToastLevel.Error);
-		return true;
-	}
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _isDarkMode = await _mudThemeProvider.GetSystemPreference();
+            await _mudThemeProvider.WatchSystemPreference(OnSystemThemeChanged);
+             LocalStorage.Changed += OnLocalStorageChanged;
+            StateHasChanged();
+        }
+    }
+
+    public Task OnSystemThemeChanged(bool newValue)
+    {
+        _isDarkMode = newValue;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    protected override void OnParametersSet()
+    {
+        errorBoundary?.Recover();
+    }
+
+    private void OnLocalStorageChanged(object? sender, ChangedEventArgs e)
+    {
+        if (e.Key != "preferences")
+        {
+            return;
+        }
+
+        var preferences = e.NewValue.As<UserPreferencesDto>();
+        OnSystemThemeChanged(preferences?.UiTheme == UIThemeDto.Dark);
+    }
+
+    private bool HandleError(Exception ex)
+    {
+        var msg = ex.Message;
+        var trace = ex.StackTrace;
+        Toast.ShowToast($"Something went wrong: {ex.Message}", ToastLevel.Error);
+        return true;
+    }
 }

@@ -5,48 +5,52 @@
 @inject ToastService Toast
 
 <div class="container p-5">
-	<EditForm Model="_authenticateUser" OnValidSubmit="HandleLogin">
-		<DataAnnotationsValidator></DataAnnotationsValidator>
-		<div class="form-group">
-			<label for="email">E-mail</label>
-			<input @bind="_authenticateUser.Email" type="email" class="form-control" id="email" aria-describedby="loginHelp" placeholder="Wpisz">
-			<ValidationMessage For="@(() => _authenticateUser.Email)"/>
-		</div>
-		<div class="form-group">
-			<label for="password">Hasło</label>
-			<input @bind="_authenticateUser.Password" type="password" class="form-control" id="password" placeholder="Wpisz">
-			<ValidationMessage For="@(() => _authenticateUser.Password)"/>
-		</div>
+    <MudItem>
+        <MudItem>
+            <EditForm Model="_authenticateUser" OnValidSubmit="HandleLogin">
+                <DataAnnotationsValidator></DataAnnotationsValidator>
+                <div class="form-group">
+                    <MudTextField @bind-Value="_authenticateUser.Email" Label="E-mail" Placeholder="Wpisz" Type="InputType.Email" Class="mb-4" id="email" For="@(() => _authenticateUser.Email)"/>
+                </div>
+                <div class="form-group">
+                    <MudTextField @bind-Value="_authenticateUser.Password" Label="Hasło" Placeholder="Wpisz" InputType="InputType.Password" Class="mb-4" id="password" For="@(() => _authenticateUser.Password)"/>
+                </div>
 
-		<button type="submit" class="btn btn-dark">Submit</button>
-	</EditForm>
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Zaloguj</MudButton>
+
+                <div class="form-group mt-4">
+                    <NavLink href="users/forgot-password">Nie pamiętasz hasła?</NavLink>
+                </div>
+            </EditForm>
+        </MudItem>
+    </MudItem>
 </div>
 
 @code
 {
-	private readonly AuthenticateUser _authenticateUser = new();
+    private readonly AuthenticateUser _authenticateUser = new();
 
-	private async void HandleLogin()
-	{
-		var loginFailedMessage = "Nie udało się zalogować. Spróbuj ponownie";
-		var loginSuccessMessage = "Zalogowano pomyślnie.";
-		
-		try
-		{
-			var isAuthenticated = await AccountService.AuthenticateAsync(_authenticateUser);
-			if (isAuthenticated)
-			{
-				Toast.ShowToast(loginSuccessMessage, ToastLevel.Success);
-				NavManager.NavigateTo("");
-			}
-			else
-			{
-				Toast.ShowToast(loginFailedMessage, ToastLevel.Error);
-			}
-		}
-		catch (Exception ex)
-		{
-			Toast.ShowToast(ex.Message, ToastLevel.Error);
-		}
-	}
+    private async void HandleLogin()
+    {
+        var loginFailedMessage = "Nie udało się zalogować. Spróbuj ponownie";
+        var loginSuccessMessage = "Zalogowano pomyślnie.";
+
+        try
+        {
+            var isAuthenticated = await AccountService.AuthenticateAsync(_authenticateUser);
+            if (isAuthenticated)
+            {
+                Toast.ShowToast(loginSuccessMessage, ToastLevel.Success);
+                NavManager.NavigateTo("");
+            }
+            else
+            {
+                Toast.ShowToast(loginFailedMessage, ToastLevel.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Toast.ShowToast(ex.Message, ToastLevel.Error);
+        }
+    }
 }

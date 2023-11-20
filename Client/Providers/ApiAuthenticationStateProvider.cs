@@ -5,7 +5,14 @@ using Microsoft.AspNetCore.Components.Authorization;
 
 namespace OnlineStore.Client.Providers;
 
-public class ApiAuthenticationStateProvider : AuthenticationStateProvider
+public interface ICallContext
+{
+    Task<int> GetUserId();
+    
+    Task<AuthenticationState> GetAuthenticationStateAsync();
+}
+
+public class ApiAuthenticationStateProvider : AuthenticationStateProvider, ICallContext
 {
     private readonly JwtSecurityTokenHandler _jwtSecurityTokenHandler;
     private readonly ILocalStorageService _localStorage;
@@ -59,7 +66,13 @@ public class ApiAuthenticationStateProvider : AuthenticationStateProvider
         var savedToken = await _localStorage.GetItemAsync<string>("accessToken");
         var tokenContent = _jwtSecurityTokenHandler.ReadJwtToken(savedToken);
         var claims = tokenContent.Claims.ToList();
-        //claims.Add(new Claim(ClaimTypes.Name, tokenContent.Subject));
         return claims;
+    }
+
+    public async Task<int> GetUserId()
+    {
+        var claims = await GetClaims();
+        var userId = int.Parse(claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value);
+        return userId;
     }
 }

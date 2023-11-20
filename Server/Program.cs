@@ -6,8 +6,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using NLog.Web;
 using OnlineStore.Server;
+using OnlineStore.Server.Accounts;
+using OnlineStore.Server.Accounts.Repositories;
+using OnlineStore.Server.Accounts.Services;
+using OnlineStore.Server.Accounts.Strategies;
 using OnlineStore.Server.Authentication;
+using OnlineStore.Server.Clients.Factories;
 using OnlineStore.Server.Entities;
+using OnlineStore.Server.Infrastructure;
 using OnlineStore.Server.Jobs;
 using OnlineStore.Server.Middleware;
 using OnlineStore.Server.Options;
@@ -15,6 +21,7 @@ using OnlineStore.Server.Services;
 using OnlineStore.Server.Services.Email;
 using OnlineStore.Server.Validators;
 using OnlineStore.Shared.Accounts;
+using OnlineStore.Shared.Clients;
 using OnlineStore.Shared.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -58,13 +65,18 @@ builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
 builder.Services.AddValidatorsFromAssembly(typeof(AbstractValidator<>).Assembly);
 
-
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
-builder.Services.AddScoped<IValidator<RegisterUser>, RegisterUserDtoValidator>();
+builder.Services.AddScoped<IValidator<RegisterAdmin>, RegisterUserDtoValidator>();
 builder.Services.AddScoped<StoreSeeder>();
 builder.Services.AddScoped<IBlobStorage, AzureStorage>();
 builder.Services.AddSingleton<IClock, Clock>();
+builder.Services.AddScoped<IResultPaginator, ResultPaginator>();
+builder.Services.AddTransient<IUserFactory<RegisterAdmin>, AdminFactory>();
+builder.Services.AddTransient<IUserFactory<RegisterClient>, ClientFactory>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ITokenGenerator, TokenGenerator>();
+
 builder.Services.AddMemoryCache();
 
 builder.Services.Configure<SmtpOptions>(builder.Configuration.GetSection("Smtp"));
@@ -72,6 +84,8 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.RegisterQuartzJobs();
 builder.Services.RegisterEmailServices();
+
+
 
 builder.Services.AddCors(options =>
 {

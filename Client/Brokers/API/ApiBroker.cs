@@ -17,25 +17,21 @@ public partial class ApiBroker : IApiBroker
 
     public async Task<T> GetAsync<T>(string relativeUrl)
     {
-        return await _httpClient.GetFromJsonAsync<T>(relativeUrl);
-    }
-
-    public async Task<T> GetWithAuthAsync<T>(string relativeUrl)
-    {
-        var token = await _authenticationStateProvider.GetAuthenticationJwtToken();
-        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        await IncludeAuthenticationToken();
         return await _httpClient.GetFromJsonAsync<T>(relativeUrl);
     }
 
     public async Task<bool> PostAsync<T>(string relativeUrl, T content)
     {
-        using var response = await _httpClient.PostAsJsonAsync(relativeUrl, content);
+        await IncludeAuthenticationToken();
+        var response = await _httpClient.PostAsJsonAsync(relativeUrl, content);
         return await Validate(response);
     }
 
     public async Task<TDto> PostAsync<TPostDto, TDto>(string relativeUrl, TPostDto content)
     {
-        using var response = await _httpClient.PostAsJsonAsync(relativeUrl, content);
+        await IncludeAuthenticationToken();
+        var response = await _httpClient.PostAsJsonAsync(relativeUrl, content);
         await Validate(response);
 
         return await response.Content.ReadFromJsonAsync<TDto>();
@@ -43,13 +39,15 @@ public partial class ApiBroker : IApiBroker
 
     public async Task<bool> PutAsync<T>(string relativeUrl, T content)
     {
-        using var response = await _httpClient.PutAsJsonAsync(relativeUrl, content);
+        await IncludeAuthenticationToken();
+        var response = await _httpClient.PutAsJsonAsync(relativeUrl, content);
         return await Validate(response);
     }
 
     public async Task<TDto> PutAsync<TPutDto, TDto>(string relativeUrl, TPutDto content)
     {
-        using var response = await _httpClient.PutAsJsonAsync(relativeUrl, content);
+        await IncludeAuthenticationToken();
+        var response = await _httpClient.PutAsJsonAsync(relativeUrl, content);
         await Validate(response);
 
         return await response.Content.ReadFromJsonAsync<TDto>();
@@ -57,7 +55,8 @@ public partial class ApiBroker : IApiBroker
 
     public async Task<bool> DeleteAsync(string relativeUrl)
     {
-        using var response = await _httpClient.DeleteAsync(relativeUrl);
+        await IncludeAuthenticationToken();
+        var response = await _httpClient.DeleteAsync(relativeUrl);
 
         return await Validate(response);
     }
@@ -72,6 +71,15 @@ public partial class ApiBroker : IApiBroker
         }
 
         return true;
+    }
+
+    private async Task IncludeAuthenticationToken()
+    {
+        var token = await _authenticationStateProvider.GetAuthenticationJwtToken();
+        if (!string.IsNullOrWhiteSpace(token))
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        }
     }
 }
 

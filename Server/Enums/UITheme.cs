@@ -2,4 +2,6 @@
 
 public enum UITheme
 {
+    Light = 1,
+    Dark = 2,
 }

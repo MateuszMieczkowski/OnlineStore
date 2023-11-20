@@ -13,7 +13,7 @@
       "hotReloadEnabled": true,
       "commandLineArgs": "watch run",
       "dotnetRunMessages": true,
-      "launchBrowser": true,
+      "launchBrowser": false,
       "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}",
       "applicationUrl": "https://localhost:7020",
       "environmentVariables": {
