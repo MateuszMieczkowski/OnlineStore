@@ -1,111 +1,79 @@
 ﻿using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Extensions.Options;
 using OnlineStore.Server.Entities;
+using OnlineStore.Server.Options;
 using OnlineStore.Shared.Models;
 
 namespace OnlineStore.Server;
 
 public interface IBlobStorage
 {
-    Task<string> Upload(IFormCollection formCollection);
-    Task<bool> Upload(IEnumerable<CreateProductDto> dtos, IEnumerable<Product> products);
-    Task<bool> Update(int id, UpdateProductDto dto);
-    Task<bool> Remove(int id);
+    Task<string> UploadAsync(BlobFileName blobFileName, string fileBase64,
+        CancellationToken cancellationToken = default);
+
+    Task<bool> RemoveAsync(BlobFileName blobFileName, CancellationToken cancellationToken = default);
 }
 
 public class AzureStorage : IBlobStorage
 {
     private readonly ILogger<AzureStorage> _logger;
-    private readonly string _storageConnectionString;
-    private readonly string _storageContainerName;
+    private readonly BlobStorageOptions _storageOptions;
 
-    public AzureStorage(IConfiguration configuration, ILogger<AzureStorage> logger)
+    public AzureStorage(IOptions<BlobStorageOptions> storageOptions, ILogger<AzureStorage> logger)
     {
-        _storageConnectionString = configuration.GetValue<string>("BlobConnectionString");
-        _storageContainerName = configuration.GetValue<string>("BlobContainerName");
+        _storageOptions = storageOptions.Value;
         _logger = logger;
     }
 
-    public async Task<string> Upload(IFormCollection formCollection)
+    public async Task<string> UploadAsync(BlobFileName blobFileName, string fileBase64,
+        CancellationToken cancellationToken = default)
     {
-        var container = new BlobContainerClient(_storageConnectionString, _storageContainerName);
-        var createResponse = await container.CreateIfNotExistsAsync();
-        if (createResponse != null && createResponse.GetRawResponse().Status == 201)
-            await container.SetAccessPolicyAsync(PublicAccessType.Blob);
-
-        var file = formCollection.Files.First();
-        var blob = container.GetBlobClient(file.FileName);
-        await blob.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots);
-        using (var fileStream = file.OpenReadStream())
+        var container = await GetContainerAsync(cancellationToken);
+        var blob = container.GetBlobClient(blobFileName.ToString());
+        
+        await blob.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots, cancellationToken: cancellationToken);
+        
+        var fileBinary = Convert.FromBase64String(fileBase64);
+        await using (var fileStream = await new StreamContent(new MemoryStream(fileBinary)).ReadAsStreamAsync(cancellationToken))
         {
-            await blob.UploadAsync(fileStream, new BlobHttpHeaders { ContentType = file.ContentType });
+            new FileExtensionContentTypeProvider().TryGetContentType(blobFileName.ToString(), out var contentType);
+            await blob.UploadAsync(fileStream, new BlobHttpHeaders { ContentType = contentType }, cancellationToken: cancellationToken);
         }
 
         return blob.Uri.ToString();
     }
 
-    public async Task<bool> Upload(IEnumerable<CreateProductDto> dtos, IEnumerable<Product> products)
+    public async Task<bool> RemoveAsync(BlobFileName blobFileName, CancellationToken cancellationToken = default)
     {
-        if (dtos.Count() != products.Count())
-            throw new Exception("Something went wrong during uploading images");
+        var container = await GetContainerAsync(cancellationToken);
+        var blob = container.GetBlobClient(blobFileName.ToString());
 
-        var container = await GetContainter();
-
-        var contentType = "image/png";
-
-        var em = dtos.GetEnumerator();
-        foreach (var product in products)
-        {
-            em.MoveNext();
-            var dto = em.Current;
-
-            var blob = container.GetBlobClient(product.Id.ToString());
-            await blob.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots);
-            var bytes = Convert.FromBase64String(dto.ThumbnailPath);
-            using (var fileStream = new StreamContent(new MemoryStream(bytes)).ReadAsStream())
-            {
-                await blob.UploadAsync(fileStream, new BlobHttpHeaders { ContentType = contentType });
-            }
-        }
-
-        return true;
+        return await blob.DeleteIfExistsAsync(cancellationToken: cancellationToken);
     }
 
-    public async Task<bool> Update(int id, UpdateProductDto dto)
+    private async Task<BlobContainerClient> GetContainerAsync(CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrEmpty(dto.ThumbnailPath)) return false;
-        var container = await GetContainter();
-
-        var contentType = "image/png";
-
-
-        var blob = container.GetBlobClient(id.ToString());
-        await blob.DeleteIfExistsAsync();
-        var bytes = Convert.FromBase64String(dto.ThumbnailPath);
-        using (var fileStream = new StreamContent(new MemoryStream(bytes)).ReadAsStream())
-        {
-            await blob.UploadAsync(fileStream, new BlobHttpHeaders { ContentType = contentType });
-        }
-
-        return true;
-    }
-
-    public async Task<bool> Remove(int id)
-    {
-        var container = await GetContainter();
-
-        var blob = container.GetBlobClient(id.ToString());
-        await blob.DeleteIfExistsAsync();
-        return true;
-    }
-
-    private async Task<BlobContainerClient> GetContainter()
-    {
-        var container = new BlobContainerClient(_storageConnectionString, _storageContainerName);
-        var createResponse = await container.CreateIfNotExistsAsync();
+        var container = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.ContainerName);
+        var createResponse = await container.CreateIfNotExistsAsync(cancellationToken: cancellationToken);
         if (createResponse != null && createResponse.GetRawResponse().Status == 201)
-            await container.SetAccessPolicyAsync(PublicAccessType.Blob);
+            await container.SetAccessPolicyAsync(PublicAccessType.Blob, cancellationToken: cancellationToken);
 
         return container;
     }
+}
+
+public class BlobFileName
+{
+    private readonly Guid _blobId;
+    private readonly string _fileName;
+
+    public BlobFileName(Guid blobId, string fileName)
+    {
+        _blobId = blobId;
+        _fileName = fileName;
+    }
+
+    public override string ToString() => $"{_blobId}{Path.GetExtension(_fileName)}";
 }

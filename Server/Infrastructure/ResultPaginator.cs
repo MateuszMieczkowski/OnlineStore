@@ -14,7 +14,7 @@ public interface IResultPaginator
         where TDto : class;
 }
 
-public class ResultPaginator : IResultPaginator
+public class ResultPaginator : IResultPaginator  
 {
     public async Task<PagedResult<TDto>> GetPagedResult<TEntity, TDto>(
         IQueryable<TEntity> queryBase,

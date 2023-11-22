@@ -8,8 +8,6 @@ public class SneakersMappingProfile : Profile
 {
     public SneakersMappingProfile()
     {
-        CreateMap<CreateProductDto, Product>();
-        CreateMap<Product, ProductDto>();
         CreateMap<User, AuthResponse>();
     }
 }
