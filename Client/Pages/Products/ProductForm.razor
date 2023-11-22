@@ -1,0 +1,220 @@
+@using OnlineStore.Client.Products.Models
+@using OnlineStore.Client.Extensions
+@using OnlineStore.Shared.Products
+@using TaxRateDto = OnlineStore.Shared.Enums.TaxRateDto
+
+<MudCardHeader>
+    <CardHeaderContent>
+        <MudText Typo="Typo.h4">@_model.Name</MudText>
+    </CardHeaderContent>
+</MudCardHeader>
+@* <MudForm Model="_model"> *@
+    <MudCardContent Class="d-flex flex-column gap-2">
+
+        @if (!string.IsNullOrEmpty(_thumbnailBase64))
+        {
+            <MudImage ObjectFit="ObjectFit.Contain" Src="@_thumbnailBase64" Alt="thumbnail-mud" Elevation="25" Class="rounded-lg" Height="300"/>
+        }
+        <MudFileUpload T="IBrowserFile" FilesChanged="file => UploadFile(file, ProductFileTypeDto.Thumbnail)" Accept=".png, .jpg">
+            <ButtonTemplate>
+                <MudButton HtmlTag="label"
+                           Variant="Variant.Filled"
+                           Color="Color.Secondary"
+                           StartIcon="@Icons.Material.Filled.Photo"
+                           for="@context">
+                    Dodaj miniaturkę produktu
+                </MudButton>
+            </ButtonTemplate>
+        </MudFileUpload>
+        <MudTextField @bind-Value="_model.Name"
+                      Class="mt-2"
+                      For="@(() => _model.Name)"
+                      Immediate="true"
+                      Variant="Variant.Outlined"
+                      Label="Nazwa *"/>
+        <MudTextField @bind-Value="_model.ReferenceNumber"
+                      For="@(() => _model.ReferenceNumber)"
+                      Variant="Variant.Outlined"
+                      Label="Numer referencyjny *"/>
+        <MudTextField @bind-Value="_model.ShortDescription"
+                      For="@(() => _model.ShortDescription)"
+                      Variant="Variant.Outlined"
+                      Label="Krótki opis"/>
+
+        <MudTextField @bind-Value="_model.Quantity"
+                      For="@(() => _model.Quantity)"
+                      Variant="Variant.Outlined"
+                      InputType="InputType.Number"
+                      Label="Ilość"/>
+        <div class="d-flex gap-2">
+            <MudNumericField @bind-Value="_model.PriceNet"
+                             For="@(() => _model.PriceNet)"
+                             Variant="Variant.Outlined"
+                             Format="N2"
+                             Adornment="Adornment.End"
+                             AdornmentText="zł"
+                             Label="Cena netto *"/>
+
+            <MudSelect T="TaxRateDto" Label="Stawka podatku *" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" @bind-Value="_model.TaxRate">
+                @foreach (var value in Enum.GetValues<TaxRateDto>())
+                {
+                    <MudSelectItem T="TaxRateDto" Value="@value">@EnumHelper.GetDescription(value)</MudSelectItem>
+                }
+            </MudSelect>
+            <MudNumericField
+                Variant="Variant.Outlined"
+                Format="N2"
+                ReadOnly="true"
+                Value="@PriceGross"
+                Adornment="Adornment.End"
+                AdornmentText="zł"
+                Label="Cena brutto (wyliczona)"/>
+        </div>
+        <MudSwitch @bind-Checked="_model.IsHidden"
+                   For="@(() => _model.IsHidden)"
+                   Label="Ukrycie produktu"/>
+
+        <MudGrid>
+            <MudItem xs="12" md="6">
+                <MudTextField @bind-Value="_model.Description"
+                              For="@(() => _model.ShortDescription)"
+                              Variant="Variant.Outlined"
+                              Immediate="true"
+                              Lines="10"
+                              Label="Opis szczegółowy"/>
+
+            </MudItem>
+
+            <MudItem xs="12" md="6">
+                <div>
+                    <strong>Podgląd:</strong>
+                    <div>
+                        @((MarkupString)_model.Description)
+                    </div>
+                </div>
+            </MudItem>
+        </MudGrid>
+        <MudFileUpload T="IReadOnlyList<IBrowserFile>" FilesChanged="@((files) => UploadFiles(files, ProductFileTypeDto.Image))" Accept=".png, .jpg">
+            <ButtonTemplate>
+                <MudButton HtmlTag="label"
+                           Variant="Variant.Filled"
+                           Color="Color.Secondary"
+                           StartIcon="@Icons.Material.Filled.Image"
+                           for="@context">
+                    Dodaj obrazy
+                </MudButton>
+            </ButtonTemplate>
+        </MudFileUpload>
+        <MudList>
+            @foreach (var file in _model.ProductFiles.Where(x => x.ProductFileType == ProductFileTypeDto.Image))
+            {
+                <MudListItem Icon="@Icons.Material.Filled.Image">
+                    @file.FileName
+                    <MudButton OnClick="@(() => RemoveFile(file))" EndIcon="@Icons.Material.Filled.RemoveCircle" Variant="Variant.Outlined" Color="Color.Secondary">Usuń</MudButton>
+                </MudListItem>
+            }
+        </MudList>
+        @if (_model.ProductFiles.Any(x => x.ProductFileType == ProductFileTypeDto.Image))
+        {
+            <MudCarousel TData="object" Style="height:600px;" AutoCycle="false" css>
+                @foreach (var file in _model.ProductFiles.Where(x => x.ProductFileType == ProductFileTypeDto.Image))
+                {
+                    <MudCarouselItem>
+                        <MudImage ObjectFit="ObjectFit.Cover" Src="@file.FileBase64" Alt="gallery-item" Elevation="25" Class="rounded-lg d-block m-auto"/>
+                    </MudCarouselItem>
+                }
+            </MudCarousel>
+        }
+        <MudFileUpload T="IReadOnlyList<IBrowserFile>" Accept=".pdf" FilesChanged="@((files) => UploadFiles(files, ProductFileTypeDto.Other))">
+            <ButtonTemplate>
+                <MudButton HtmlTag="label"
+                           Variant="Variant.Filled"
+                           Color="Color.Secondary"
+                           StartIcon="@Icons.Material.Filled.Image"
+                           for="@context">
+                    Załącz pliki
+                </MudButton>
+            </ButtonTemplate>
+        </MudFileUpload>
+        <MudList>
+            @foreach (var file in _model.ProductFiles.Where(x => x.ProductFileType == ProductFileTypeDto.Other))
+            {
+                <MudListItem Icon="@Icons.Material.Filled.AttachFile">
+                    <div class="d-flex flex-column gap-2">
+                        <MudButton OnClick="@(() => RemoveFile(file))" EndIcon="@Icons.Material.Filled.RemoveCircle" Variant="Variant.Outlined" Color="Color.Secondary">Usuń</MudButton>
+                        <MudTextField @bind-Value="file.FileName"
+                                      Variant="Variant.Outlined"
+                                      Label="Nazwa *"/>
+                        <MudTextField @bind-Value="file.Description"
+                                      Variant="Variant.Outlined"
+                                      Label="Opis"/>
+                    </div>
+                </MudListItem>
+            }
+        </MudList>
+    </MudCardContent>
+@* </MudForm> *@
+
+
+@code {
+
+    private string _thumbnailBase64 = "";
+
+    [Parameter]
+    public CreateProductModel _model { get; set; }
+
+    // private readonly CreateProductModel _model = new();
+
+    IList<IBrowserFile> allFiles = new List<IBrowserFile>();
+
+    private decimal PriceGross => _model.TaxRate != TaxRateDto.Vat0 && _model.TaxRate != TaxRateDto.VatZw ? Math.Round(_model.PriceNet * (1 + (decimal)_model.TaxRate / 100), 2) : _model.PriceNet;
+
+    private async Task UploadFiles(IReadOnlyList<IBrowserFile> files, ProductFileTypeDto fileType)
+    {
+        foreach (var file in files)
+        {
+            await UploadFile(file, fileType);
+        }
+    }
+
+    private async Task UploadFile(IBrowserFile file, ProductFileTypeDto fileType)
+    {
+
+        var productFile = new CreateProductFileModel
+        {
+            FileName = file.Name,
+            File = file,
+            ProductFileType = fileType,
+        };
+
+        var buffer = new byte[file.Size];
+
+    // if (e.File.Size > maxFileSizeInKB)
+    // {
+    //     Toast.ShowToast("Max size of image is 100kB!", ToastLevel.Error);
+    //     return;
+    // }
+
+        await file.OpenReadStream().ReadAsync(buffer);
+
+        var fileBase64 = $"data:image/jpeg;base64,{Convert.ToBase64String(buffer)}";
+        productFile.FileBase64 = fileBase64;
+
+        if (fileType == ProductFileTypeDto.Thumbnail)
+        {
+            _thumbnailBase64 = fileBase64;
+        }
+
+        _model.ProductFiles.Add(productFile);
+        allFiles.Add(file);
+
+        StateHasChanged();
+    }
+
+    private void RemoveFile(CreateProductFileModel file)
+    {
+        allFiles.Remove(file.File);
+        _model.ProductFiles.Remove(file);
+        StateHasChanged();
+    }
+}

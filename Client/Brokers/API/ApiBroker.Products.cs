@@ -1,4 +1,6 @@
 ﻿using OnlineStore.Shared.Models;
+using OnlineStore.Shared.Products;
+using ProductDto = OnlineStore.Shared.Models.ProductDto;
 
 namespace OnlineStore.Client.Brokers.API;
 
@@ -11,9 +13,10 @@ public partial class ApiBroker
         return await GetAsync<List<ProductDto>>(ProductRelativeUrl);
     }
 
-    public async Task<bool> PostProductsAsync(List<CreateProductDto> dtos)
+    
+    public async Task PostProductsAsync(CreateProductsBatch command)
     {
-        return await PostAsync(ProductRelativeUrl, dtos);
+        await PostAsync($"{ProductRelativeUrl}/create-batch", command);
     }
 
     public async Task<ProductDto> UpdateProductAsync(int id, UpdateProductDto dto)

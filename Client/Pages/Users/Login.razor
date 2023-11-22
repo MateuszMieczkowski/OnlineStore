@@ -2,7 +2,7 @@
 @using OnlineStore.Shared.Models
 @inject IAccountService AccountService
 @inject NavigationManager NavManager
-@inject ToastService Toast
+@inject ISnackbar Snackbar
 
 <div class="container p-5">
     <MudItem>
@@ -40,17 +40,17 @@
             var isAuthenticated = await AccountService.AuthenticateAsync(_authenticateUser);
             if (isAuthenticated)
             {
-                Toast.ShowToast(loginSuccessMessage, ToastLevel.Success);
+                Snackbar.Add(loginSuccessMessage, Severity.Success);
                 NavManager.NavigateTo("");
             }
             else
             {
-                Toast.ShowToast(loginFailedMessage, ToastLevel.Error);
+                Snackbar.Add(loginFailedMessage, Severity.Error);
             }
         }
         catch (Exception ex)
         {
-            Toast.ShowToast(ex.Message, ToastLevel.Error);
+            Snackbar.Add(ex.Message, Severity.Error);
         }
     }
 }

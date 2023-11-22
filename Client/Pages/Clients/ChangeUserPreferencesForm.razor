@@ -4,7 +4,7 @@
 @using OnlineStore.Client.Shared
 @using Blazored.LocalStorage
 @using OnlineStore.Shared.Clients
-@inject ToastService Toast
+@inject ISnackbar Snackbar
 @inject IClientService ClientService
 @inject ILocalStorageService LocalStorageService
 
@@ -79,11 +79,11 @@
         try
         {
             await ClientService.ChangeUserPreferences(Model);
-            Toast.ShowToast("Zaktualizowano preferencje", ToastLevel.Success);
+            Snackbar.Add("Zaktualizowano preferencje", Severity.Success);
         }
         catch (Exception ex)
         {
-            Toast.ShowToast(ex.Message, ToastLevel.Error);
+            Snackbar.Add(ex.Message, Severity.Error);
         }
     }
 

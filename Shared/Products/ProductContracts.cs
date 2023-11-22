@@ -2,7 +2,6 @@ using OnlineStore.Shared.Infrastructure;
 
 namespace OnlineStore.Shared.Products;
 
-
 // GET: api/products (filtry się dorobi później)
 public record GetProductList(int PageNumber, int PageSize) : IPagedQuery<ProductListItemDto>;
 
