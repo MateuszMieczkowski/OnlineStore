@@ -18,8 +18,8 @@ public class GetProductQueryHandler : IQueryHandler<GetProduct, ProductDto>
     {
         var result = await _dbContext.Products
             .Where(x => x.Id == query.Id
-                        && (query.IncludeDeleted || !x.IsDeleted)
-                        && (query.IncludeHidden || !x.IsHidden))
+                && (query.IncludeDeleted || !x.IsDeleted)
+                && (query.IncludeHidden || !x.IsHidden))
             .Select(x => new ProductDto(
                 x.Name,
                 x.ReferenceNumber,
