@@ -10,8 +10,10 @@ namespace OnlineStore.Server;
 
 public interface IBlobStorage
 {
-    Task<string> UploadAsync(Guid fileId, string fileName, string fileBase64);
-    Task<bool> RemoveAsync(Guid id);
+    Task<string> UploadAsync(BlobFileName blobFileName, string fileBase64,
+        CancellationToken cancellationToken = default);
+
+    Task<bool> RemoveAsync(BlobFileName blobFileName, CancellationToken cancellationToken = default);
 }
 
 public class AzureStorage : IBlobStorage
@@ -25,37 +27,53 @@ public class AzureStorage : IBlobStorage
         _logger = logger;
     }
 
-    public async Task<string> UploadAsync(Guid fileId, string fileName, string fileBase64)
+    public async Task<string> UploadAsync(BlobFileName blobFileName, string fileBase64,
+        CancellationToken cancellationToken = default)
     {
-        var container = await GetContainerAsync();
-        var blobFilename = fileId + Path.GetExtension(fileName);
-        var blob = container.GetBlobClient(blobFilename);
-        await blob.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots);
+        var container = await GetContainerAsync(cancellationToken);
+        var blob = container.GetBlobClient(blobFileName.ToString());
+        
+        await blob.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots, cancellationToken: cancellationToken);
+        
         var fileBinary = Convert.FromBase64String(fileBase64);
-        await using (var fileStream = await new StreamContent(new MemoryStream(fileBinary)).ReadAsStreamAsync())
+        await using (var fileStream = await new StreamContent(new MemoryStream(fileBinary)).ReadAsStreamAsync(cancellationToken))
         {
-            new FileExtensionContentTypeProvider().TryGetContentType(fileName, out var contentType);
-            await blob.UploadAsync(fileStream, new BlobHttpHeaders { ContentType = contentType });
+            new FileExtensionContentTypeProvider().TryGetContentType(blobFileName.ToString(), out var contentType);
+            await blob.UploadAsync(fileStream, new BlobHttpHeaders { ContentType = contentType }, cancellationToken: cancellationToken);
         }
 
         return blob.Uri.ToString();
     }
 
-    public async Task<bool> RemoveAsync(Guid id)
+    public async Task<bool> RemoveAsync(BlobFileName blobFileName, CancellationToken cancellationToken = default)
     {
-        var container = await GetContainerAsync();
-        var blob = container.GetBlobClient(id.ToString());
-        
-        return await blob.DeleteIfExistsAsync();
+        var container = await GetContainerAsync(cancellationToken);
+        var blob = container.GetBlobClient(blobFileName.ToString());
+
+        return await blob.DeleteIfExistsAsync(cancellationToken: cancellationToken);
     }
 
-    private async Task<BlobContainerClient> GetContainerAsync()
+    private async Task<BlobContainerClient> GetContainerAsync(CancellationToken cancellationToken = default)
     {
         var container = new BlobContainerClient(_storageOptions.ConnectionString, _storageOptions.ContainerName);
-        var createResponse = await container.CreateIfNotExistsAsync();
+        var createResponse = await container.CreateIfNotExistsAsync(cancellationToken: cancellationToken);
         if (createResponse != null && createResponse.GetRawResponse().Status == 201)
-            await container.SetAccessPolicyAsync(PublicAccessType.Blob);
+            await container.SetAccessPolicyAsync(PublicAccessType.Blob, cancellationToken: cancellationToken);
 
         return container;
     }
+}
+
+public class BlobFileName
+{
+    private readonly Guid _blobId;
+    private readonly string _fileName;
+
+    public BlobFileName(Guid blobId, string fileName)
+    {
+        _blobId = blobId;
+        _fileName = fileName;
+    }
+
+    public override string ToString() => $"{_blobId}{Path.GetExtension(_fileName)}";
 }

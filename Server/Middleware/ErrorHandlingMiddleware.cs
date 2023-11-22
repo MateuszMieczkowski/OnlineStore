@@ -1,5 +1,6 @@
 ﻿using OnlineStore.Server.Services.Exceptions;
 using System.Text.Json;
+using FluentValidation;
 
 namespace OnlineStore.Server.Middleware;
 
@@ -17,6 +18,10 @@ public class ErrorHandlingMiddleware : IMiddleware
         try
         {
             await next.Invoke(context);
+        }
+        catch (ValidationException requestValidationException)
+        {
+            await HandleExceptionAsync(context, requestValidationException, 400);
         }
         catch (BadRequestException badRequestException)
         {

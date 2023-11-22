@@ -1,8 +1,7 @@
 ﻿using FluentValidation;
 using OnlineStore.Shared.Accounts;
-using OnlineStore.Shared.Models;
 
-namespace OnlineStore.Server.Validators;
+namespace OnlineStore.Server.Accounts.Validators;
 
 public class RegisterUserDtoValidator : AbstractValidator<RegisterAdmin>
 {

@@ -49,7 +49,7 @@ public class CreateProductsBatchCommandHandler : ICommandHandler<CreateProductsB
         
         if (anyReferenceNumberExists)
         {
-            throw new BadRequestException("One or more reference numbers already exists.");
+            throw new DuplicateException("One or more reference numbers already exists.");
         }
     }
 
@@ -91,7 +91,7 @@ public class CreateProductsBatchCommandHandler : ICommandHandler<CreateProductsB
         };
 
         productFile.BlobUri =
-            await _blobStorage.UploadAsync(productFile.BlobId, productFile.FileName, createProductFile.FileBase64);
+            await _blobStorage.UploadAsync(new BlobFileName(productFile.BlobId, productFile.FileName), createProductFile.FileBase64);
 
         if (productFile.FileType == ProductFileType.Thumbnail)
         {

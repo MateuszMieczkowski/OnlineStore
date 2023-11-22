@@ -8,9 +8,13 @@ public class ProductFileConfiguration : IEntityTypeConfiguration<ProductFile>
     public void Configure(EntityTypeBuilder<ProductFile> builder)
     {
         builder.HasKey(e => e.Id);
+        
         builder.Property(e => e.Id)
             .ValueGeneratedOnAdd()
             .UseIdentityColumn();
+
+        builder.Property(e => e.BlobUri)
+            .ValueGeneratedNever();
 
         builder.Property(e => e.FileName)
             .IsRequired()
@@ -18,6 +22,9 @@ public class ProductFileConfiguration : IEntityTypeConfiguration<ProductFile>
 
         builder.Property(e => e.BlobUri)
             .HasMaxLength(500)
+            .IsRequired();
+
+        builder.Property(e => e.FileType)
             .IsRequired();
 
         builder.HasOne(e => e.Product)

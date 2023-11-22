@@ -3,18 +3,9 @@ using OnlineStore.Shared.Products;
 
 namespace OnlineStore.Server.Products.Validators;
 
-public class CreateProductsBatchValidator : AbstractValidator<CreateProductsBatch>
+public class UpdateProductValidator : AbstractValidator<UpdateProduct>
 {
-    public CreateProductsBatchValidator()
-    {
-        RuleForEach(x => x.Products)
-            .SetValidator(new CreateProductDtoValidator());
-    }
-}
-
-public class CreateProductDtoValidator : AbstractValidator<CreateProductDto>
-{
-    public CreateProductDtoValidator()
+    public UpdateProductValidator()
     {
         RuleFor(x => x.Name)
             .NotEmpty()
@@ -48,21 +39,17 @@ public class CreateProductDtoValidator : AbstractValidator<CreateProductDto>
         
         RuleForEach(x => x.ProductFiles)
             .NotEmpty()
-            .SetValidator(new CreateProductFileValidator());
-
-        RuleFor(x => x.ProductFiles)
-            .Must(x => x.Any(y => y.ProductFileType == ProductFileTypeDto.Thumbnail))
-            .WithMessage("Product must have at least one thumbnail.");
+            .SetValidator(new UpdateProductFileValidator());
         
         RuleFor(x => x.ProductFiles)
-            .Must(x => x.Count(y => y.ProductFileType == ProductFileTypeDto.Thumbnail) > 1)
-            .WithMessage("Product must have only one thumbnail.");
+            .Must(x => x.Count(y => y.ProductFileType == ProductFileTypeDto.Thumbnail) == 1)
+            .WithMessage("Product must have one and only thumbnail.");
     }
 }
 
-public class CreateProductFileValidator : AbstractValidator<CreateProductFile>
+public class UpdateProductFileValidator : AbstractValidator<UpdateProductFileDto>
 {
-    public CreateProductFileValidator()
+    public UpdateProductFileValidator()
     {
         RuleFor(x => x.FileName)
             .NotEmpty()
