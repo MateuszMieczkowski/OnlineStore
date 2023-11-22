@@ -24,8 +24,8 @@ public class AccountController : ControllerBase
     public async Task<PagedResult<UserDto>> GetUsers(int pageNumber , int pageSize)
     {
         var query = new GetUserList(pageNumber, pageSize);
-        var reponse = await _mediator.Send(query);
-        return reponse;
+        var response = await _mediator.Send(query);
+        return response;
     }
     
     [HttpPost("register")]
