@@ -3,6 +3,13 @@ html {
     scroll-behavior: smooth;
 }
 
+a:hover{
+    text-decoration: none;
+    color: inherit;
+}
+
+
+
 .card col-md-3
 {
     width: 500px;
@@ -13,14 +20,7 @@ html {
 .card-body{
     transition: background-color ease-in-out 300ms;
 }
-.card-body:hover{
-    background-color: #e9ecef;
-}
 
-li:hover {
-    background: #212529;
-    color: white
-}
 
 .info {
     margin-top: 15px;
@@ -81,13 +81,6 @@ li:hover {
         transform: rotate(360deg)
     }
 }
-.nav-link.nav-item {
-    color: rgba(0,0,0,.5);
-}
-
-    .nav-link.nav-item:hover, .nav-link.nav-item:focus {
-        color: rgba(0,0,0,.7);
-    }
 
 .selectize-input {
     max-width: 200px;

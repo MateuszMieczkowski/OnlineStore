@@ -217,6 +217,9 @@ namespace OnlineStore.Server.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
+                    b.Property<decimal>("PriceGross")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<decimal>("PriceNet")
                         .HasColumnType("decimal(18,2)");
 
@@ -237,6 +240,11 @@ namespace OnlineStore.Server.Migrations
 
                     b.Property<int>("TaxRateId")
                         .HasColumnType("int");
+
+                    b.Property<string>("ThumbnailBlobUri")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.HasKey("Id");
 
@@ -273,6 +281,9 @@ namespace OnlineStore.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<Guid>("BlobId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("BlobUri")
                         .IsRequired()
                         .HasMaxLength(500)
@@ -286,6 +297,9 @@ namespace OnlineStore.Server.Migrations
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
+
+                    b.Property<int>("FileType")
+                        .HasColumnType("int");
 
                     b.Property<int>("ProductId")
                         .HasColumnType("int");

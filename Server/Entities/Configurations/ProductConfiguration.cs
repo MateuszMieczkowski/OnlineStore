@@ -28,6 +28,9 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
 
         builder.Property(e => e.PriceNet)
             .IsRequired();
+        
+        builder.Property(e => e.PriceGross)
+            .IsRequired();
 
         builder.Property(e => e.IsHidden)
             .IsRequired();
@@ -36,6 +39,10 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .IsRequired();
 
         builder.Property(e => e.Quantity)
+            .IsRequired();
+        
+        builder.Property(e => e.ThumbnailBlobUri)
+            .HasMaxLength(500)
             .IsRequired();
 
         builder.HasOne(e => e.TaxRate)

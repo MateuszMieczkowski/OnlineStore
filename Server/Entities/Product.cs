@@ -8,9 +8,11 @@ public class Product
     public string? ShortDescription { get; set; }
     public string? Description { get; set; }
     public decimal PriceNet { get; set; }
+    public decimal PriceGross { get; set; }
     public bool IsHidden { get; set; }
     public bool IsDeleted { get; set; }
     public int Quantity { get; set; }
+    public string ThumbnailBlobUri { get; set; } = string.Empty;
     public int TaxRateId { get; set; }
     public int? ProductCategoryId { get; set; }
     public TaxRate TaxRate { get; set; } = default!;

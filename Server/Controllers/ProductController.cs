@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OnlineStore.Server.Services;
-using OnlineStore.Shared.Models;
+using OnlineStore.Server.Authentication;
+using OnlineStore.Shared.Infrastructure;
+using OnlineStore.Shared.Products;
 
 namespace OnlineStore.Server.Controllers;
 
@@ -10,51 +12,101 @@ namespace OnlineStore.Server.Controllers;
 [Route("api/products")]
 public class ProductController : ControllerBase
 {
-    private readonly IBlobStorage _azureStorage;
+    private readonly IMediator _mediator;
 
-    public ProductController( IBlobStorage azureStorage)
+    public ProductController(IMediator mediator)
     {
-        _azureStorage = azureStorage;
+        _mediator = mediator;
     }
 
+    [HttpPost("create-batch")]
+    [Authorize(Roles = UserRoles.Admin)]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    public async Task<ActionResult> CreateProductsBatch([FromBody] CreateProductsBatch command)
+    {
+        await _mediator.Send(command);
+        return Created("/products", null);
+    }
+    
     [HttpGet]
     [AllowAnonymous]
-    public async Task<ActionResult<IEnumerable<ProductDto>>> GetAll()
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<PagedResult<ProductListItemDto>> GetProductList([FromQuery] GetProductList query)
     {
+        var response = await _mediator.Send(query);
+        return response;
+    }
+    
+    [HttpGet("{id:int}")]
+    [AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ProductDto> GetProduct([FromRoute] int id,
+        [FromQuery] bool includeDeleted = false,
+        [FromQuery] bool includeHidden = false)
+    {
+        var response = await _mediator.Send(new GetProduct(id, includeDeleted, includeHidden));
+        return response;
+    }
+    
+    [HttpPut("{id:int}")]
+    [Authorize(Roles = UserRoles.Admin)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult> UpdateProduct([FromRoute] int id, [FromBody] UpdateProductDto updateProductDto)
+    {
+        await _mediator.Send(updateProductDto.ToCommand(id));
         return Ok();
     }
     
-    [HttpGet("search")]
-    [AllowAnonymous]
-    public async Task<ActionResult<IEnumerable<ProductDto>>> GetBySerach([FromQuery] string filter)
+    [HttpDelete("{id:int}/soft-delete")]
+    [Authorize(Roles = UserRoles.Admin)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<ActionResult> SoftDeleteProduct([FromRoute] int id)
     {
+        await _mediator.Send(new SoftDeleteProduct(id));
         return Ok();
     }
-
-    [HttpPost]
-    public async Task<ActionResult> PostMany([FromBody] List<CreateProductDto> dtos)
+    
+    [HttpDelete("{id:int}/hard-delete")]
+    [Authorize(Roles = UserRoles.Admin)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<ActionResult> HardDeleteProduct([FromRoute] int id)
     {
-        //var products = await _productService.CreateManyAsync(dtos);
-        //await _azureStorage.Upload(dtos, products);
-
-        return Created("api/products", null);
-    }
-
-
-    [HttpDelete("{id:int}")]
-    public async Task<ActionResult> RemoveById([FromRoute] int id)
-    {
-        //_productService.RemoveById(id);
-        await _azureStorage.Remove(id);
-        return NoContent();
-    }
-
-    [HttpPut("{id:int}")]
-    public async Task<ActionResult<ProductDto>> Update([FromRoute] int id, [FromBody] UpdateProductDto dto)
-    {
-        await _azureStorage.Update(id, dto);
-        //var updatedDto = await _productService.UpdateAsync(id, dto);
-
+        await _mediator.Send(new HardDeleteProduct(id));
         return Ok();
+    }
+    
+    [HttpPost("{id:int}/recover")]
+    [Authorize(Roles = UserRoles.Admin)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<ActionResult> RecoverProduct([FromRoute] int id)
+    {
+        await _mediator.Send(new RecoverProduct(id));
+        return Ok();
+    }
+    
+    [HttpPost("{id:int}/hide")]
+    [Authorize(Roles = UserRoles.Admin)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<ActionResult> HideProduct([FromRoute] int id)
+    {
+        await _mediator.Send(new RecoverProduct(id));
+        return Ok();
+    }
+    
+    [HttpPost("{id:int}/reveal")]
+    [Authorize(Roles = UserRoles.Admin)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<ActionResult> RevealProduct([FromRoute] int id)
+    {
+        await _mediator.Send(new RecoverProduct(id));
+        return Ok();
+    }
+    
+    [HttpGet("taxRates")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IEnumerable<TaxRateDto>> GetTaxRates()
+    {
+        var response = await _mediator.Send(new GetTaxRates());
+        return response;
     }
 }

@@ -1,16 +1,19 @@
 ﻿using OnlineStore.Client.Brokers.API;
 using OnlineStore.Client.Products.Models;
+using OnlineStore.Shared.Infrastructure;
 using OnlineStore.Shared.Models;
 using OnlineStore.Shared.Products;
-using ProductDto = OnlineStore.Shared.Models.ProductDto;
 
 namespace OnlineStore.Client.Services;
 
 public interface IProductService
 {
-    Task<List<ProductDto>> GetAllAsync();
+    Task<PagedResult<ProductListItemDto>> GetProductList(int pageNumber = 1, int pageSize = 50);
+    
+    Task<ProductDto> GetProductById(int id);
+    
     Task CreateProducts(ICollection<CreateProductModel> products);
-    Task<ProductDto> Update(int id, UpdateProductDto dto);
+    Task<ProductDtoOld> Update(int id, UpdateProductDto dto);
     Task<bool> Remove(int id);
 }
 
@@ -23,9 +26,16 @@ public class ProductService : IProductService
         _broker = broker;
     }
 
-    public async Task<List<ProductDto>> GetAllAsync()
+    public async Task<PagedResult<ProductListItemDto>> GetProductList(int pageNumber = 1, int pageSize = 50)
     {
-        return await _broker.GetProductsAsync();
+        var query = new GetProductList(pageNumber, pageSize, IncludeDeleted: false, IncludeHidden: false);
+        return await _broker.GetProductsAsync(query);
+    }
+
+    public async Task<ProductDto> GetProductById(int id)
+    {
+        var query = new GetProduct(Id: id, IncludeDeleted: true, IncludeHidden: true);
+        return await _broker.GetProductByIdAsync(query);
     }
 
     public async Task CreateProducts(ICollection<CreateProductModel> products)
@@ -36,16 +46,17 @@ public class ProductService : IProductService
                     var files = x.ProductFiles
                         .Select(y => new CreateProductFile(y.FileName, y.FileBase64 ?? "", y.ProductFileType, y.Description))
                         .ToList();
-                    return new ProductContracts(
-                        x.Name,
-                        x.ReferenceNumber,
-                        x.ShortDescription,
-                        x.Description,
-                        x.Quantity,
-                        x.PriceNet,
-                        x.IsHidden,
-                        (int)x.TaxRate,
-                        files);
+                    return new CreateProductDto(
+                        Name: x.Name,
+                        ReferenceNumber: x.ReferenceNumber,
+                        ShortDescription: x.ShortDescription,
+                        Description: x.Description,
+                        Quantity: x.Quantity,
+                        PriceNet: x.PriceNet,
+                        PriceGross: x.PriceNet, // TOO remove price gross from dto
+                        IsHidden: x.IsHidden,
+                        TaxRateId: (int)x.TaxRate,
+                        ProductFiles: files);
                 })
             .ToList();
 
@@ -54,7 +65,7 @@ public class ProductService : IProductService
         await _broker.PostProductsAsync(command);
     }
 
-    public async Task<ProductDto> Update(int id, UpdateProductDto dto)
+    public async Task<ProductDtoOld> Update(int id, UpdateProductDto dto)
     {
         return await _broker.UpdateProductAsync(id, dto);
     }

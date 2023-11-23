@@ -19,12 +19,13 @@ public class ChangeUserPreferencesCommandHandler : ICommandHandler<ChangeUserPre
     public async Task Handle(ChangeUserPreferences command, CancellationToken cancellationToken)
     {
         var userId = command.UserId;
-        var userPreferences = await _dbContext.UserPreferences.FirstOrDefaultAsync(x => x.UserId == userId, cancellationToken);
+        var userPreferences =
+            await _dbContext.UserPreferences.FirstOrDefaultAsync(x => x.UserId == userId, cancellationToken);
         var shouldCreatePreferences = userPreferences is null;
 
         if (shouldCreatePreferences)
         {
-            userPreferences = new UserPreferences{Id = 1, UserId = userId};
+            userPreferences = new UserPreferences { UserId = userId };
         }
 
         userPreferences!.UITheme = (UITheme)command.UiThemeDto;
@@ -39,7 +40,7 @@ public class ChangeUserPreferencesCommandHandler : ICommandHandler<ChangeUserPre
         {
             _dbContext.UserPreferences.Update(userPreferences);
         }
-        
+
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 }

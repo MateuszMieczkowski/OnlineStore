@@ -1,0 +1,64 @@
+@page "/products/{id:int}"
+@using OnlineStore.Shared.Products
+@inject IProductService ProductService
+@inject NavigationManager NavigationManager
+
+<h3>Informacje o produkcie</h3>
+@if (_product is null)
+{
+    
+}
+else
+{
+
+    <MudContainer>
+        <MudCard>
+            <MudCardContent>
+                <MudText Typo="Typo.h4">@_product.Name</MudText>
+                <MudText Typo="Typo.body2">@_product.ShortDescription</MudText>
+
+                <MudImage Src="@_product.ThumbnailUri" Width="300"/>
+
+                <MudTabs>
+                    <MudTabPanel Text="Opis">
+                        <div class="d-flex align-content-center justify-content-center p-2">@((MarkupString)_product.Description)</div>
+                    </MudTabPanel>
+                    <MudTabPanel Text="Zdjęcia">
+                        @foreach (var image in _product.ProductFiles.Where(pf => pf.FileType == ProductFileTypeDto.Image))
+                        {
+                            <MudImage Src="@image.BlobUri" Height="200" Width="200"/>
+                        }
+                    </MudTabPanel>
+                    <MudTabPanel Text="Pliki">
+                        @foreach (var otherFile in _product.ProductFiles.Where(pf => pf.FileType == ProductFileTypeDto.Other))
+                        {
+                            <div>
+                                <a href="@otherFile.BlobUri" target="_blank">@otherFile.FileName</a>
+                                <div>@otherFile.Description</div>
+                            </div>
+                        }
+                    </MudTabPanel>
+                </MudTabs>
+
+                <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="NavigateBack">Powrót</MudButton>
+            </MudCardContent>
+        </MudCard>
+    </MudContainer>
+}
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private ProductDto? _product;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _product = await ProductService.GetProductById(Id);
+    }
+    
+    private void NavigateBack()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+    
+}

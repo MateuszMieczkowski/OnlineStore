@@ -10,6 +10,7 @@ using OnlineStore.Server.Accounts;
 using OnlineStore.Server.Accounts.Repositories;
 using OnlineStore.Server.Accounts.Services;
 using OnlineStore.Server.Accounts.Strategies;
+using OnlineStore.Server.Accounts.Validators;
 using OnlineStore.Server.Authentication;
 using OnlineStore.Server.Clients.Factories;
 using OnlineStore.Server.Entities;
@@ -17,12 +18,15 @@ using OnlineStore.Server.Infrastructure;
 using OnlineStore.Server.Jobs;
 using OnlineStore.Server.Middleware;
 using OnlineStore.Server.Options;
+using OnlineStore.Server.Products.Services;
+using OnlineStore.Server.Products.Validators;
 using OnlineStore.Server.Services;
 using OnlineStore.Server.Services.Email;
-using OnlineStore.Server.Validators;
 using OnlineStore.Shared.Accounts;
 using OnlineStore.Shared.Clients;
+using OnlineStore.Shared.Infrastructure;
 using OnlineStore.Shared.Models;
+using OnlineStore.Shared.Products;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -62,12 +66,18 @@ builder.Services.AddDbContext<OnlineStoreDbContext>(
 builder.Services.AddScoped<ErrorHandlingMiddleware>();
 
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
+    cfg.AddOpenBehavior(typeof(ValidatorBehavior<,>));   
+});
 builder.Services.AddValidatorsFromAssembly(typeof(AbstractValidator<>).Assembly);
 
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<IValidator<RegisterAdmin>, RegisterUserDtoValidator>();
+builder.Services.AddScoped<IValidator<CreateProductsBatch>, CreateProductsBatchValidator>();
+builder.Services.AddScoped<IValidator<UpdateProduct>, UpdateProductValidator>();
 builder.Services.AddScoped<StoreSeeder>();
 builder.Services.AddScoped<IBlobStorage, AzureStorage>();
 builder.Services.AddSingleton<IClock, Clock>();
@@ -76,10 +86,12 @@ builder.Services.AddTransient<IUserFactory<RegisterAdmin>, AdminFactory>();
 builder.Services.AddTransient<IUserFactory<RegisterClient>, ClientFactory>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ITokenGenerator, TokenGenerator>();
+builder.Services.AddScoped<ITaxService, TaxService>();
 
 builder.Services.AddMemoryCache();
 
 builder.Services.Configure<SmtpOptions>(builder.Configuration.GetSection("Smtp"));
+builder.Services.Configure<BlobStorageOptions>(builder.Configuration.GetSection("BlobStorage"));
 builder.Services.AddSwaggerGen();
 
 builder.Services.RegisterQuartzJobs();

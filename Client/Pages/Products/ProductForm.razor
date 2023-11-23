@@ -2,6 +2,8 @@
 @using OnlineStore.Client.Extensions
 @using OnlineStore.Shared.Products
 @using TaxRateDto = OnlineStore.Shared.Enums.TaxRateDto
+@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Http.Internal
 
 <MudCardHeader>
     <CardHeaderContent>
@@ -11,11 +13,11 @@
 @* <MudForm Model="_model"> *@
     <MudCardContent Class="d-flex flex-column gap-2">
 
-        @if (!string.IsNullOrEmpty(_thumbnailBase64))
+        @if (!string.IsNullOrEmpty(_model.ThumbnailBase64))
         {
-            <MudImage ObjectFit="ObjectFit.Contain" Src="@_thumbnailBase64" Alt="thumbnail-mud" Elevation="25" Class="rounded-lg" Height="300"/>
+            <MudImage ObjectFit="ObjectFit.Contain" Src="@_model.ThumbnailBase64" Alt="thumbnail-mud" Elevation="25" Class="rounded-lg" Height="300"/>
         }
-        <MudFileUpload T="IBrowserFile" FilesChanged="file => UploadFile(file, ProductFileTypeDto.Thumbnail)" Accept=".png, .jpg">
+        <MudFileUpload T="IBrowserFile" FilesChanged="file => UploadFile(file, ProductFileTypeDto.Thumbnail)" Accept=".png, .jpg" For="@(() => _model.ThumbnailFile)">
             <ButtonTemplate>
                 <MudButton HtmlTag="label"
                            Variant="Variant.Filled"
@@ -71,13 +73,14 @@
                 Label="Cena brutto (wyliczona)"/>
         </div>
         <MudSwitch @bind-Checked="_model.IsHidden"
+                   Color="Color.Secondary"
                    For="@(() => _model.IsHidden)"
                    Label="Ukrycie produktu"/>
 
         <MudGrid>
             <MudItem xs="12" md="6">
                 <MudTextField @bind-Value="_model.Description"
-                              For="@(() => _model.ShortDescription)"
+                              For="@(() => _model.Description)"
                               Variant="Variant.Outlined"
                               Immediate="true"
                               Lines="10"
@@ -120,7 +123,7 @@
                 @foreach (var file in _model.ProductFiles.Where(x => x.ProductFileType == ProductFileTypeDto.Image))
                 {
                     <MudCarouselItem>
-                        <MudImage ObjectFit="ObjectFit.Cover" Src="@file.FileBase64" Alt="gallery-item" Elevation="25" Class="rounded-lg d-block m-auto"/>
+                        <MudImage ObjectFit="ObjectFit.Cover" Src=@file.FileBase64Source Alt="gallery-item" Elevation="25" Class="rounded-lg d-block m-auto"/>
                     </MudCarouselItem>
                 }
             </MudCarousel>
@@ -158,8 +161,6 @@
 
 @code {
 
-    private string _thumbnailBase64 = "";
-
     [Parameter]
     public CreateProductModel _model { get; set; }
 
@@ -187,7 +188,7 @@
             ProductFileType = fileType,
         };
 
-        var buffer = new byte[file.Size];
+        Console.WriteLine(file.Name);
 
     // if (e.File.Size > maxFileSizeInKB)
     // {
@@ -195,14 +196,32 @@
     //     return;
     // }
 
-        await file.OpenReadStream().ReadAsync(buffer);
-
-        var fileBase64 = $"data:image/jpeg;base64,{Convert.ToBase64String(buffer)}";
+        // await using FileStream fs = new(path, FileMode.Create);
+        // await browserFile.OpenReadStream().CopyToAsync(fs);
+        //
+        // using (var memoryStream = new MemoryStream())
+        // {
+        //     await file.OpenReadStream().CopyToAsync(memoryStream);
+        //     var fileModel = new FileUploadModel
+        //     {
+        //         File = new FormFile(memoryStream, 0, memoryStream.Length, file.Name, file.Name),
+        //         FileName = file.Name
+        //     };
+        //
+        //     productFile.FormFile = fileModel.File;
+        // }
+        
+        // file.RequestImageFileAsync()
+        var maxAllowedSize = 1024 * 1000;
+        var buffer = new byte[file.Size];
+        await file.OpenReadStream(maxAllowedSize).ReadAsync(buffer);
+        var fileBase64 = Convert.ToBase64String(buffer);
         productFile.FileBase64 = fileBase64;
-
+        
         if (fileType == ProductFileTypeDto.Thumbnail)
         {
-            _thumbnailBase64 = fileBase64;
+            _model.ThumbnailBase64 = $"data:image/jpeg;base64,{fileBase64}";
+            _model.ThumbnailFile = file;
         }
 
         _model.ProductFiles.Add(productFile);
@@ -216,5 +235,11 @@
         allFiles.Remove(file.File);
         _model.ProductFiles.Remove(file);
         StateHasChanged();
+    }
+    
+    public class FileUploadModel
+    {
+        public string FileName { get; set; }
+        public IFormFile File { get; set; }
     }
 }

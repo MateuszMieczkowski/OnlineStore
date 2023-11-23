@@ -36,8 +36,18 @@
         }
 
         <div class="mt-3 mb-5">
-            <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="@OnButtonClick">Dodaj kolejny produkt</MudButton>
-            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Success" OnClick="@Submit">Zapisz produkty</MudButton>
+            <MudButton Color="Color.Secondary" Variant="Variant.Filled" OnClick="@OnButtonClick">Dodaj kolejny produkt</MudButton>
+            <MudButton Disabled="_isLoading" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" OnClick="@Submit">
+                   @if (_isLoading)
+                    {
+                        <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
+                        <MudText Class="ms-2">Zapisywanie</MudText>
+                    }
+                    else
+                    {
+                        <MudText>Zapisz produkty</MudText>
+                    }
+            </MudButton>
         </div>
     </div>
 
@@ -48,6 +58,7 @@
 {
     private readonly List<CreateProductModel> _createdProducts = new();
     private readonly List<EditContext> _editContexts = new();
+    private bool _isLoading;
 
     protected override void OnInitialized()
     {
@@ -72,7 +83,7 @@
     {
         if (_createdProducts.Count == 1)
         {
-            Snackbar.Add("There must be at least one product!", Severity.Error);
+            Snackbar.Add("Musi zostać dodany przynajmniej jeden produkt", Severity.Warning);
             return;
         }
         await Task.Run(() => _createdProducts.Remove(product));
@@ -81,6 +92,8 @@
 
     private async Task Submit()
     {
+        _isLoading = true;
+
         try
         {
             var isValidate = true;
@@ -100,12 +113,15 @@
             await ProductService.CreateProducts(_createdProducts);
 
             Snackbar.Add("Dodano produkty", Severity.Success);
-            Snackbar.Add("There must be at least one product!", Severity.Error);
             NavManager.NavigateTo("/");
         }
         catch (Exception ex)
         {
             Snackbar.Add(ex.Message, Severity.Error);
+        }
+        finally
+        {
+            _isLoading = false;
         }
     }
 
