@@ -1,0 +1,117 @@
+﻿@page "/create"
+@using OnlineStore.Client.Products.Models
+@using ISnackbar = MudBlazor.ISnackbar
+@using Severity = MudBlazor.Severity
+@* @attribute [Authorize(Roles = "Admin")] TODO uncomment it *@
+@inject IJSRuntime JsRuntime
+@inject IProductService ProductService
+@inject ISnackbar Snackbar
+@inject NavigationManager NavManager
+<section role="main">
+    <div class="container mt-5">
+        <h2>Definiowanie produktów</h2>
+
+        @foreach (var product in _createdProducts)
+        {
+            <MudCard Outlined="true">
+                <MudCardContent>
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h4">Produkt #@(_createdProducts.IndexOf(product) + 1)</MudText>
+                        </CardHeaderContent>
+                        <CardHeaderActions>
+                            <MudButton OnClick="@(() => Remove(product))" StartIcon="@Icons.Material.Filled.RemoveCircle" Color="Color.Secondary">Usuń produkt</MudButton>
+                        </CardHeaderActions>
+                    </MudCardHeader>
+                    @* <EditForm Model="product"> *@
+                    @*     <ProductForm _model="@product"/> *@
+                    @* </EditForm> *@
+                    <EditForm Model="@product" Context="productContext">
+                        <DataAnnotationsValidator/>
+                        @AddEditForm(productContext)
+                        <ProductForm _model="@product"/>
+                    </EditForm>
+                </MudCardContent>
+            </MudCard>
+        }
+
+        <div class="mt-3 mb-5">
+            <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="@OnButtonClick">Dodaj kolejny produkt</MudButton>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Success" OnClick="@Submit">Zapisz produkty</MudButton>
+        </div>
+    </div>
+
+</section>
+
+
+@code
+{
+    private readonly List<CreateProductModel> _createdProducts = new();
+    private readonly List<EditContext> _editContexts = new();
+
+    protected override void OnInitialized()
+    {
+        AddNewProduct();
+    }
+
+    private void AddNewProduct()
+    {
+        var newProduct = new CreateProductModel();
+        _createdProducts.Add(newProduct);
+        StateHasChanged();
+    }
+
+    private async void OnButtonClick()
+    {
+        await Task.Run(AddNewProduct);
+        await JsRuntime.InvokeVoidAsync("OnScrollEvent");
+        StateHasChanged();
+    }
+
+    private async void Remove(CreateProductModel product)
+    {
+        if (_createdProducts.Count == 1)
+        {
+            Snackbar.Add("There must be at least one product!", Severity.Error);
+            return;
+        }
+        await Task.Run(() => _createdProducts.Remove(product));
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task Submit()
+    {
+        try
+        {
+            var isValidate = true;
+            foreach (var editContext in _editContexts)
+            {
+                if (!editContext.Validate())
+                {
+                    isValidate = false;
+                }
+            }
+            if (!isValidate)
+            {
+                throw new Exception("Popraw formularz");
+            }
+
+            StateHasChanged();
+            await ProductService.CreateProducts(_createdProducts);
+
+            Snackbar.Add("Dodano produkty", Severity.Success);
+            Snackbar.Add("There must be at least one product!", Severity.Error);
+            NavManager.NavigateTo("/");
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+    }
+
+    private string AddEditForm(EditContext? editContext)
+    {
+        if (editContext != null) _editContexts.Add(editContext);
+        return string.Empty;
+    }
+}

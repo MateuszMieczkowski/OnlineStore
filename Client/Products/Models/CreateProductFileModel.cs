@@ -9,12 +9,8 @@ public class CreateProductFileModel
 
     public IBrowserFile File { get; set; }
 
-    // public IFormFile  FormFile { get; set; }
-
-    public string FileBase64 { get; set; }
-
-    public string FileBase64Source => $"data:image/jpeg;base64,{FileBase64}";
-
+    public string? FileBase64 { get; set; }
+    
     public ProductFileTypeDto ProductFileType { get; set; }
 
     public string? Description { get; set; }

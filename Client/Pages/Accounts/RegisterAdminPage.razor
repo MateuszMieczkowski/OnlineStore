@@ -3,7 +3,7 @@
 @inject NavigationManager NavManager
 @inject IAccountService AccountService
 @inject AuthenticationStateProvider AuthenticationStateProvider
-@inject ToastService Toast
+@inject ISnackbar Snackbar
 
 <div class="container p-5">
     <EditForm Model="RegisterAdminDto" OnInvalidSubmit="OnInvalidSubmit" OnValidSubmit="OnSubmit">
@@ -36,7 +36,7 @@
 
     private void OnInvalidSubmit()
     {
-        Toast.ShowToast("Proszę poprawić formularz", ToastLevel.Error);
+        Snackbar.Add("Proszę poprawić formularz", Severity.Error);
     }
 
     private async Task OnSubmit()
@@ -44,7 +44,7 @@
         try
         {
             await AccountService.RegisterAdmin(RegisterAdminDto);
-            Toast.ShowToast("Zajerestrowano użytkownika", ToastLevel.Success);
+            Snackbar.Add("Zajerestrowano użytkownika", Severity.Success);
             var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
             var isAdmin = authenticationState.User.IsInRole("Admin");
             if (isAdmin)
@@ -58,7 +58,7 @@
         }
         catch (Exception ex)
         {
-            Toast.ShowToast($"Nie udało się zajerestrować: {ex.Message}", ToastLevel.Error);
+            Snackbar.Add($"Nie udało się zajerestrować: {ex.Message}", Severity.Error);
         }
     }
 }

@@ -54,7 +54,7 @@ public class ProductService : IProductService
                         Quantity: x.Quantity,
                         PriceNet: x.PriceNet,
                         IsHidden: x.IsHidden,
-                        TaxRateId: x.TaxRate.TaxRateId,
+                        TaxRateId: (int)x.TaxRate,
                         ProductFiles: files);
                 })
             .ToList();
