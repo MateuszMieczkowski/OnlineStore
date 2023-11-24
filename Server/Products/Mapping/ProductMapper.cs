@@ -7,7 +7,9 @@ public static class ProductMapper
 {
     public static ProductListItemDto ToListItemDto(this Product product)
     {
-        return new ProductListItemDto(product.Name,
+        return new ProductListItemDto(
+            product.Id,
+            product.Name,
             product.ReferenceNumber,
             product.ShortDescription,
             product.Quantity,

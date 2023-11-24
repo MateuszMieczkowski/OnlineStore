@@ -1,4 +1,6 @@
-﻿using OnlineStore.Shared.Models;
+﻿using OnlineStore.Shared.Infrastructure;
+using OnlineStore.Shared.Models;
+using OnlineStore.Shared.Products;
 
 namespace OnlineStore.Client.Brokers.API;
 
@@ -6,19 +8,25 @@ public partial class ApiBroker
 {
     private const string ProductRelativeUrl = "api/products";
 
-    public async Task<List<ProductDto>> GetProductsAsync()
+    public async Task<PagedResult<ProductListItemDto>> GetProductsAsync(GetProductList query)
     {
-        return await GetAsync<List<ProductDto>>(ProductRelativeUrl);
+        var queryParams = $"?pageNumber={query.PageNumber}&pageSize={query.PageSize}";
+        return await GetAsync<PagedResult<ProductListItemDto>>($"{ProductRelativeUrl}{queryParams}");
     }
 
-    public async Task<bool> PostProductsAsync(List<CreateProductDto> dtos)
+    public async Task<ProductDto> GetProductByIdAsync(GetProduct query)
     {
-        return await PostAsync(ProductRelativeUrl, dtos);
+        return await GetAsync<ProductDto>($"{ProductRelativeUrl}/{query.Id}");
     }
 
-    public async Task<ProductDto> UpdateProductAsync(int id, UpdateProductDto dto)
+    public async Task PostProductsAsync(CreateProductsBatch command)
     {
-        return await PutAsync<UpdateProductDto, ProductDto>(ProductRelativeUrl + $"/{id}", dto);
+        await PostAsync($"{ProductRelativeUrl}/create-batch", command);
+    }
+
+    public async Task<ProductDtoOld> UpdateProductAsync(int id, UpdateProductDto dto)
+    {
+        return await PutAsync<UpdateProductDto, ProductDtoOld>(ProductRelativeUrl + $"/{id}", dto);
     }
 
     public async Task<bool> RemoveProductAsync(int id)

@@ -17,6 +17,7 @@
         <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="6.0.7"/>
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.7"/>
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.7" PrivateAssets="all"/>
+        <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
         <PackageReference Include="MudBlazor" Version="6.11.0" />
         <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.21.0"/>
     </ItemGroup>
@@ -31,5 +32,14 @@
 
     <ItemGroup>
         <_ContentIncludedByDefault Remove="Pages\Users\Main.razor"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="Microsoft.AspNetCore.Http">
+        <HintPath>..\..\..\..\..\Program Files\dotnet\shared\Microsoft.AspNetCore.App\6.0.20\Microsoft.AspNetCore.Http.dll</HintPath>
+      </Reference>
+      <Reference Include="Microsoft.AspNetCore.Http.Features">
+        <HintPath>..\..\..\..\..\Program Files\dotnet\shared\Microsoft.AspNetCore.App\6.0.20\Microsoft.AspNetCore.Http.Features.dll</HintPath>
+      </Reference>
     </ItemGroup>
 </Project>
