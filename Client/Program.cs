@@ -2,6 +2,7 @@ using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using MudBlazor;
 using MudBlazor.Services;
 using OnlineStore.Client;
 using OnlineStore.Client.Brokers.API;
@@ -13,7 +14,6 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.Logging.SetMinimumLevel(LogLevel.Information);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
-builder.Services.AddSingleton<ToastService>();
 
 
 builder.Services.AddBlazoredLocalStorage();
@@ -29,7 +29,18 @@ builder.Services.AddScoped<IApiBroker, ApiBroker>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IClientService, ClientService>();
-builder.Services.AddMudServices();
+builder.Services.AddMudServices(config =>
+{
+    config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.TopEnd;
+
+    config.SnackbarConfiguration.PreventDuplicates = false;
+    config.SnackbarConfiguration.NewestOnTop = false;
+    config.SnackbarConfiguration.ShowCloseIcon = true;
+    config.SnackbarConfiguration.VisibleStateDuration = 3000;
+    config.SnackbarConfiguration.HideTransitionDuration = 250;
+    config.SnackbarConfiguration.ShowTransitionDuration = 250;
+    config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
+});
 
 var url = builder.Configuration.Get<Configuration>().BaseAddress;
 

@@ -2,9 +2,10 @@
 @using Blazored.LocalStorage
 @using MudBlazor.Extensions
 @using OnlineStore.Shared.Enums
-@using System.Linq.Expressions
+@using ISnackbar = MudBlazor.ISnackbar
+@using Severity = MudBlazor.Severity
 @inherits LayoutComponentBase
-@inject ToastService Toast;
+@inject ISnackbar Snackbar
 @inject ILocalStorageService LocalStorage
 
 <Toast></Toast>
@@ -78,9 +79,7 @@
 
     private bool HandleError(Exception ex)
     {
-        var msg = ex.Message;
-        var trace = ex.StackTrace;
-        Toast.ShowToast($"Something went wrong: {ex.Message}", ToastLevel.Error);
+        Snackbar.Add($"Wystąpił błąd: {ex.Message}", Severity.Error);
         return true;
     }
 }

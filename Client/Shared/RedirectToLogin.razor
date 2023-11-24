@@ -1,12 +1,13 @@
-﻿@inject NavigationManager NavManager
-@inject ToastService Toast
+﻿@using Severity = MudBlazor.Severity
+@inject NavigationManager NavManager
+@inject ISnackbar Snackbar
 
 @code
 {
 
 	protected override void OnInitialized()
 	{
-		Toast.ShowToast("You have to login to continue", ToastLevel.Info);
+		Snackbar.Add("Proszę się zalogować aby kontynuować", Severity.Info);
 		NavManager.NavigateTo("users/login");
 	}
 }
