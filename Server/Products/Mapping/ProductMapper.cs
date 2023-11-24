@@ -8,14 +8,14 @@ public static class ProductMapper
     public static ProductListItemDto ToListItemDto(this Product product)
     {
         return new ProductListItemDto(
-            product.Id,
-            product.Name,
-            product.ReferenceNumber,
-            product.ShortDescription,
-            product.Quantity,
-            product.PriceNet,
-            product.PriceGross,
-            product.ThumbnailBlobUri);
+            Id: product.Id,
+            Name: product.Name,
+            ReferenceNumber: product.ReferenceNumber,
+            ShortDescription: product.ShortDescription,
+            Quantity: product.Quantity,
+            PriceNet: product.PriceNet,
+            PriceGross: product.PriceGross,
+            ThumbnailUri: product.ThumbnailBlobUri);
     }
     
 }
