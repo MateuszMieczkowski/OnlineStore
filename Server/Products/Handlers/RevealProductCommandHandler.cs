@@ -17,6 +17,7 @@ public class RevealProductCommandHandler : ICommandHandler<RevealProduct>
     {
         await _dbContext.Products
             .Where(x => x.Id == request.Id)
-            .ExecuteUpdateAsync(setter => setter.SetProperty(x => x.IsHidden, false));
+            .ExecuteUpdateAsync(setter => setter.SetProperty(x => x.IsHidden, false),
+                cancellationToken: cancellationToken);
     }
 }

@@ -11,7 +11,6 @@ public record CreateProductDto(
     string Description,
     int Quantity,
     decimal PriceNet,
-    decimal PriceGross,
     bool IsHidden,
     int TaxRateId,
     IReadOnlyCollection<CreateProductFile> ProductFiles);

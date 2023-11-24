@@ -29,10 +29,6 @@ public class UpdateProductValidator : AbstractValidator<UpdateProduct>
         RuleFor(x => x.PriceNet)
             .NotEmpty()
             .GreaterThan(0);
-        
-        RuleFor(x => x.PriceGross)
-            .NotEmpty()
-            .GreaterThan(0);
 
         RuleFor(x => x.TaxRateId)
             .NotEmpty();
