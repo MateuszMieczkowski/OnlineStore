@@ -13,7 +13,7 @@ public interface IProductService
     Task<ProductDto> GetProductById(int id);
     
     Task CreateProducts(ICollection<CreateProductModel> products);
-    Task<ProductDtoOld> Update(int id, UpdateProductDto dto);
+    Task Update(int id, UpdateProductModel model);
     Task<bool> Remove(int id);
 }
 
@@ -64,9 +64,22 @@ public class ProductService : IProductService
         await _broker.PostProductsAsync(command);
     }
 
-    public async Task<ProductDtoOld> Update(int id, UpdateProductDto dto)
+    public async Task Update(int id, UpdateProductModel model)
     {
-        return await _broker.UpdateProductAsync(id, dto);
+        var dtoFiles = model.ProductFiles.Select(x => new UpdateProductFileDto(x.Id, x.FileName, x.FileBase64, x.ProductFileType, x.Description)).ToList();
+        var dto = new UpdateProductDto(
+            Name: model.Name,
+            ReferenceNumber: model.ReferenceNumber,
+            ShortDescription: model.ShortDescription,
+            Description: model.Description,
+            Quantity: model.Quantity,
+            PriceNet: model.PriceNet,
+            IsHidden: model.IsHidden,
+            IsDeleted: false,
+            TaxRateId: (int)model.TaxRate,
+            ProductFiles: dtoFiles);
+        
+        await _broker.UpdateProductAsync(id, dto);
     }
 
     public async Task<bool> Remove(int id)

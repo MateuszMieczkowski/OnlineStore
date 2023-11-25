@@ -24,9 +24,9 @@ public partial class ApiBroker
         await PostAsync($"{ProductRelativeUrl}/create-batch", command);
     }
 
-    public async Task<ProductDtoOld> UpdateProductAsync(int id, UpdateProductDto dto)
+    public async Task UpdateProductAsync(int id, UpdateProductDto dto)
     {
-        return await PutAsync<UpdateProductDto, ProductDtoOld>(ProductRelativeUrl + $"/{id}", dto);
+        await PutAsync($"{ProductRelativeUrl}/{id}", dto);
     }
 
     public async Task<bool> RemoveProductAsync(int id)

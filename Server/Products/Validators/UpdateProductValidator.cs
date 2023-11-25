@@ -50,9 +50,17 @@ public class UpdateProductFileValidator : AbstractValidator<UpdateProductFileDto
         RuleFor(x => x.FileName)
             .NotEmpty()
             .MaximumLength(255);
+
+        When(
+            x => x.Id == null,
+            () =>
+            {
+                RuleFor(x => x.FileBase64).NotEmpty();
+            });
         
         RuleFor(x => x.FileBase64)
-            .NotEmpty();
+            .NotEmpty()
+            .When(x => x.Id == null);
         
         RuleFor(x => x.ProductFileType)
             .IsInEnum();

@@ -77,7 +77,7 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<IValidator<RegisterAdmin>, RegisterUserDtoValidator>();
 builder.Services.AddScoped<IValidator<CreateProductsBatch>, CreateProductsBatchValidator>();
-builder.Services.AddScoped<IValidator<UpdateProduct>, UpdateProductValidator>();
+// builder.Services.AddScoped<IValidator<UpdateProduct>, UpdateProductValidator>();
 builder.Services.AddScoped<StoreSeeder>();
 builder.Services.AddScoped<IBlobStorage, AzureStorage>();
 builder.Services.AddSingleton<IClock, Clock>();

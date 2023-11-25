@@ -8,7 +8,7 @@ public record ProductDto(
     string Name,
     string ReferenceNumber,
     string? ShortDescription,
-    string? Description,
+    string Description,
     string ThumbnailUri,
     int Quantity,
     decimal PriceNet,

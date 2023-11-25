@@ -11,6 +11,6 @@ public partial interface IApiBroker
     Task<ProductDto> GetProductByIdAsync(GetProduct query);
 
     Task PostProductsAsync(CreateProductsBatch command);
-    Task<ProductDtoOld> UpdateProductAsync(int id, UpdateProductDto dto);
+    Task UpdateProductAsync(int id, UpdateProductDto dto);
     Task<bool> RemoveProductAsync(int id);
 }

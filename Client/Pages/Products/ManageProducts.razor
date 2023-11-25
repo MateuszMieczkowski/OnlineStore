@@ -1,0 +1,79 @@
+﻿@page "/configuration"
+@using OnlineStore.Shared.Models
+@using OnlineStore.Client.Components
+@using OnlineStore.Shared.Products
+@attribute [Authorize]
+@inject ISnackbar Snackbar
+@inject IProductService ProductService
+@inject NavigationManager NavigationManager
+<PageTitle>Zarządzanie produktami</PageTitle>
+
+<MudContainer>
+    <MudTable Items="@products" Hover="true" Loading="@_isLoading" LoadingProgressColor="Color.Info">
+        <HeaderContent>
+            <MudTh>Nazwa</MudTh>
+            <MudTh>Numer referencyjny</MudTh>
+            <MudTh>Ilość</MudTh>
+            <MudTh>Cena netto</MudTh>
+            <MudTh>Cena brutto</MudTh>
+            <MudTh>Stan</MudTh>
+            <MudTh>Akcje</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>@context.Name</MudTd>
+            <MudTd>@context.ReferenceNumber</MudTd>
+            <MudTd>@context.Quantity</MudTd>
+            <MudTd>@context.PriceNet</MudTd>
+            <MudTd>@context.PriceGross</MudTd>
+            <MudTd>Akywny / Ukryty / Kosz</MudTd>
+            <MudTd>
+                <MudButtonGroup Variant="Variant.Outlined" Color="Color.Secondary">
+                    <MudMenu Icon="@Icons.Material.Filled.MoreVert" ActivationEvent="@MouseEvent.MouseOver" AnchorOrigin="Origin.CenterRight" TransformOrigin="Origin.BottomRight">
+                        <MudMenuItem Icon="@Icons.Material.Filled.Info" OnClick="@(() => NavigationManager.NavigateTo($"/products/{context.Id}"))">Szczegóły</MudMenuItem>
+                        <MudMenuItem Icon="@Icons.Material.Filled.Edit" OnClick="@(() => NavigationManager.NavigateTo($"/products/{context.Id}/edit"))">Edycja</MudMenuItem>
+                        <MudMenuItem Icon="@Icons.Material.Filled.HideSource">Ukryj</MudMenuItem>
+                        <MudMenuItem Icon="@Icons.Material.Filled.FolderDelete">Kosz</MudMenuItem>
+                        <MudMenuItem Icon="@Icons.Material.Filled.DeleteForever">Usuń</MudMenuItem>
+                    </MudMenu>
+                </MudButtonGroup>
+            </MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <div class="d-flex flex-column align-center">
+                <MudPagination Size="Size.Large" Variant="Variant.Filled" Color="Color.Secondary" SelectedChanged="PageChanged" Count="@_pageCount" Class="pa-4"/>
+            </div>
+        </PagerContent>
+    </MudTable>
+</MudContainer>
+
+@code
+{
+    private IReadOnlyCollection<ProductListItemDto> products = new List<ProductListItemDto>();
+
+    private bool _isLoading = true;
+    private int _pageSize = 5;
+    private int _pageNumber = 1;
+    private int _pageCount;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await ProductService.GetProductList(_pageNumber, _pageSize);
+        products = response.Items;
+        _pageCount = response.TotalPages;
+        _isLoading = false;
+    }
+
+    private async Task RefreshProducts()
+    {
+        _isLoading = true;
+        var response = await ProductService.GetProductList(_pageNumber, _pageSize);
+        products = response.Items;
+        _isLoading = false;
+    }
+
+    private async Task PageChanged(int i)
+    {
+        _pageNumber = i;
+        await RefreshProducts();
+    }
+}

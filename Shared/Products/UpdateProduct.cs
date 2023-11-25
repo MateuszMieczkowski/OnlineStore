@@ -44,7 +44,7 @@ public record UpdateProductDto(
 public record UpdateProductFileDto(
     int? Id,
     string FileName,
-    string FileBase64,
+    string? FileBase64,
     ProductFileTypeDto ProductFileType,
     string? Description);
 

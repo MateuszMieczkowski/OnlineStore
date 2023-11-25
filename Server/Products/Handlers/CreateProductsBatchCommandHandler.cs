@@ -33,8 +33,8 @@ public class CreateProductsBatchCommandHandler : ICommandHandler<CreateProductsB
 
         foreach (var productDto in command.Products)
         {
-            var newProduct = await CreateProductAsync(productDto, taxRates);
-            await _dbContext.AddAsync(newProduct, cancellationToken);
+            var newProduct = await CreateProductAsync(productDto, taxRates, cancellationToken);
+            _dbContext.Add(newProduct);
         }
 
         await _dbContext.SaveChangesAsync(cancellationToken);
@@ -54,7 +54,7 @@ public class CreateProductsBatchCommandHandler : ICommandHandler<CreateProductsB
         }
     }
 
-    private async Task<Product> CreateProductAsync(CreateProductDto productDto, IEnumerable<TaxRate> taxRates)
+    private async Task<Product> CreateProductAsync(CreateProductDto productDto, IEnumerable<TaxRate> taxRates, CancellationToken cancellationToken = default)
     {
         var taxRate = taxRates.FirstOrDefault(x => x.Id == productDto.TaxRateId)
             ?? throw new NotFoundException($"Tax rate with id {productDto.TaxRateId} was not found.");
@@ -74,7 +74,7 @@ public class CreateProductsBatchCommandHandler : ICommandHandler<CreateProductsB
             ProductFiles = new List<ProductFile>()
         };
         var productFileTasks = productDto.ProductFiles
-            .Select(createProductFile => UploadProductFile(product, createProductFile))
+            .Select(createProductFile => UploadProductFile(product, createProductFile, cancellationToken))
             .ToList();
 
         var productFiles = await Task.WhenAll(productFileTasks);
@@ -86,7 +86,7 @@ public class CreateProductsBatchCommandHandler : ICommandHandler<CreateProductsB
         return product;
     }
     
-    private async Task<ProductFile> UploadProductFile(Product product, CreateProductFile createProductFile)
+    private async Task<ProductFile> UploadProductFile(Product product, CreateProductFile createProductFile, CancellationToken cancellationToken = default)
     {
         var productFile = new ProductFile
         {
@@ -98,7 +98,7 @@ public class CreateProductsBatchCommandHandler : ICommandHandler<CreateProductsB
         };
 
         productFile.BlobUri =
-            await _blobStorage.UploadAsync(new BlobFileName(productFile.BlobId, productFile.FileName), createProductFile.FileBase64);
+            await _blobStorage.UploadAsync(new BlobFileName(productFile.BlobId, productFile.FileName), createProductFile.FileBase64, cancellationToken);
 
         if (productFile.FileType == ProductFileType.Thumbnail)
         {

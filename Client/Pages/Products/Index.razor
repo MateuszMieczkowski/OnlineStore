@@ -1,64 +1,71 @@
 ﻿@page "/"
 @using OnlineStore.Shared.Products
+@using Blazored.LocalStorage
+@using OnlineStore.Shared.Clients
+@using OnlineStore.Shared.Enums
 @inject NavigationManager NavigationManager
+@inject ILocalStorageService LocalStorageService
 @inject IProductService ProductService
 
 <PageTitle>Dostępne produkty</PageTitle>
 
 @* <ProductsFilter Products="_products" OnSearchStringChanged="Refresh"></ProductsFilter> *@
 
-@if (_isLoading)	
+@if (_isLoading)
 {
-	<div class="d-flex align-content-center justify-content-center">
-	<MudProgressCircular Color="Color.Primary" Size="Size.Large" Indeterminate="true" />
-	</div>
+    <div class="d-flex align-content-center justify-content-between">
+        <MudProgressCircular Color="Color.Primary" Size="Size.Large" Indeterminate="true"/>
+    </div>
 }
 else
 {
 
-		<div class="row d-flex gap-3">
-            @foreach (var product in _products)  //.Where(p => p.IsVisible))
-            {
-	            <MudCard Square="true" @onclick="@(() => NavigationManager.NavigateTo($"products/{product.Id}"))">
-		            <MudCardMedia Image="@product.ThumbnailUri" Height="200" />
-		            <MudCardContent>
-			            <MudText Typo="Typo.h5">@product.Name</MudText>
-			            <MudText Typo="Typo.h6">@product.PriceGross zł</MudText>
-			            <MudText Typo="Typo.body2">@product.ReferenceNumber.</MudText>
-			            <MudText Typo="Typo.body2">Ilość: @product.Quantity</MudText>
-		            </MudCardContent>
-		            <MudCardActions>
-			            <MudButton Variant="Variant.Text" Color="Color.Primary" StartIcon="@Icons.Material.Filled.ShoppingCartCheckout">Kup teraz</MudButton>
-			            <MudButton Variant="Variant.Text" Color="Color.Primary" StartIcon="@Icons.Material.Filled.AddShoppingCart">Dodaj do koszyka</MudButton>
-		            </MudCardActions>
-	            </MudCard>
-	            @* <div class="col-md-2"> *@
-		           @*   *@
-		           @*  <div class="card mb-5 ml-2"> *@
-			          @*   <img class="img-thumbnail" src="@product.ThumbnailUri" alt="Product image"> *@
-			          @*   <div class="card-body"> *@
-				         @*    <p class="card-text">@product.Name</p> *@
-				         @*    <p class="card-text">@product.ReferenceNumber</p> *@
-				         @*    <p class="card-text">Ilość: @product.Quantity</p> *@
-			          @*   </div> *@
-		           @*  </div> *@
-	            @* </div> *@
-			}
-		</div>
+    <MudGrid Spacing="7" Justify="Justify.Center">
+        @foreach (var product in _products) //.Where(p => p.IsVisible))
+        {
+            <MudItem>
+                <MudCard @onclick="@(() => NavigationManager.NavigateTo($"products/{product.Id}"))" class="pointer">
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h5">@product.Name</MudText>
+                            <MudText Typo="Typo.body2">@product.ReferenceNumber</MudText>
+                        </CardHeaderContent>
+                        <CardHeaderActions>
+                            <MudTooltip Duration="250" Text="@product.ShortDescription" Placement="Placement.Top">
+                                <MudIconButton Icon="@Icons.Material.Filled.Description" Color="Color.Primary"/>
+                            </MudTooltip>
+                        </CardHeaderActions>
+                    </MudCardHeader>
+                    <MudCardMedia Image="@product.ThumbnailUri" Height="200"/>
+                    <MudCardContent>
+                        <MudText Typo="Typo.h6">@(_showNetPrice ? product.PriceNet : product.PriceGross) zł</MudText>
+                        <MudText Typo="Typo.body2">Ilość: @product.Quantity</MudText>
+                    </MudCardContent>
+                    <MudCardActions>
+                        <MudButton Variant="Variant.Text" Color="Color.Primary" StartIcon="@Icons.Material.Filled.AddShoppingCart">Dodaj do koszyka</MudButton>
+                        <MudButton Variant="Variant.Text" Color="Color.Primary" StartIcon="@Icons.Material.Filled.ShoppingCartCheckout">Kup teraz</MudButton>
+                    </MudCardActions>
+                </MudCard>
+            </MudItem>
+        }
+    </MudGrid>
 
 }
 
 @code {
 
-	private IReadOnlyCollection<ProductListItemDto> _products = new List<ProductListItemDto>();
-	private bool _isLoading = true;
+    private IReadOnlyCollection<ProductListItemDto> _products = new List<ProductListItemDto>();
+    private bool _isLoading = true;
+    private bool _showNetPrice;
 
-	protected override async Task OnInitializedAsync()
-	{
-		var response = await ProductService.GetProductList(pageNumber: 1, pageSize: 50);
-		_products = response.Items;
-		_isLoading = false;
-	}
+    protected override async Task OnInitializedAsync()
+    {
+        var userPreferences = await LocalStorageService.GetItemAsync<UserPreferencesDto>("preferences");
+        _showNetPrice = userPreferences?.DisplayedPrice == DisplayedPriceDto.Net;
+        var response = await ProductService.GetProductList(pageNumber: 1, pageSize: 50);
+        _products = response.Items;
+        _isLoading = false;
+    }
 
     // private void Refresh()
     // {

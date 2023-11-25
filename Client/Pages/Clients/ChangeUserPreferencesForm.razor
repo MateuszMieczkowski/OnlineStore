@@ -59,8 +59,7 @@
         if (firstRender)
         {
             var userPreferences = await LocalStorageService.GetItemAsync<UserPreferencesDto>("preferences");
-            Console.WriteLine(userPreferences.DisplayedPrice);
-            if (userPreferences is null)
+            if (userPreferences == null)
             {
                 Model.UiTheme = UIThemeDto.Light;
                 Model.DisplayedPrice = DisplayedPriceDto.Gross;

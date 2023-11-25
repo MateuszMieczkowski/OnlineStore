@@ -24,7 +24,7 @@ public class GetProductQueryHandler : IQueryHandler<GetProduct, ProductDto>
                 x.Name,
                 x.ReferenceNumber,
                 x.ShortDescription,
-                x.Description,
+                x.Description ?? "", // TOOD establish if description is nullable or not
                 x.ThumbnailBlobUri,
                 x.Quantity,
                 x.PriceNet,

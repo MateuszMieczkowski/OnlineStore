@@ -103,6 +103,11 @@ public class UpdateProductCommandHandler : ICommandHandler<UpdateProduct>
             return;
         }
 
+        if (updateProductFileDto.FileBase64 is null)
+        {
+            return;
+        }
+        
         productFile.FileName = updateProductFileDto.FileName;
         productFile.Description = updateProductFileDto.Description;
         productFile.FileType = (ProductFileType)updateProductFileDto.ProductFileType;
