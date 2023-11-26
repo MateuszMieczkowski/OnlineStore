@@ -8,7 +8,7 @@ namespace OnlineStore.Client.Services;
 
 public interface IClientService
 {
-    Task Regiser(RegisterClient command);
+    Task Register(RegisterClient command);
 
     Task ChangeUserPreferences(ChangePreferencesModel model);
 }
@@ -26,7 +26,7 @@ public class ClientService : IClientService
         _localStorage = localStorage ?? throw new ArgumentNullException(nameof(localStorage));
     }
 
-    public async Task Regiser(RegisterClient command)
+    public async Task Register(RegisterClient command)
     {
         await _broker.RegisterClientAsync(command);
     }
@@ -38,10 +38,16 @@ public class ClientService : IClientService
             UserId: userId,
             UiThemeDto: model.UiTheme,
             DisplayedPriceDto: model.DisplayedPrice,
-            IsSubscribedToNewsletter: false);
+            IsSubscribedToNewsletter: model.IsSubscribedToNewsLetter,
+            PageSize: model.PageSize);
 
         await _broker.ChangeClientPreferences(command);
 
-        await _localStorage.SetItemAsync("preferences", new UserPreferencesDto(model.UiTheme, model.DisplayedPrice, false));
+        await _localStorage.SetItemAsync(LocalStorageKeys.UserPreferences,
+            new UserPreferencesDto(
+                model.UiTheme,
+                model.DisplayedPrice,
+                model.IsSubscribedToNewsLetter,
+                model.PageSize));
     }
 }

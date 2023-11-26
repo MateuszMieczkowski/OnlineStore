@@ -9,4 +9,6 @@ public class UserPreferences
     public DisplayedPrice DisplayedPrice { get; set; }
     public int UserId { get; set; }
     public User? User { get; set; } 
+    public bool IsSubscribedToNewsLetter { get; set; }
+    public int PageSize { get; set; }
 }

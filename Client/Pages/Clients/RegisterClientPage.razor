@@ -51,7 +51,7 @@
     {
         try
         {
-            await ClientService.Regiser(RegisterClientDto);
+            await ClientService.Register(RegisterClientDto);
             Snackbar.Add("Zajerestrowano użytkownika", Severity.Success);
             NavManager.NavigateTo("/users/login");
         }
