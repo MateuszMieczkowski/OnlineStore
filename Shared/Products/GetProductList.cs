@@ -2,7 +2,15 @@
 
 namespace OnlineStore.Shared.Products;
 
-public record GetProductList(int PageNumber, int PageSize, bool IncludeDeleted, bool IncludeHidden) : IPagedQuery<ProductListItemDto>;
+public record GetProductList(
+    int PageNumber,
+    int PageSize,
+    bool DeletedOnly = false,
+    bool HiddenOnly = false,
+    string? SearchPhrase = null,
+    decimal? PriceGrossFrom = null,
+    decimal? PriceGrossTo = null) : IPagedQuery<ProductListItemDto>;
+
 
 public record ProductListItemDto(
     int Id,
@@ -12,4 +20,6 @@ public record ProductListItemDto(
     int Quantity,
     decimal PriceNet,
     decimal PriceGross,
-    string ThumbnailUri);
+    string ThumbnailUri,
+    bool IsDeleted,
+    bool IsHidden);

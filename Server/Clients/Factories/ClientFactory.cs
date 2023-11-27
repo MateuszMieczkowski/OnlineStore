@@ -15,7 +15,6 @@ public class ClientFactory : IUserFactory<RegisterClient>
             LastName = command.LastName,
             Email = command.Email,
             PhoneNumber = command.PhoneNumber,
-            IsSubscribedToNewsletter = command.IsSubscribedToNewsletter,
             UserRole = UserRole.User
         };
     }

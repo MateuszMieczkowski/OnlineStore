@@ -41,7 +41,7 @@ public class ForgotPasswordCommandHandler : ICommandHandler<ForgotPassword>
         {
             UserId = user.Id,
             User = user,
-            CreatedTime = DateTimeOffset.UtcNow,
+            CreatedTime = DateTimeOffset.UtcNow,    
             Token = Guid.NewGuid().ToString(),
             IsUsed = false,
         };

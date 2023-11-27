@@ -405,6 +405,14 @@ namespace OnlineStore.Server.Migrations
                     b.Property<int>("DisplayedPrice")
                         .HasColumnType("int");
 
+                    b.Property<bool>("IsSubscribedToNewsLetter")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("PageSize")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(20);
+
                     b.Property<int>("UITheme")
                         .HasColumnType("int");
 
@@ -427,9 +435,6 @@ namespace OnlineStore.Server.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
-
-                    b.Property<bool>("IsSubscribedToNewsletter")
-                        .HasColumnType("bit");
 
                     b.Property<string>("LastName")
                         .IsRequired()

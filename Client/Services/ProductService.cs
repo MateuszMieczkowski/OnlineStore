@@ -8,10 +8,16 @@ namespace OnlineStore.Client.Services;
 
 public interface IProductService
 {
-    Task<PagedResult<ProductListItemDto>> GetProductList(int pageNumber = 1, int pageSize = 50);
-    
+    Task<PagedResult<ProductListItemDto>> GetProductList(int pageNumber = 1,
+        int pageSize = 50,
+        bool deletedOnly = false,
+        bool hiddenOnly = false,
+        string? searchPhrase = null,
+        decimal? priceGrossFrom = null,
+        decimal? priceGrossTo = null);
+
     Task<ProductDto> GetProductById(int id);
-    
+
     Task CreateProducts(ICollection<CreateProductModel> products);
     Task<ProductDtoOld> Update(int id, UpdateProductDto dto);
     Task<bool> Remove(int id);
@@ -26,9 +32,23 @@ public class ProductService : IProductService
         _broker = broker;
     }
 
-    public async Task<PagedResult<ProductListItemDto>> GetProductList(int pageNumber = 1, int pageSize = 50)
+    public async Task<PagedResult<ProductListItemDto>> GetProductList(
+        int pageNumber = 1,
+        int pageSize = 50,
+        bool deletedOnly = false,
+        bool hiddenOnly = false,
+        string? searchPhrase = null,
+        decimal? priceGrossFrom = null,
+        decimal? priceGrossTo = null)
     {
-        var query = new GetProductList(pageNumber, pageSize, IncludeDeleted: false, IncludeHidden: false);
+        var query = new GetProductList(
+            pageNumber,
+            pageSize,
+            deletedOnly,
+            hiddenOnly,
+            searchPhrase,
+            priceGrossFrom,
+            priceGrossTo);
         return await _broker.GetProductsAsync(query);
     }
 
@@ -44,7 +64,8 @@ public class ProductService : IProductService
                 x =>
                 {
                     var files = x.ProductFiles
-                        .Select(y => new CreateProductFile(y.FileName, y.FileBase64 ?? "", y.ProductFileType, y.Description))
+                        .Select(y =>
+                            new CreateProductFile(y.FileName, y.FileBase64 ?? "", y.ProductFileType, y.Description))
                         .ToList();
                     return new CreateProductDto(
                         Name: x.Name,
@@ -60,7 +81,7 @@ public class ProductService : IProductService
             .ToList();
 
         var command = new CreateProductsBatch(commandProducts);
-        
+
         await _broker.PostProductsAsync(command);
     }
 

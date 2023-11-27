@@ -1,7 +1,10 @@
 ﻿@page "/"
 @using OnlineStore.Shared.Products
+@using OnlineStore.Shared.Clients
+@using Blazored.LocalStorage
 @inject NavigationManager NavigationManager
 @inject IProductService ProductService
+@inject ILocalStorageService LocalStorage
 
 <PageTitle>Dostępne produkty</PageTitle>
 
@@ -32,18 +35,10 @@ else
 			            <MudButton Variant="Variant.Text" Color="Color.Primary" StartIcon="@Icons.Material.Filled.AddShoppingCart">Dodaj do koszyka</MudButton>
 		            </MudCardActions>
 	            </MudCard>
-	            @* <div class="col-md-2"> *@
-		           @*   *@
-		           @*  <div class="card mb-5 ml-2"> *@
-			          @*   <img class="img-thumbnail" src="@product.ThumbnailUri" alt="Product image"> *@
-			          @*   <div class="card-body"> *@
-				         @*    <p class="card-text">@product.Name</p> *@
-				         @*    <p class="card-text">@product.ReferenceNumber</p> *@
-				         @*    <p class="card-text">Ilość: @product.Quantity</p> *@
-			          @*   </div> *@
-		           @*  </div> *@
-	            @* </div> *@
 			}
+		</div>
+		<div class="d-flex flex-column align-center">
+			<MudPagination Size="Size.Large" Variant="Variant.Filled"  Color="Color.Secondary" @bind-Selected="@PageNumber" Count="@_pageCount" Class="pa-4"/>
 		</div>
 
 }
@@ -52,16 +47,39 @@ else
 
 	private IReadOnlyCollection<ProductListItemDto> _products = new List<ProductListItemDto>();
 	private bool _isLoading = true;
+	private UserPreferencesDto? _userPreferences;
+	private int _pageNumber = 1;
+	private int _pageCount;
+
+	public int PageNumber
+	{
+		set
+		{
+			_pageNumber = value;
+			PageChanged(_pageNumber).RunSynchronously();
+		}
+		get => _pageNumber;
+	}
 
 	protected override async Task OnInitializedAsync()
 	{
-		var response = await ProductService.GetProductList(pageNumber: 1, pageSize: 50);
-		_products = response.Items;
-		_isLoading = false;
+		_userPreferences = await LocalStorage.GetItemAsync<UserPreferencesDto>(LocalStorageKeys.UserPreferences);
+		await GetProducts();
 	}
 
-    // private void Refresh()
-    // {
-    //     StateHasChanged();
-    // }
+	private async Task GetProducts()
+	{
+		_isLoading = true;
+		var response = await ProductService.GetProductList(_pageNumber, _userPreferences?.PageSize ?? 20);
+		_products = response.Items;
+		_pageCount = response.TotalPages;
+		_isLoading = false;
+		StateHasChanged();
+	}
+
+	private async Task PageChanged(int i)
+	{
+		_pageNumber = i;
+		await GetProducts();
+	}
 }
