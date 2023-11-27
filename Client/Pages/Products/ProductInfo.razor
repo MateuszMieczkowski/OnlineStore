@@ -44,7 +44,7 @@ else
                         <MudCard>
                             <MudCardHeader>
                                 <MudChip Color="Color.Primary" Size="Size.Large">
-                                    <MudText Typo="Typo.h4">Pliki</MudText>
+                                    <MudText Typo="Typo.h4">Zdjęcia</MudText>
                                 </MudChip>
                             </MudCardHeader>
                             <MudDivider/>
@@ -53,7 +53,7 @@ else
                                     @foreach (var file in _product.ProductFiles.Where(x => x.FileType != ProductFileTypeDto.Other))
                                     {
                                         <MudCarouselItem>
-                                            <MudImage ObjectFit="ObjectFit.Cover" Height="600" Src=@file.BlobUri Alt="gallery-item" Elevation="25" Class="rounded-lg d-block m-auto"/>
+                                            <MudImage ObjectFit="ObjectFit.ScaleDown" Height="500" Src=@file.BlobUri Alt="gallery-item" Elevation="25" Class="rounded-lg d-block m-auto"/>
                                         </MudCarouselItem>
                                     }
                                 </MudCarousel>
