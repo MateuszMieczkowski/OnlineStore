@@ -1,7 +1,6 @@
 ﻿@page "/create"
 @using OnlineStore.Client.Products.Models
 @using ISnackbar = MudBlazor.ISnackbar
-@using Severity = MudBlazor.Severity
 @* @attribute [Authorize(Roles = "Admin")] TODO uncomment it *@
 @inject IJSRuntime JsRuntime
 @inject IProductService ProductService
@@ -23,9 +22,6 @@
                             <MudButton OnClick="@(() => Remove(product))" StartIcon="@Icons.Material.Filled.RemoveCircle" Color="Color.Secondary">Usuń produkt</MudButton>
                         </CardHeaderActions>
                     </MudCardHeader>
-                    @* <EditForm Model="product"> *@
-                    @*     <ProductForm _model="@product"/> *@
-                    @* </EditForm> *@
                     <EditForm Model="@product" Context="productContext">
                         <DataAnnotationsValidator/>
                         @AddEditForm(productContext)

@@ -5,6 +5,9 @@ using OnlineStore.Server.Infrastructure;
 using OnlineStore.Server.Products.Mapping;
 using OnlineStore.Shared.Infrastructure;
 using OnlineStore.Shared.Products;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace OnlineStore.Server.Products.Handlers;
 
@@ -46,8 +49,6 @@ public class GetProductsListQueryHandler : IQueryHandler<GetProductList, PagedRe
         {
             dbQueryBase = dbQueryBase.Where(x => x.IsHidden);
         }
-
-        
         
         if (!string.IsNullOrWhiteSpace(query.SearchPhrase))
         {

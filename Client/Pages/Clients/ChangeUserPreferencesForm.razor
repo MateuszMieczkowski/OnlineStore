@@ -78,8 +78,7 @@
         if (firstRender)
         {
             var userPreferences = await LocalStorageService.GetItemAsync<UserPreferencesDto>(LocalStorageKeys.UserPreferences);
-            Console.WriteLine(userPreferences.DisplayedPrice);
-            if (userPreferences is null)
+            if (userPreferences == null)
             {
                 Model.UiTheme = UIThemeDto.Light;
                 Model.DisplayedPrice = DisplayedPriceDto.Gross;
@@ -116,5 +115,4 @@
         await MainLayout.OnSystemThemeChanged(Model.UiTheme == UIThemeDto.Dark);
         StateHasChanged();
     }
-
 }

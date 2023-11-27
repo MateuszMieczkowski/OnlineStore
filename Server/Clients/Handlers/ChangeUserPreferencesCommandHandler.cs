@@ -31,6 +31,7 @@ public class ChangeUserPreferencesCommandHandler : ICommandHandler<ChangeUserPre
         userPreferences!.UITheme = (UITheme)command.UiThemeDto;
         userPreferences.DisplayedPrice = (DisplayedPrice)command.DisplayedPriceDto;
         userPreferences.IsSubscribedToNewsLetter = command.IsSubscribedToNewsletter;
+        userPreferences.PageSize = command.PageSize;
 
         if (shouldCreatePreferences)
         {

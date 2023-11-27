@@ -4,8 +4,9 @@
 @inject IAccountService AccountService
 @attribute [Authorize(Roles = "Admin")]
 
-<h3>Lista administratorów</h3>
-
+<MudContainer>
+    
+<h3>Lista użytkowników</h3>
 <a class="btn btn-primary mb-2" href="/accounts/register">Dodaj nowego administratotra</a>
 
 @if (items.Any())
@@ -23,8 +24,6 @@
             <tr>
                 <td>@user.Email</td>
                 <td>
-                    <button class="btn btn-warning" @onclick="() => EditUser(user.Id)">Edytuj</button>
-                    <button class="btn btn-danger" @onclick="() => DeleteUser(user.Id)">Usuń</button>
                 </td>
             </tr>
         }
@@ -49,15 +48,5 @@ else
         var userListDto = await AccountService.GetUserList(PageNumber, PageSize);
         items = userListDto.Items;
     }
-
-    private void EditUser(int userId)
-    {
-    // Napisz kod do przenoszenia do strony edycji użytkownika, np. navigationManager.NavigateTo($"/users/edit/{userId}");
-    }
-
-    private void DeleteUser(int userId)
-    {
-    // Napisz kod do usuwania użytkownika, np. httpClient.DeleteAsync($"api/users/{userId}")
-    // Po usunięciu użytkownika odśwież stronę lub listę użytkowników
-    }
 }
+</MudContainer>

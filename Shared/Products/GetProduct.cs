@@ -1,14 +1,15 @@
-﻿using OnlineStore.Shared.Infrastructure;
+﻿using OnlineStore.Shared.Enums;
+using OnlineStore.Shared.Infrastructure;
 
 namespace OnlineStore.Shared.Products;
 
-public record GetProduct(int Id, bool IncludeDeleted, bool IncludeHidden) : IQuery<ProductDto>;
+public record GetProduct(int Id) : IQuery<ProductDto>;
 
 public record ProductDto(
     string Name,
     string ReferenceNumber,
     string? ShortDescription,
-    string? Description,
+    string Description,
     string ThumbnailUri,
     int Quantity,
     decimal PriceNet,
@@ -16,6 +17,5 @@ public record ProductDto(
     bool IsHidden,
     bool IsDeleted,
     TaxRateDto TaxRate,
-    IEnumerable<ProductFileDto> ProductFiles) : ICommand;
-
+    IEnumerable<ProductFileDto> ProductFiles);
 public record ProductFileDto(int Id, string FileName, string BlobUri, string? Description, ProductFileTypeDto FileType);

@@ -1,5 +1,4 @@
 ﻿using OnlineStore.Shared.Infrastructure;
-using OnlineStore.Shared.Models;
 using OnlineStore.Shared.Products;
 
 namespace OnlineStore.Client.Brokers.API;
@@ -10,7 +9,12 @@ public partial class ApiBroker
 
     public async Task<PagedResult<ProductListItemDto>> GetProductsAsync(GetProductList query)
     {
-        var queryParams = $"?pageNumber={query.PageNumber}&pageSize={query.PageSize}";
+        var queryParams = $"?pageNumber={query.PageNumber}&pageSize={query.PageSize}&hiddenOnly={query.HiddenOnly}&deletedOnly={query.DeletedOnly}";
+        if (query.SearchPhrase != null)
+        {
+            queryParams += $"&searchPhrase={query.SearchPhrase}";
+        }
+        
         return await GetAsync<PagedResult<ProductListItemDto>>($"{ProductRelativeUrl}{queryParams}");
     }
 
@@ -24,13 +28,39 @@ public partial class ApiBroker
         await PostAsync($"{ProductRelativeUrl}/create-batch", command);
     }
 
-    public async Task<ProductDtoOld> UpdateProductAsync(int id, UpdateProductDto dto)
+    public async Task UpdateProductAsync(int id, UpdateProductDto dto)
     {
-        return await PutAsync<UpdateProductDto, ProductDtoOld>(ProductRelativeUrl + $"/{id}", dto);
+        await PutAsync($"{ProductRelativeUrl}/{id}", dto);
     }
 
-    public async Task<bool> RemoveProductAsync(int id)
+
+    public async Task HideProductAsync(int id)
     {
-        return await DeleteAsync(ProductRelativeUrl + $"/{id}");
+        await PutAsync($"{ProductRelativeUrl}/{id}/hide");
+    }
+    
+    public async Task RecoverProductAsync(int id)
+    {
+        await PutAsync($"{ProductRelativeUrl}/{id}/recover");
+    }
+    
+    public async Task RevealProductAsync(int id)
+    {
+        await PutAsync($"{ProductRelativeUrl}/{id}/reveal");
+    }
+
+    public async Task SoftDeleteProductAsync(int id)
+    {
+        await DeleteAsync($"{ProductRelativeUrl}/{id}/soft-delete");
+    }
+    
+    public async Task HardDeleteProductAsync(int id)
+    {
+        await DeleteAsync($"{ProductRelativeUrl}/{id}/hard-delete");
+    }
+
+    public async Task<IReadOnlyCollection<TaxRateDto>> GetTaxRates()
+    {
+        return await GetAsync<IReadOnlyCollection<TaxRateDto>>($"{ProductRelativeUrl}/taxRates");
     }
 }

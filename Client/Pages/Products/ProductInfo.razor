@@ -1,51 +1,138 @@
 @page "/products/{id:int}"
 @using OnlineStore.Shared.Products
 @inject IProductService ProductService
-@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
 
-<h3>Informacje o produkcie</h3>
 @if (_product is null)
 {
-    
+
 }
 else
 {
 
     <MudContainer>
+        <MudText Typo="Typo.h2">Informacje o produkcie</MudText>
         <MudCard>
             <MudCardContent>
-                <MudText Typo="Typo.h4">@_product.Name</MudText>
-                <MudText Typo="Typo.body2">@_product.ShortDescription</MudText>
+                <MudGrid>
+                    <MudItem>
+                        <MudImage Class="m-auto" Src="@_product.ThumbnailUri" Width="300"/>
+                    </MudItem>
+                    <MudItem>
+                        <MudText Typo="Typo.h3">@_product.Name</MudText>
+                        <MudText Typo="Typo.h5">@_product.ShortDescription</MudText>
+                    </MudItem>
+                </MudGrid>
 
-                <MudImage Src="@_product.ThumbnailUri" Width="300"/>
+                <div class="my-4">
+                    <MudCard Outlined="false">
+                        <MudCardHeader>
+                            <MudChip Color="Color.Primary" Size="Size.Large">
+                                <MudText Typo="Typo.h4">Opis szczegółowy</MudText>
+                            </MudChip>
+                        </MudCardHeader>
+                        <MudDivider/>
+                        <MudCardContent Class="p-2">
+                            <div>@((MarkupString)_product.Description)</div>
+                        </MudCardContent>
+                    </MudCard>
+                </div>
 
-                <MudTabs>
-                    <MudTabPanel Text="Opis">
-                        <div class="d-flex align-content-center justify-content-center p-2">@((MarkupString)_product.Description)</div>
-                    </MudTabPanel>
-                    <MudTabPanel Text="Zdjęcia">
-                        @foreach (var image in _product.ProductFiles.Where(pf => pf.FileType == ProductFileTypeDto.Image))
-                        {
-                            <MudImage Src="@image.BlobUri" Height="200" Width="200"/>
-                        }
-                    </MudTabPanel>
-                    <MudTabPanel Text="Pliki">
-                        @foreach (var otherFile in _product.ProductFiles.Where(pf => pf.FileType == ProductFileTypeDto.Other))
-                        {
-                            <div>
-                                <a href="@otherFile.BlobUri" target="_blank">@otherFile.FileName</a>
-                                <div>@otherFile.Description</div>
-                            </div>
-                        }
-                    </MudTabPanel>
-                </MudTabs>
+                @if (_product.ProductFiles.Any(x => x.FileType == ProductFileTypeDto.Image))
+                {
+                    <div class="mt-4">
+                        <MudCard>
+                            <MudCardHeader>
+                                <MudChip Color="Color.Primary" Size="Size.Large">
+                                    <MudText Typo="Typo.h4">Zdjęcia</MudText>
+                                </MudChip>
+                            </MudCardHeader>
+                            <MudDivider/>
+                            <MudCardContent Class="p-2">
+                                <MudCarousel TData="object" css Style="height: 600px">
+                                    @foreach (var file in _product.ProductFiles.Where(x => x.FileType != ProductFileTypeDto.Other))
+                                    {
+                                        <MudCarouselItem>
+                                            <MudImage ObjectFit="ObjectFit.ScaleDown" Height="500" Src=@file.BlobUri Alt="gallery-item" Elevation="25" Class="rounded-lg d-block m-auto"/>
+                                        </MudCarouselItem>
+                                    }
+                                </MudCarousel>
+                            </MudCardContent>
+                        </MudCard>
+                    </div>
+                }
 
-                <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="NavigateBack">Powrót</MudButton>
+                @if (_product.ProductFiles.Any(x => x.FileType == ProductFileTypeDto.Other))
+                {
+                    <div class="mt-4">
+                        <MudCard>
+                            <MudCardHeader>
+                                <MudChip Color="Color.Primary" Size="Size.Large">
+                                    <MudText Typo="Typo.h4">Pliki</MudText>
+                                </MudChip>
+                            </MudCardHeader>
+                            <MudDivider/>
+                            <MudCardContent Class="p-2">
+                                <MudList>
+                                    @foreach (var file in _product.ProductFiles.Where(x => x.FileType == ProductFileTypeDto.Other))
+                                    {
+                                        <MudTooltip Text="@file.Description" Placement="Placement.Top">
+                                            <MudListItem>
+                                                <MudButton Color="Color.Secondary" StartIcon="@Icons.Material.Filled.FileDownload" Variant="Variant.Filled" Href="@file.BlobUri">@file.FileName</MudButton>
+                                            </MudListItem>
+                                        </MudTooltip>
+                                    }
+                                </MudList>
+                            </MudCardContent>
+                        </MudCard>
+                    </div>
+                }
+
+                <div class="mt-4">
+                    <MudCard>
+                        <MudCardHeader>
+                            <MudChip Color="Color.Primary" Size="Size.Large">
+                                <MudText Typo="Typo.h4">Parametry produktu</MudText>
+                            </MudChip>
+
+                        </MudCardHeader>
+                        <MudDivider/>
+                        <MudCardContent>
+                            <h5>
+                                <strong>Numer referencyjny:</strong> @_product.ReferenceNumber
+                            </h5>
+                            <h5>
+                                <strong>Ilość:</strong> @_product.Quantity szt.
+                            </h5>
+                            <h5>
+                                <strong>Cena Netto:</strong> @_product.PriceNet zł
+                            </h5>
+                            <h5>
+                                <strong>Cena Netto:</strong> @_product.TaxRate.Description
+                            </h5>
+                            <h5>
+                                <strong>Cena Brutto:</strong> @_product.PriceGross zł
+                            </h5>
+
+                        </MudCardContent>
+                    </MudCard>
+                </div>
+
+                <div class="mt-4">
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.AddShoppingCart">Dodaj do koszyka</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.ShoppingCartCheckout">Kup teraz</MudButton>
+                </div>
+
+                <div class="mt-4">
+                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="NavigateBack">Powrót</MudButton>
+                </div>
             </MudCardContent>
         </MudCard>
     </MudContainer>
 }
+
 @code {
+
     [Parameter]
     public int Id { get; set; }
 
@@ -55,10 +142,9 @@ else
     {
         _product = await ProductService.GetProductById(Id);
     }
-    
-    private void NavigateBack()
+
+    private async Task NavigateBack()
     {
-        NavigationManager.NavigateTo("/");
+        await JSRuntime.InvokeVoidAsync("history.back");
     }
-    
 }

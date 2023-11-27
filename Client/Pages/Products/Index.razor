@@ -1,42 +1,53 @@
 ﻿@page "/"
 @using OnlineStore.Shared.Products
-@using OnlineStore.Shared.Clients
 @using Blazored.LocalStorage
+@using OnlineStore.Shared.Clients
+@using OnlineStore.Shared.Enums
 @inject NavigationManager NavigationManager
 @inject IProductService ProductService
 @inject ILocalStorageService LocalStorage
 
 <PageTitle>Dostępne produkty</PageTitle>
 
-@* <ProductsFilter Products="_products" OnSearchStringChanged="Refresh"></ProductsFilter> *@
+<ProductsFilter OnSearchStringChanged="@GetProducts"/>
 
-@if (_isLoading)	
+@if (_isLoading)
 {
-	<div class="d-flex align-content-center justify-content-center">
-	<MudProgressCircular Color="Color.Primary" Size="Size.Large" Indeterminate="true" />
-	</div>
+    <div class="d-flex align-content-center justify-content-center">
+        <MudProgressCircular Color="Color.Primary" Size="Size.Large" Indeterminate="true"/>
+    </div>
 }
 else
 {
-
-		<div class="row d-flex gap-3">
-            @foreach (var product in _products)  //.Where(p => p.IsVisible))
+		<MudGrid Spacing="7" Justify="Justify.Center">
+            @foreach (var product in _products)
             {
-	            <MudCard Square="true" @onclick="@(() => NavigationManager.NavigateTo($"products/{product.Id}"))">
-		            <MudCardMedia Image="@product.ThumbnailUri" Height="200" />
-		            <MudCardContent>
-			            <MudText Typo="Typo.h5">@product.Name</MudText>
-			            <MudText Typo="Typo.h6">@product.PriceGross zł</MudText>
-			            <MudText Typo="Typo.body2">@product.ReferenceNumber.</MudText>
-			            <MudText Typo="Typo.body2">Ilość: @product.Quantity</MudText>
-		            </MudCardContent>
-		            <MudCardActions>
-			            <MudButton Variant="Variant.Text" Color="Color.Primary" StartIcon="@Icons.Material.Filled.ShoppingCartCheckout">Kup teraz</MudButton>
-			            <MudButton Variant="Variant.Text" Color="Color.Primary" StartIcon="@Icons.Material.Filled.AddShoppingCart">Dodaj do koszyka</MudButton>
-		            </MudCardActions>
-	            </MudCard>
+	            <MudItem>
+		            <MudCard @onclick="@(() => NavigationManager.NavigateTo($"products/{product.Id}"))" class="pointer">
+			            <MudCardHeader>
+				            <CardHeaderContent>
+					            <MudText Typo="Typo.h5">@product.Name</MudText>
+					            <MudText Typo="Typo.body2">@product.ReferenceNumber</MudText>
+				            </CardHeaderContent>
+				            <CardHeaderActions>
+					            <MudTooltip Duration="250" Text="@product.ShortDescription" Placement="Placement.Top">
+						            <MudIconButton Icon="@Icons.Material.Filled.Description" Color="Color.Primary"/>
+					            </MudTooltip>
+				            </CardHeaderActions>
+			            </MudCardHeader>
+			            <MudCardMedia Image="@product.ThumbnailUri" Height="200"/>
+			            <MudCardContent>
+				            <MudText Typo="Typo.h6">@(_showNetPrice ? product.PriceNet : product.PriceGross) zł</MudText>
+				            <MudText Typo="Typo.body2">Ilość: @product.Quantity</MudText>
+			            </MudCardContent>
+			            <MudCardActions>
+				            <MudButton Variant="Variant.Text" Color="Color.Primary" StartIcon="@Icons.Material.Filled.AddShoppingCart">Dodaj do koszyka</MudButton>
+				            <MudButton Variant="Variant.Text" Color="Color.Primary" StartIcon="@Icons.Material.Filled.ShoppingCartCheckout">Kup teraz</MudButton>
+			            </MudCardActions>
+		            </MudCard>
+	            </MudItem>
 			}
-		</div>
+		</MudGrid>
 		<div class="d-flex flex-column align-center">
 			<MudPagination Size="Size.Large" Variant="Variant.Filled"  Color="Color.Secondary" @bind-Selected="@PageNumber" Count="@_pageCount" Class="pa-4"/>
 		</div>
@@ -50,7 +61,9 @@ else
 	private UserPreferencesDto? _userPreferences;
 	private int _pageNumber = 1;
 	private int _pageCount;
-
+	private int _pageSize;
+	private bool _showNetPrice;
+	
 	public int PageNumber
 	{
 		set
@@ -64,13 +77,17 @@ else
 	protected override async Task OnInitializedAsync()
 	{
 		_userPreferences = await LocalStorage.GetItemAsync<UserPreferencesDto>(LocalStorageKeys.UserPreferences);
+		_showNetPrice = _userPreferences?.DisplayedPrice == DisplayedPriceDto.Net;
+		_pageSize = _userPreferences?.PageSize > 0 ? _userPreferences.PageSize : 20;
+		
 		await GetProducts();
 	}
 
-	private async Task GetProducts()
+	private async Task GetProducts(string? filter = null)
 	{
 		_isLoading = true;
-		var response = await ProductService.GetProductList(_pageNumber, _userPreferences?.PageSize ?? 20);
+		
+		var response = await ProductService.GetProductList(_pageNumber, _pageSize, searchPhrase: filter);
 		_products = response.Items;
 		_pageCount = response.TotalPages;
 		_isLoading = false;

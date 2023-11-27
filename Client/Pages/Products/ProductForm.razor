@@ -1,23 +1,25 @@
 @using OnlineStore.Client.Products.Models
 @using OnlineStore.Client.Extensions
 @using OnlineStore.Shared.Products
-@using TaxRateDto = OnlineStore.Shared.Enums.TaxRateDto
 @using Microsoft.AspNetCore.Http
 @using Microsoft.AspNetCore.Http.Internal
+@using System.Collections.ObjectModel
+@inject IProductService ProductService
+@inject ISnackbar Snackbar
+@typeparam TFile where TFile:ProductFileModel, new()
 
 <MudCardHeader>
     <CardHeaderContent>
         <MudText Typo="Typo.h4">@_model.Name</MudText>
     </CardHeaderContent>
 </MudCardHeader>
-@* <MudForm Model="_model"> *@
     <MudCardContent Class="d-flex flex-column gap-2">
 
-        @if (!string.IsNullOrEmpty(_model.ThumbnailBase64))
+        @if (!string.IsNullOrEmpty(_model.ThumbnailImageSource))
         {
-            <MudImage ObjectFit="ObjectFit.Contain" Src="@_model.ThumbnailBase64" Alt="thumbnail-mud" Elevation="25" Class="rounded-lg" Height="300"/>
+            <MudImage ObjectFit="ObjectFit.Contain" Src="@_model.ThumbnailImageSource" Alt="thumbnail-mud" Elevation="25" Class="rounded-lg" Height="300"/>
         }
-        <MudFileUpload T="IBrowserFile" FilesChanged="file => UploadFile(file, ProductFileTypeDto.Thumbnail)" Accept=".png, .jpg" For="@(() => _model.ThumbnailFile)">
+        <MudFileUpload T="IBrowserFile" FilesChanged="file => UploadFile(file, ProductFileTypeDto.Thumbnail)" Accept=".png, .jpg">
             <ButtonTemplate>
                 <MudButton HtmlTag="label"
                            Variant="Variant.Filled"
@@ -28,6 +30,7 @@
                 </MudButton>
             </ButtonTemplate>
         </MudFileUpload>
+        <ValidationMessage For="() => _model.ThumbnailImageSource"/>
         <MudTextField @bind-Value="_model.Name"
                       Class="mt-2"
                       For="@(() => _model.Name)"
@@ -57,9 +60,9 @@
                              Label="Cena netto *"/>
 
             <MudSelect T="TaxRateDto" Label="Stawka podatku *" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" @bind-Value="_model.TaxRate">
-                @foreach (var value in Enum.GetValues<TaxRateDto>())
+                @foreach (var taxRate in _taxRates)
                 {
-                    <MudSelectItem T="TaxRateDto" Value="@value">@EnumHelper.GetDescription(value)</MudSelectItem>
+                    <MudSelectItem T="TaxRateDto" Value="@taxRate">@taxRate.Description</MudSelectItem>
                 }
             </MudSelect>
             <MudNumericField
@@ -118,11 +121,11 @@
         </MudList>
         @if (_model.ProductFiles.Any(x => x.ProductFileType == ProductFileTypeDto.Image))
         {
-            <MudCarousel TData="object" Style="height:600px;" AutoCycle="false" css>
+            <MudCarousel TData="object" AutoCycle="false" css Style="height: 300px">
                 @foreach (var file in _model.ProductFiles.Where(x => x.ProductFileType == ProductFileTypeDto.Image))
                 {
                     <MudCarouselItem>
-                        <MudImage ObjectFit="ObjectFit.Cover" Src=@file.FileBase64Source Alt="gallery-item" Elevation="25" Class="rounded-lg d-block m-auto"/>
+                        <MudImage ObjectFit="ObjectFit.Cover" Height="300" Src=@file.ImageSource Alt="gallery-item" Elevation="25" Class="rounded-lg d-block m-auto"/>
                     </MudCarouselItem>
                 }
             </MudCarousel>
@@ -155,17 +158,21 @@
             }
         </MudList>
     </MudCardContent>
-@* </MudForm> *@
 
 
 @code {
 
     [Parameter]
-    public CreateProductModel _model { get; set; }
+    public ProductModel<TFile> _model { get; set; }
 
-    IList<IBrowserFile> allFiles = new List<IBrowserFile>();
+    private IReadOnlyCollection<TaxRateDto> _taxRates = new Collection<TaxRateDto>();
 
-    private decimal PriceGross => _model.TaxRate != TaxRateDto.Vat0 && _model.TaxRate != TaxRateDto.VatZw ? Math.Round(_model.PriceNet * (1 + (decimal)_model.TaxRate / 100), 2) : _model.PriceNet;
+    protected override async Task OnInitializedAsync()
+    {
+        _taxRates = await ProductService.GetTaxRates();
+    }
+
+    private decimal PriceGross => _model.TaxRate?.Amount > 0 ? Math.Round(_model.PriceNet * (1 + (decimal)_model.TaxRate.Amount / 100), 2) : _model.PriceNet;
 
     private async Task UploadFiles(IReadOnlyList<IBrowserFile> files, ProductFileTypeDto fileType)
     {
@@ -177,59 +184,45 @@
 
     private async Task UploadFile(IBrowserFile file, ProductFileTypeDto fileType)
     {
+        var maxAllowedSize = 1024 * 1000;
+        if (file.Size > maxAllowedSize)
+        {
+            Snackbar.Add($"Zdjęcie/plik o nazwie {file.Name} ma zbyt duży rozmiar (max. 1 MB)", Severity.Warning);
+            return;
+        }
 
-        var productFile = new CreateProductFileModel
+        var productFile = new TFile
         {
             FileName = file.Name,
             File = file,
             ProductFileType = fileType,
         };
-
-        Console.WriteLine(file.Name);
-
-    // if (e.File.Size > maxFileSizeInKB)
-    // {
-    //     Toast.ShowToast("Max size of image is 100kB!", ToastLevel.Error);
-    //     return;
-    // }
-
-        // await using FileStream fs = new(path, FileMode.Create);
-        // await browserFile.OpenReadStream().CopyToAsync(fs);
-        //
-        // using (var memoryStream = new MemoryStream())
-        // {
-        //     await file.OpenReadStream().CopyToAsync(memoryStream);
-        //     var fileModel = new FileUploadModel
-        //     {
-        //         File = new FormFile(memoryStream, 0, memoryStream.Length, file.Name, file.Name),
-        //         FileName = file.Name
-        //     };
-        //
-        //     productFile.FormFile = fileModel.File;
-        // }
         
-        // file.RequestImageFileAsync()
-        var maxAllowedSize = 1024 * 1000;
         var buffer = new byte[file.Size];
         await file.OpenReadStream(maxAllowedSize).ReadAsync(buffer);
         var fileBase64 = Convert.ToBase64String(buffer);
         productFile.FileBase64 = fileBase64;
-        
+
         if (fileType == ProductFileTypeDto.Thumbnail)
         {
-            _model.ThumbnailBase64 = $"data:image/jpeg;base64,{fileBase64}";
-            _model.ThumbnailFile = file;
+            var currentThumbnail = _model.ProductFiles.FirstOrDefault(x => x.ProductFileType == ProductFileTypeDto.Thumbnail);
+            if (currentThumbnail != null)
+            {
+                RemoveFile(currentThumbnail);
+            }
+            _model.ThumbnailImageSource = $"data:image/jpeg;base64,{fileBase64}";
+            if (_model is CreateProductModel createModel)
+            {
+                createModel.ThumbnailFile = file;
+            }
         }
 
         _model.ProductFiles.Add(productFile);
-        allFiles.Add(file);
-
         StateHasChanged();
     }
 
-    private void RemoveFile(CreateProductFileModel file)
+    private void RemoveFile(TFile file)
     {
-        allFiles.Remove(file.File);
         _model.ProductFiles.Remove(file);
         StateHasChanged();
     }

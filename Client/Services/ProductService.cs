@@ -1,17 +1,17 @@
 ﻿using OnlineStore.Client.Brokers.API;
 using OnlineStore.Client.Products.Models;
 using OnlineStore.Shared.Infrastructure;
-using OnlineStore.Shared.Models;
 using OnlineStore.Shared.Products;
 
 namespace OnlineStore.Client.Services;
 
 public interface IProductService
 {
-    Task<PagedResult<ProductListItemDto>> GetProductList(int pageNumber = 1,
+    Task<PagedResult<ProductListItemDto>> GetProductList(
+        int pageNumber = 1,
         int pageSize = 50,
-        bool deletedOnly = false,
         bool hiddenOnly = false,
+        bool deletedOnly = false,
         string? searchPhrase = null,
         decimal? priceGrossFrom = null,
         decimal? priceGrossTo = null);
@@ -19,8 +19,14 @@ public interface IProductService
     Task<ProductDto> GetProductById(int id);
 
     Task CreateProducts(ICollection<CreateProductModel> products);
-    Task<ProductDtoOld> Update(int id, UpdateProductDto dto);
-    Task<bool> Remove(int id);
+    Task Update(int id, UpdateProductModel model);
+    Task SoftDelete(int id);
+    Task Hide(int id);
+    Task Reveal(int id);
+    Task Recover(int id);
+    Task HardDelete(int id);
+
+    Task<IReadOnlyCollection<TaxRateDto>> GetTaxRates();
 }
 
 public class ProductService : IProductService
@@ -35,26 +41,26 @@ public class ProductService : IProductService
     public async Task<PagedResult<ProductListItemDto>> GetProductList(
         int pageNumber = 1,
         int pageSize = 50,
-        bool deletedOnly = false,
-        bool hiddenOnly = false,
+        bool includeHidden = false,
+        bool onlyDeleted = false,
         string? searchPhrase = null,
         decimal? priceGrossFrom = null,
         decimal? priceGrossTo = null)
     {
         var query = new GetProductList(
-            pageNumber,
-            pageSize,
-            deletedOnly,
-            hiddenOnly,
-            searchPhrase,
-            priceGrossFrom,
-            priceGrossTo);
+            PageNumber: pageNumber,
+            PageSize: pageSize,
+            DeletedOnly: onlyDeleted,
+            HiddenOnly: includeHidden,
+            SearchPhrase: searchPhrase,
+            PriceGrossFrom: priceGrossFrom,
+            PriceGrossTo: priceGrossTo);
         return await _broker.GetProductsAsync(query);
     }
 
     public async Task<ProductDto> GetProductById(int id)
     {
-        var query = new GetProduct(Id: id, IncludeDeleted: true, IncludeHidden: true);
+        var query = new GetProduct(Id: id);
         return await _broker.GetProductByIdAsync(query);
     }
 
@@ -75,7 +81,7 @@ public class ProductService : IProductService
                         Quantity: x.Quantity,
                         PriceNet: x.PriceNet,
                         IsHidden: x.IsHidden,
-                        TaxRateId: (int)x.TaxRate,
+                        TaxRateId: x.TaxRate!.TaxRateId,
                         ProductFiles: files);
                 })
             .ToList();
@@ -85,13 +91,39 @@ public class ProductService : IProductService
         await _broker.PostProductsAsync(command);
     }
 
-    public async Task<ProductDtoOld> Update(int id, UpdateProductDto dto)
+    public async Task Update(int id, UpdateProductModel model)
     {
-        return await _broker.UpdateProductAsync(id, dto);
+        var dtoFiles = model.ProductFiles.Select(x => new UpdateProductFileDto(x.Id, x.FileName, x.FileBase64, x.ProductFileType, x.Description)).ToList();
+        var dto = new UpdateProductDto(
+            Name: model.Name,
+            ReferenceNumber: model.ReferenceNumber,
+            ShortDescription: model.ShortDescription,
+            Description: model.Description,
+            Quantity: model.Quantity,
+            PriceNet: model.PriceNet,
+            IsHidden: model.IsHidden,
+            IsDeleted: false,
+            TaxRateId: model.TaxRate!.TaxRateId,
+            ProductFiles: dtoFiles);
+        
+        await _broker.UpdateProductAsync(id, dto);
     }
 
-    public async Task<bool> Remove(int id)
-    {
-        return await _broker.RemoveProductAsync(id);
-    }
+    public async Task SoftDelete(int id)
+        => await _broker.SoftDeleteProductAsync(id);
+
+    public async Task Hide(int id)
+        => await _broker.HideProductAsync(id);
+
+    public async Task Reveal(int id)
+        => await _broker.RevealProductAsync(id);
+
+    public async Task Recover(int id)
+        => await _broker.RecoverProductAsync(id);
+
+    public async Task HardDelete(int id)
+        => await _broker.HardDeleteProductAsync(id);
+
+    public async Task<IReadOnlyCollection<TaxRateDto>> GetTaxRates()
+        => await _broker.GetTaxRates();
 }

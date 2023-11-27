@@ -15,10 +15,10 @@
     </div>
 
     <main>
-        <MudContainer class="p-4">
+        <MudContainer MaxWidth="MaxWidth.ExtraLarge" class="p-5">
             <ErrorBoundary @ref="errorBoundary">
                 <ChildContent>
-                    <MudThemeProvider @ref="@_mudThemeProvider" @bind-IsDarkMode="@_isDarkMode" DefaultScrollbar="true"/>
+                    <MudThemeProvider @bind-IsDarkMode="@_isDarkMode"/>
                     <MudDialogProvider/>
                     <MudSnackbarProvider/>
                     <CascadingValue Value="this">
@@ -47,8 +47,15 @@
     {
         if (firstRender)
         {
-            _isDarkMode = await _mudThemeProvider.GetSystemPreference();
-            await _mudThemeProvider.WatchSystemPreference(OnSystemThemeChanged);
+            var preferences = await LocalStorage.GetItemAsync<UserPreferencesDto>("preferences");
+            if (preferences is null)
+            {
+                _isDarkMode = false;
+            }
+            else
+            {
+                _isDarkMode = preferences.UiTheme == UIThemeDto.Dark;
+            }
              LocalStorage.Changed += OnLocalStorageChanged;
             StateHasChanged();
         }

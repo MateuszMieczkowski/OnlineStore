@@ -36,6 +36,10 @@ h1:focus {
     z-index: 1000;
 }
 
+.pointer{
+    cursor: pointer;
+}
+
     #blazor-error-ui .dismiss {
         cursor: pointer;
         position: absolute;
@@ -52,3 +56,4 @@ h1:focus {
     .blazor-error-boundary::after {
         content: "An error has occurred."
     }
+    

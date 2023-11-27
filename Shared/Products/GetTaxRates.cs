@@ -4,4 +4,8 @@ namespace OnlineStore.Shared.Products;
 
 public record GetTaxRates : IQuery<IEnumerable<TaxRateDto>>;
 
-public record TaxRateDto(int TaxRateId, int Amount, string Description);
+public record TaxRateDto(int TaxRateId, int Amount, string Description)
+{
+    public override string ToString()
+        => Description;
+};

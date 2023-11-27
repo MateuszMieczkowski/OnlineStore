@@ -3,17 +3,15 @@ using OnlineStore.Shared.Products;
 
 namespace OnlineStore.Client.Products.Models;
 
-public class CreateProductFileModel
+public class CreateProductFileModel : ProductFileModel
 {
-    public string FileName { get; set; }
+    // public string FileName { get; set; }
 
-    public IBrowserFile File { get; set; }
+    // public IBrowserFile File { get; set; }
 
-    public string FileBase64 { get; set; }
-
-    public string FileBase64Source => $"data:image/jpeg;base64,{FileBase64}";
+    // public string FileBase64 { get; set; }
     
-    public ProductFileTypeDto ProductFileType { get; set; }
+    // public ProductFileTypeDto ProductFileType { get; set; }
 
-    public string? Description { get; set; }
+    // public string? Description { get; set; }
 }
