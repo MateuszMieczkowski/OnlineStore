@@ -21,7 +21,7 @@ name: Build and deploy ASP.Net Core app to an Azure Web App
 
 env:
   AZURE_WEBAPP_NAME: onlinestore-aspmvc    # set this to the name of your Azure Web App
-  AZURE_WEBAPP_PACKAGE_PATH: './Server/'      # set this to the path to your web app project, defaults to the repository root
+  AZURE_WEBAPP_PACKAGE_PATH: '.'      # set this to the path to your web app project, defaults to the repository root
   DOTNET_VERSION: '6.0'                 # set this to the .NET Core version to use
 
 on:
@@ -53,10 +53,10 @@ jobs:
             ${{ runner.os }}-nuget-
 
       - name: Build with dotnet
-        run: dotnet build OnlineStore.Server --configuration Release
+        run: dotnet build Server --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish OnlineStore.Server -c Release -o ${{env.DOTNET_ROOT}}/myapp
+        run: dotnet publish Server -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
