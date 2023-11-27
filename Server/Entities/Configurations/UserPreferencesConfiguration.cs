@@ -15,6 +15,13 @@ public class UserPreferencesConfiguration : IEntityTypeConfiguration<UserPrefere
         builder.Property(e => e.DisplayedPrice)
             .IsRequired();
 
+        builder.Property(e => e.IsSubscribedToNewsLetter)
+            .IsRequired();
+
+        builder.Property(e => e.PageSize)
+            .IsRequired()
+            .HasDefaultValue(20);
+
         builder.HasOne(e => e.User)
             .WithOne()
             .HasForeignKey<UserPreferences>(e => e.UserId)

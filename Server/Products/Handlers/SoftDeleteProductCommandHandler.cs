@@ -17,7 +17,8 @@ public class SoftDeleteProductCommandHandler : ICommandHandler<SoftDeleteProduct
     {
         await _dbContext.Products
             .Where(x => x.Id == request.Id)
-            .ExecuteUpdateAsync(setter => setter.SetProperty(x => x.IsDeleted, true),
+            .ExecuteUpdateAsync(setter => setter.SetProperty(x => x.IsDeleted, true)
+                    .SetProperty(x => x.IsHidden, false),
                 cancellationToken: cancellationToken);
     }
 }

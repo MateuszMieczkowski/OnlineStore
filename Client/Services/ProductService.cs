@@ -10,11 +10,14 @@ public interface IProductService
     Task<PagedResult<ProductListItemDto>> GetProductList(
         int pageNumber = 1,
         int pageSize = 50,
-        bool includeHidden = false,
-        bool onlyDeleted = false);
-    
+        bool hiddenOnly = false,
+        bool deletedOnly = false,
+        string? searchPhrase = null,
+        decimal? priceGrossFrom = null,
+        decimal? priceGrossTo = null);
+
     Task<ProductDto> GetProductById(int id);
-    
+
     Task CreateProducts(ICollection<CreateProductModel> products);
     Task Update(int id, UpdateProductModel model);
     Task SoftDelete(int id);
@@ -39,9 +42,19 @@ public class ProductService : IProductService
         int pageNumber = 1,
         int pageSize = 50,
         bool includeHidden = false,
-        bool onlyDeleted = false)
+        bool onlyDeleted = false,
+        string? searchPhrase = null,
+        decimal? priceGrossFrom = null,
+        decimal? priceGrossTo = null)
     {
-        var query = new GetProductList(pageNumber, pageSize, IncludeDeleted: onlyDeleted, IncludeHidden: includeHidden);
+        var query = new GetProductList(
+            PageNumber: pageNumber,
+            PageSize: pageSize,
+            DeletedOnly: onlyDeleted,
+            HiddenOnly: includeHidden,
+            SearchPhrase: searchPhrase,
+            PriceGrossFrom: priceGrossFrom,
+            PriceGrossTo: priceGrossTo);
         return await _broker.GetProductsAsync(query);
     }
 
@@ -57,7 +70,8 @@ public class ProductService : IProductService
                 x =>
                 {
                     var files = x.ProductFiles
-                        .Select(y => new CreateProductFile(y.FileName, y.FileBase64 ?? "", y.ProductFileType, y.Description))
+                        .Select(y =>
+                            new CreateProductFile(y.FileName, y.FileBase64 ?? "", y.ProductFileType, y.Description))
                         .ToList();
                     return new CreateProductDto(
                         Name: x.Name,
@@ -73,7 +87,7 @@ public class ProductService : IProductService
             .ToList();
 
         var command = new CreateProductsBatch(commandProducts);
-        
+
         await _broker.PostProductsAsync(command);
     }
 

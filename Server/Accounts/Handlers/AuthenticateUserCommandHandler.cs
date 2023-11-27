@@ -58,18 +58,21 @@ public class AuthenticateUserQueryHandler : IQueryHandler<AuthenticateUser, Auth
         var defaultUiTheme = UITheme.Light;
         var defaultDisplayPrice = DisplayedPrice.Gross;
         var defaultIsSubscribedToNewsletter = false;
+        var defaultPageSize = 20;
 
         if (preferences == null)
         {
             return new UserPreferencesDto(
                 UiTheme: (UIThemeDto)defaultUiTheme,
                 DisplayedPrice: (DisplayedPriceDto)defaultDisplayPrice,
-                IsSubscribedToNewsletter: defaultIsSubscribedToNewsletter);
+                IsSubscribedToNewsletter: defaultIsSubscribedToNewsletter,
+                PageSize: defaultPageSize);
         }
 
         return new UserPreferencesDto(
             UiTheme:  (UIThemeDto)preferences.UITheme,
             DisplayedPrice: (DisplayedPriceDto)preferences.DisplayedPrice,
-            IsSubscribedToNewsletter: defaultIsSubscribedToNewsletter); // TODO move IsSubscribedToNewsletter to UserPreferences entity
+            IsSubscribedToNewsletter: preferences.IsSubscribedToNewsLetter,
+            PageSize: preferences.PageSize);
     }
 }

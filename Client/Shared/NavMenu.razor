@@ -7,13 +7,12 @@
     <div class="container-fluid">
         <div class="nav">
             <MudButton Variant="Variant.Text" Href="/">Home</MudButton>
-            <MudButton StartIcon="@Icons.Material.Outlined.Add" href="create">Dodaj produkt</MudButton>
         </div>
 
         <div class="nav" style="margin-right: auto;">
             <AuthorizeView Roles="Admin">
                 <Authorized>
-                    @* <NavLink class="nav-item nav-link" href="create">Dodaj produkt</NavLink> *@
+                    <MudButton StartIcon="@Icons.Material.Outlined.Add" href="create">Dodaj produkt</MudButton>
                     <MudButton Variant="Variant.Text" Href="/configuration">Zarządzanie produktami</MudButton>
                     <MudButton Variant="Variant.Text" Href="/accounts/manage">Zarządzanie użytkownikami</MudButton>
                 </Authorized>

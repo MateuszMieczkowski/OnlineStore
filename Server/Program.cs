@@ -87,6 +87,8 @@ builder.Services.AddTransient<IUserFactory<RegisterClient>, ClientFactory>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ITokenGenerator, TokenGenerator>();
 builder.Services.AddScoped<ITaxService, TaxService>();
+builder.Services.AddScoped<ILoggedUserService, LoggedUserService>();
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddMemoryCache();
 

@@ -29,8 +29,8 @@ public class ChangeUserPreferencesCommandHandler : ICommandHandler<ChangeUserPre
         }
 
         userPreferences!.UITheme = (UITheme)command.UiThemeDto;
-        userPreferences!.DisplayedPrice = (DisplayedPrice)command.DisplayedPriceDto;
-        // userPreferences.IsSubscribedToNewsletter = command.IsSubscribedToNewsletter; TODO implement it
+        userPreferences.DisplayedPrice = (DisplayedPrice)command.DisplayedPriceDto;
+        userPreferences.IsSubscribedToNewsLetter = command.IsSubscribedToNewsletter;
 
         if (shouldCreatePreferences)
         {

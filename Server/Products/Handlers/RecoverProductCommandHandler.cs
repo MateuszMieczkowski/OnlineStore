@@ -17,7 +17,8 @@ public class RecoverProductCommandHandler : ICommandHandler<RecoverProduct>
     {
         await _dbContext.Products
             .Where(x => x.Id == request.Id)
-            .ExecuteUpdateAsync(setter => setter.SetProperty(x => x.IsDeleted, false),
+            .ExecuteUpdateAsync(setter => setter.SetProperty(x => x.IsDeleted, false)
+                    .SetProperty(x => x.IsHidden, false),
                 cancellationToken: cancellationToken);
     }
 }

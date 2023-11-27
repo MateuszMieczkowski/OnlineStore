@@ -16,8 +16,10 @@ public static class ProductMapper
             Quantity: product.Quantity,
             PriceNet: product.PriceNet,
             PriceGross: product.PriceGross,
-            ThumbnailUri: product.ThumbnailBlobUri,
-            Status: GetStatusDto(product));
+            ThumbnailUri: product.ThumbnailBlobUri)
+        {
+            Status = GetStatusDto(product)
+        };
     }
 
     private static ProductStatusDto GetStatusDto(Product product)
