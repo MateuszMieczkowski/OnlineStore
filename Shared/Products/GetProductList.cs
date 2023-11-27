@@ -4,8 +4,8 @@ using OnlineStore.Shared.Infrastructure;
 namespace OnlineStore.Shared.Products;
 
 public record GetProductList(
-    int PageNumber,
-    int PageSize,
+    int PageNumber = 1,
+    int PageSize = 20,
     bool DeletedOnly = false,
     bool HiddenOnly = false,
     string? SearchPhrase = null,
