@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using OnlineStore.Server.Accounts.Services;
+using OnlineStore.Server.Authentication;
 using OnlineStore.Server.Infrastructure;
 using OnlineStore.Server.Products.Mapping;
 using OnlineStore.Shared.Infrastructure;
@@ -10,28 +12,43 @@ public class GetProductsListQueryHandler : IQueryHandler<GetProductList, PagedRe
 {
     private readonly IResultPaginator _resultPaginator;
     private readonly OnlineStoreDbContext _dbContext;
+    private ILoggedUserService _loggedUserService;
 
-    public GetProductsListQueryHandler(IResultPaginator resultPaginator, OnlineStoreDbContext dbContext)
+    public GetProductsListQueryHandler(
+        IResultPaginator resultPaginator,
+        OnlineStoreDbContext dbContext,
+        ILoggedUserService loggedUserService)
     {
         _resultPaginator = resultPaginator;
         _dbContext = dbContext;
+        _loggedUserService = loggedUserService;
     }
 
     public async Task<PagedResult<ProductListItemDto>> Handle(GetProductList query, CancellationToken cancellationToken)
     {
+        
+        bool isAdmin = _loggedUserService.GetUserRole() == UserRoles.Admin;
+        
         var dbQueryBase = _dbContext.Products
             .AsNoTracking();
-
-        if (query.DeletedOnly)
+        
+        if (!isAdmin)
+        {
+            dbQueryBase = dbQueryBase.Where(x => !x.IsHidden && !x.IsDeleted);
+        }
+        
+        if (query is { DeletedOnly: true, HiddenOnly: false } && isAdmin)
         {
             dbQueryBase = dbQueryBase.Where(x => x.IsDeleted);
         }
         
-        if (query.HiddenOnly)
+        if (query is { HiddenOnly: true, DeletedOnly: false } && isAdmin)
         {
             dbQueryBase = dbQueryBase.Where(x => x.IsHidden);
         }
 
+        
+        
         if (!string.IsNullOrWhiteSpace(query.SearchPhrase))
         {
             var searchPhrase = query.SearchPhrase.Trim();
