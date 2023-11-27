@@ -10,7 +10,11 @@ public partial class ApiBroker
     public async Task<PagedResult<ProductListItemDto>> GetProductsAsync(GetProductList query)
     {
         var queryParams = $"?pageNumber={query.PageNumber}&pageSize={query.PageSize}&hiddenOnly={query.HiddenOnly}&deletedOnly={query.DeletedOnly}";
-        Console.WriteLine(queryParams);
+        if (query.SearchPhrase != null)
+        {
+            queryParams += $"&searchPhrase={query.SearchPhrase}";
+        }
+        
         return await GetAsync<PagedResult<ProductListItemDto>>($"{ProductRelativeUrl}{queryParams}");
     }
 

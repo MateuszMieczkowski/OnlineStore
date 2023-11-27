@@ -1,50 +1,34 @@
-﻿@using OnlineStore.Shared.Models
-<section class="jumbotron text-left">
-	<div class="container">
-		<form id="filter">
-			<div class="col-sm-8">
-				<div class="form-group">
-					<label for="inputSearchFilter">Search:</label>
-					<input class="form-control" id="inputSearchFilter" type="text" value="@_searchString"/>
-					       @* @oninput="SearchStringChanged"> *@
-				</div>
-				<button type="button" @onclick="Reset" class="btn btn-outline-dark">Clear</button>
-			</div>
-		</form>
-	</div>
-</section>
+﻿@using OnlineStore.Shared.Products
+@inject IProductService ProductService
 
+<MudContainer Class="mb-5 w-50">
+    <MudPaper Elevation="4">
+        <MudGrid Justify="Justify.Center">
+            <MudItem xs="9">
+                <MudTextField AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary" Variant="Variant.Filled" @bind-Value="_searchString" DebounceInterval="400" OnDebounceIntervalElapsed="StageFilter" Label="Szukaj"/>
+            </MudItem>
+            <MudItem Class="mt-3">
+                <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="Reset">Wyczyść</MudButton>
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
+</MudContainer>
 
-@code
-{
-	[Parameter]
-	public List<ProductDtoOld>? Products { get; set; }
+@code {
+    [Parameter]
+    public EventCallback<string> OnSearchStringChanged { get; set; }
 
-	[Parameter]
-	public EventCallback OnSearchStringChanged { get; set; }
+    private string? _searchString = string.Empty;
 
-	private string? _searchString = string.Empty;
+    private async Task StageFilter(string filter)
+    {
+        _searchString = filter;
+        await OnSearchStringChanged.InvokeAsync(_searchString);
+    }
 
-	private void SearchStringChanged(ChangeEventArgs e)
-	{
-		_searchString = e?.Value?.ToString();
-		StageFilter();
-		if (!string.IsNullOrEmpty(_searchString))
-		{
-			Products?.ForEach(p => p.IsVisible = p.Name.ToLower().Contains(_searchString.ToLower()) || p.ReferenceNumber.ToLower().Contains(_searchString.ToLower()));
-		}
-		OnSearchStringChanged.InvokeAsync();
-	}
-
-	private void StageFilter()
-	{
-		Products?.ForEach(x => x.IsVisible = true);
-	}
-
-	private void Reset()
-	{
-		_searchString = string.Empty;
-		StageFilter();
-		OnSearchStringChanged.InvokeAsync();
-	}
+    private async Task Reset()
+    {
+        _searchString = string.Empty;
+        await StageFilter("");
+    }
 }
