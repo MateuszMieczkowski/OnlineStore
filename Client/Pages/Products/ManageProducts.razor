@@ -12,6 +12,7 @@
 <PageTitle>Zarządzanie produktami</PageTitle>
 
 <MudContainer>
+    <ProductsFilter OnSearchStringChanged="@RefreshProducts"/>
     <MudTable Items="@products" Hover="true" Loading="@_isLoading" LoadingProgressColor="Color.Info">
         <HeaderContent>
             <MudTh>Nazwa</MudTh>
@@ -34,22 +35,22 @@
                     <MudMenu Icon="@Icons.Material.Filled.MoreVert" ActivationEvent="@MouseEvent.MouseOver" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight">
                         <MudMenuItem Icon="@Icons.Material.Filled.Info" OnClick="@(() => NavigationManager.NavigateTo($"/products/{context.Id}"))">Szczegóły</MudMenuItem>
                         <MudMenuItem Icon="@Icons.Material.Filled.Edit" OnClick="@(() => NavigationManager.NavigateTo($"/products/{context.Id}/edit"))">Edycja</MudMenuItem>
-                       @if (context.Status != ProductStatusDto.Hidden)
-                       {
+                        @if (context.Status != ProductStatusDto.Hidden)
+                        {
                             <MudMenuItem OnClick="() => ExecuteAction(context, ProductService.Hide, ProductStatusDto.Hidden)" Icon="@Icons.Material.Filled.HideSource">Ukryj</MudMenuItem>
-                       }
-                       else
-                       {
-                           <MudMenuItem OnClick="() => ExecuteAction(context, ProductService.Reveal, ProductStatusDto.Active)" Icon="@Icons.Material.Filled.ArrowBack">Odkryj</MudMenuItem>
-                       }
-                       @if (context.Status != ProductStatusDto.Deleted)
-                       {
-                           <MudMenuItem OnClick="() => ExecuteAction(context, ProductService.SoftDelete, ProductStatusDto.Deleted)" Icon="@Icons.Material.Filled.FolderDelete">Do kosza</MudMenuItem>
-                       }
-                       else
-                       {
-                           <MudMenuItem OnClick="() => ExecuteAction(context, ProductService.Recover, ProductStatusDto.Active)" Icon="@Icons.Material.Filled.FolderDelete">Przywróć z kosza</MudMenuItem>
-                       }
+                        }
+                        else
+                        {
+                            <MudMenuItem OnClick="() => ExecuteAction(context, ProductService.Reveal, ProductStatusDto.Active)" Icon="@Icons.Material.Filled.ArrowBack">Odkryj</MudMenuItem>
+                        }
+                        @if (context.Status != ProductStatusDto.Deleted)
+                        {
+                            <MudMenuItem OnClick="() => ExecuteAction(context, ProductService.SoftDelete, ProductStatusDto.Deleted)" Icon="@Icons.Material.Filled.FolderDelete">Do kosza</MudMenuItem>
+                        }
+                        else
+                        {
+                            <MudMenuItem OnClick="() => ExecuteAction(context, ProductService.Recover, ProductStatusDto.Active)" Icon="@Icons.Material.Filled.FolderDelete">Przywróć z kosza</MudMenuItem>
+                        }
                     </MudMenu>
                 </MudButtonGroup>
             </MudTd>
@@ -65,7 +66,6 @@
 @code
 {
     private IReadOnlyCollection<ProductListItemDto> products = new List<ProductListItemDto>();
-
     private bool _isLoading;
     private int _pageSize;
     private int _pageNumber = 1;

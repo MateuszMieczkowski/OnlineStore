@@ -1,5 +1,4 @@
 ﻿@page "/"
-@attribute [Authorize(Roles = "Admin")]
 @using OnlineStore.Shared.Products
 @using Blazored.LocalStorage
 @using OnlineStore.Shared.Clients
@@ -10,7 +9,8 @@
 
 <PageTitle>Dostępne produkty</PageTitle>
 
-@* <ProductsFilter Products="_products" OnSearchStringChanged="Refresh"></ProductsFilter> *@
+<ProductsFilter OnSearchStringChanged="@GetProducts"/>
+
 @if (_isLoading)
 {
     <div class="d-flex align-content-center justify-content-center">
@@ -19,7 +19,6 @@
 }
 else
 {
-
 		<MudGrid Spacing="7" Justify="Justify.Center">
             @foreach (var product in _products)
             {
@@ -84,11 +83,11 @@ else
 		await GetProducts();
 	}
 
-	private async Task GetProducts()
+	private async Task GetProducts(string? filter = null)
 	{
 		_isLoading = true;
 		
-		var response = await ProductService.GetProductList(_pageNumber, _pageSize);
+		var response = await ProductService.GetProductList(_pageNumber, _pageSize, searchPhrase: filter);
 		_products = response.Items;
 		_pageCount = response.TotalPages;
 		_isLoading = false;
