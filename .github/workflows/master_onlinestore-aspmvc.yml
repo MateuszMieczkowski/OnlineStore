@@ -37,6 +37,7 @@ jobs:
           Smtp.Password: ${{ secrets.EMAILPASSWORD }}
           BlobStorage.ConnectionString: ${{ secrets.BLOBCONNECTIONSTRING }}
           BlobStorage.ContainerName: 'productfiles'
+          Authentication.JwtKey: ${{ secrets.JWTKEY }}
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
