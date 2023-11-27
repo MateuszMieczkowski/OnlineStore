@@ -12,7 +12,7 @@
 <PageTitle>Zarządzanie produktami</PageTitle>
 
 <MudContainer>
-    <ProductsFilter Products="@products" PageCount="@_pageCount" PageNumber="@_pageNumber" PageSize="@_pageSize"/>
+    <ProductsFilter OnSearchStringChanged="@RefreshProducts"/>
     <MudTable Items="@products" Hover="true" Loading="@_isLoading" LoadingProgressColor="Color.Info">
         <HeaderContent>
             <MudTh>Nazwa</MudTh>
