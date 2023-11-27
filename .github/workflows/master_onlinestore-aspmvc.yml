@@ -34,8 +34,8 @@ jobs:
           files: '${{env.DOTNET_ROOT}}/myapp/appsettings.json'
         env:
           ConnectionStrings.OnlineStoreDbConnection: ${{ secrets.CONNECTIONSTRING }}
-          Smtp.Password: ${{ env.EMAILPASSWORD }}
-          BlobStorage.ConnectionString: ${{ env.BLOBCONNECTIONSTRING }}
+          Smtp.Password: ${{ secrets.EMAILPASSWORD }}
+          BlobStorage.ConnectionString: ${{ secrets.BLOBCONNECTIONSTRING }}
           BlobStorage.ContainerName: 'productfiles'
 
       - name: Upload artifact for deployment job
