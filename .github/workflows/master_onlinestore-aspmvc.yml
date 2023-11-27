@@ -38,6 +38,7 @@ jobs:
           BlobStorage.ConnectionString: ${{ secrets.BLOBCONNECTIONSTRING }}
           BlobStorage.ContainerName: 'productfiles'
           Authentication.JwtKey: ${{ secrets.JWTKEY }}
+          ClientAddress: 'https://black-tree-0087f5f03.4.azurestaticapps.net/'
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
