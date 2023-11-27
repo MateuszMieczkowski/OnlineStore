@@ -3,7 +3,7 @@ using OnlineStore.Shared.Infrastructure;
 
 namespace OnlineStore.Shared.Products;
 
-public record GetProduct(int Id, bool IncludeDeleted, bool IncludeHidden) : IQuery<ProductDto>;
+public record GetProduct(int Id) : IQuery<ProductDto>;
 
 public record ProductDto(
     string Name,

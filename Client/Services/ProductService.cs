@@ -60,7 +60,7 @@ public class ProductService : IProductService
 
     public async Task<ProductDto> GetProductById(int id)
     {
-        var query = new GetProduct(Id: id, IncludeDeleted: true, IncludeHidden: true);
+        var query = new GetProduct(Id: id);
         return await _broker.GetProductByIdAsync(query);
     }
 

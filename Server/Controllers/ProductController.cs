@@ -40,11 +40,9 @@ public class ProductController : ControllerBase
     [HttpGet("{id:int}")]
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ProductDto> GetProduct([FromRoute] int id,
-        [FromQuery] bool includeDeleted = false,
-        [FromQuery] bool includeHidden = false)
+    public async Task<ProductDto> GetProduct([FromRoute] int id)
     {
-        var response = await _mediator.Send(new GetProduct(id, includeDeleted, includeHidden));
+        var response = await _mediator.Send(new GetProduct(id));
         return response;
     }
     

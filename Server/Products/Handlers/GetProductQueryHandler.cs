@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using OnlineStore.Server.Accounts.Services;
+using OnlineStore.Server.Authentication;
 using OnlineStore.Server.Infrastructure;
 using OnlineStore.Server.Services.Exceptions;
 using OnlineStore.Shared.Products;
@@ -8,16 +10,25 @@ namespace OnlineStore.Server.Products.Handlers;
 public class GetProductQueryHandler : IQueryHandler<GetProduct, ProductDto>
 {
     private readonly OnlineStoreDbContext _dbContext;
+    private readonly ILoggedUserService _loggedUserService;
 
-    public GetProductQueryHandler(OnlineStoreDbContext dbContext)
+    public GetProductQueryHandler(OnlineStoreDbContext dbContext, ILoggedUserService loggedUserService)
     {
         _dbContext = dbContext;
+        _loggedUserService = loggedUserService;
     }
 
     public async Task<ProductDto> Handle(GetProduct query, CancellationToken cancellationToken)
     {
-        var result = await _dbContext.Products
-            .Where(x => x.Id == query.Id)
+        var dbQuery = _dbContext.Products
+            .Where(x => x.Id == query.Id);
+
+        if (_loggedUserService.GetUserRole() != UserRoles.Admin)
+        {
+           dbQuery = dbQuery.Where(x => !x.IsDeleted && !x.IsHidden);
+        }
+        
+        var result = await dbQuery
             .Select(x => new ProductDto(
                 x.Name,
                 x.ReferenceNumber,
