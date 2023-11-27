@@ -15,7 +15,9 @@ public static class ProductMapper
             Quantity: product.Quantity,
             PriceNet: product.PriceNet,
             PriceGross: product.PriceGross,
-            ThumbnailUri: product.ThumbnailBlobUri);
+            ThumbnailUri: product.ThumbnailBlobUri,
+            IsDeleted: product.IsDeleted,
+            IsHidden: product.IsHidden);
     }
     
 }

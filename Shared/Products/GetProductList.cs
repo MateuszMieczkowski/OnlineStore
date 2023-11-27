@@ -20,4 +20,6 @@ public record ProductListItemDto(
     int Quantity,
     decimal PriceNet,
     decimal PriceGross,
-    string ThumbnailUri);
+    string ThumbnailUri,
+    bool IsDeleted,
+    bool IsHidden);
