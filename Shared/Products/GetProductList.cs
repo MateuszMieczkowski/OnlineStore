@@ -1,4 +1,5 @@
-﻿using OnlineStore.Shared.Infrastructure;
+﻿using OnlineStore.Shared.Enums;
+using OnlineStore.Shared.Infrastructure;
 
 namespace OnlineStore.Shared.Products;
 
@@ -12,4 +13,7 @@ public record ProductListItemDto(
     int Quantity,
     decimal PriceNet,
     decimal PriceGross,
-    string ThumbnailUri);
+    string ThumbnailUri)
+{
+    public ProductStatusDto Status { get; set; }
+};

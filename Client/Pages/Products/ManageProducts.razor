@@ -1,6 +1,6 @@
 ﻿@page "/configuration"
-@using OnlineStore.Shared.Models
-@using OnlineStore.Client.Components
+@using OnlineStore.Client.Extensions
+@using OnlineStore.Shared.Enums
 @using OnlineStore.Shared.Products
 @attribute [Authorize]
 @inject ISnackbar Snackbar
@@ -25,22 +25,35 @@
             <MudTd>@context.Quantity</MudTd>
             <MudTd>@context.PriceNet</MudTd>
             <MudTd>@context.PriceGross</MudTd>
-            <MudTd>Akywny / Ukryty / Kosz</MudTd>
+            <MudTd>@EnumHelper.GetDescription(context.Status)</MudTd>
             <MudTd>
                 <MudButtonGroup Variant="Variant.Outlined" Color="Color.Secondary">
-                    <MudMenu Icon="@Icons.Material.Filled.MoreVert" ActivationEvent="@MouseEvent.MouseOver" AnchorOrigin="Origin.CenterRight" TransformOrigin="Origin.BottomRight">
+                    <MudMenu Icon="@Icons.Material.Filled.MoreVert" ActivationEvent="@MouseEvent.MouseOver" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight">
                         <MudMenuItem Icon="@Icons.Material.Filled.Info" OnClick="@(() => NavigationManager.NavigateTo($"/products/{context.Id}"))">Szczegóły</MudMenuItem>
                         <MudMenuItem Icon="@Icons.Material.Filled.Edit" OnClick="@(() => NavigationManager.NavigateTo($"/products/{context.Id}/edit"))">Edycja</MudMenuItem>
-                        <MudMenuItem Icon="@Icons.Material.Filled.HideSource">Ukryj</MudMenuItem>
-                        <MudMenuItem Icon="@Icons.Material.Filled.FolderDelete">Kosz</MudMenuItem>
-                        <MudMenuItem Icon="@Icons.Material.Filled.DeleteForever">Usuń</MudMenuItem>
+                       @if (context.Status != ProductStatusDto.Hidden)
+                       {
+                            <MudMenuItem OnClick="() => ExecuteAction(context, ProductService.Hide, ProductStatusDto.Hidden)" Icon="@Icons.Material.Filled.HideSource">Ukryj</MudMenuItem>
+                       }
+                       else
+                       {
+                           <MudMenuItem OnClick="() => ExecuteAction(context, ProductService.Reveal, ProductStatusDto.Active)" Icon="@Icons.Material.Filled.ArrowBack">Odkryj</MudMenuItem>
+                       }
+                       @if (context.Status != ProductStatusDto.Deleted)
+                       {
+                           <MudMenuItem OnClick="() => ExecuteAction(context, ProductService.SoftDelete, ProductStatusDto.Deleted)" Icon="@Icons.Material.Filled.FolderDelete">Do kosza</MudMenuItem>
+                       }
+                       else
+                       {
+                           <MudMenuItem OnClick="() => ExecuteAction(context, ProductService.Recover, ProductStatusDto.Active)" Icon="@Icons.Material.Filled.FolderDelete">Przywróć z kosza</MudMenuItem>
+                       }
                     </MudMenu>
                 </MudButtonGroup>
             </MudTd>
         </RowTemplate>
         <PagerContent>
             <div class="d-flex flex-column align-center">
-                <MudPagination Size="Size.Large" Variant="Variant.Filled" Color="Color.Secondary" SelectedChanged="PageChanged" Count="@_pageCount" Class="pa-4"/>
+                <MudPagination Size="Size.Large" Variant="Variant.Filled" Color="Color.Secondary" sele SelectedChanged="PageChanged" Count="@_pageCount" Class="pa-4"/>
             </div>
         </PagerContent>
     </MudTable>
@@ -50,24 +63,22 @@
 {
     private IReadOnlyCollection<ProductListItemDto> products = new List<ProductListItemDto>();
 
-    private bool _isLoading = true;
-    private int _pageSize = 5;
+    private bool _isLoading;
+    private int _pageSize = 10;
     private int _pageNumber = 1;
     private int _pageCount;
 
     protected override async Task OnInitializedAsync()
     {
-        var response = await ProductService.GetProductList(_pageNumber, _pageSize);
-        products = response.Items;
-        _pageCount = response.TotalPages;
-        _isLoading = false;
+        await RefreshProducts();
     }
 
     private async Task RefreshProducts()
     {
         _isLoading = true;
-        var response = await ProductService.GetProductList(_pageNumber, _pageSize);
+        var response = await ProductService.GetProductList(_pageNumber, _pageSize, includeHidden: true);
         products = response.Items;
+        _pageCount = response.TotalPages;
         _isLoading = false;
     }
 
@@ -75,5 +86,13 @@
     {
         _pageNumber = i;
         await RefreshProducts();
+    }
+
+    private async Task ExecuteAction(ProductListItemDto product, Func<int, Task> action, ProductStatusDto newStatus)
+    {
+        await action(product.Id);
+        product.Status = newStatus;
+        StateHasChanged();
+        Snackbar.Add("Zaktualizowano stan produktu pomyślnie!");
     }
 }

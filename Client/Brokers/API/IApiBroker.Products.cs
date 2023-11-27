@@ -12,5 +12,11 @@ public partial interface IApiBroker
 
     Task PostProductsAsync(CreateProductsBatch command);
     Task UpdateProductAsync(int id, UpdateProductDto dto);
-    Task<bool> RemoveProductAsync(int id);
+    Task HideProductAsync(int id);
+    Task RevealProductAsync(int id);
+    Task SoftDeleteProductAsync(int id);
+    Task RecoverProductAsync(int id);
+    Task HardDeleteProductAsync(int id);
+
+    Task<IReadOnlyCollection<TaxRateDto>> GetTaxRates();
 }

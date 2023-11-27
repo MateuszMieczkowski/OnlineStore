@@ -1,4 +1,5 @@
 ﻿using OnlineStore.Server.Entities;
+using OnlineStore.Shared.Enums;
 using OnlineStore.Shared.Products;
 
 namespace OnlineStore.Server.Products.Mapping;
@@ -15,7 +16,22 @@ public static class ProductMapper
             Quantity: product.Quantity,
             PriceNet: product.PriceNet,
             PriceGross: product.PriceGross,
-            ThumbnailUri: product.ThumbnailBlobUri);
+            ThumbnailUri: product.ThumbnailBlobUri,
+            Status: GetStatusDto(product));
     }
-    
+
+    private static ProductStatusDto GetStatusDto(Product product)
+    {
+        if (product.IsDeleted)
+        {
+            return ProductStatusDto.Deleted;
+        }
+
+        if (product.IsHidden)
+        {
+            return ProductStatusDto.Hidden;
+        }
+
+        return ProductStatusDto.Active;
+    }
 }

@@ -1,4 +1,4 @@
-using OnlineStore.Shared.Enums;
+using OnlineStore.Shared.Products;
 using System.ComponentModel.DataAnnotations;
 
 namespace OnlineStore.Client.Products.Models;
@@ -27,7 +27,7 @@ public abstract class ProductModel<T> where T : ProductFileModel, new()
     public bool IsHidden { get; set; }
 
     [Required(ErrorMessage = "Stawka podatku jest wymagana.")]
-    public TaxRateDto TaxRate { get; set; }
+    public TaxRateDto? TaxRate { get; set; }
     
     [Required(ErrorMessage = "Miniaturka zdjęcia jest wymagana.")]
     public string ThumbnailImageSource { get; set; }

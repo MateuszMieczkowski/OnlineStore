@@ -43,6 +43,13 @@ public partial class ApiBroker : IApiBroker
         var response = await _httpClient.PutAsJsonAsync(relativeUrl, content);
         return await Validate(response);
     }
+    
+    public async Task PutAsync(string relativeUrl)
+    {
+        await IncludeAuthenticationToken();
+        var response = await _httpClient.PutAsync(relativeUrl, null);
+        await Validate(response);
+    }
 
     public async Task<TDto> PutAsync<TPutDto, TDto>(string relativeUrl, TPutDto content)
     {

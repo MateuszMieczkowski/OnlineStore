@@ -1,4 +1,5 @@
-﻿using OnlineStore.Shared.Infrastructure;
+﻿using OnlineStore.Shared.Enums;
+using OnlineStore.Shared.Infrastructure;
 
 namespace OnlineStore.Shared.Products;
 
@@ -16,6 +17,5 @@ public record ProductDto(
     bool IsHidden,
     bool IsDeleted,
     TaxRateDto TaxRate,
-    IEnumerable<ProductFileDto> ProductFiles) : ICommand;
-
+    IEnumerable<ProductFileDto> ProductFiles);
 public record ProductFileDto(int Id, string FileName, string BlobUri, string? Description, ProductFileTypeDto FileType);

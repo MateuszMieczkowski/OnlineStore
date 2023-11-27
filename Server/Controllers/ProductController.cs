@@ -75,7 +75,7 @@ public class ProductController : ControllerBase
         return Ok();
     }
     
-    [HttpPost("{id:int}/recover")]
+    [HttpPut("{id:int}/recover")]
     [Authorize(Roles = UserRoles.Admin)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<ActionResult> RecoverProduct([FromRoute] int id)
@@ -84,21 +84,21 @@ public class ProductController : ControllerBase
         return Ok();
     }
     
-    [HttpPost("{id:int}/hide")]
+    [HttpPut("{id:int}/hide")]
     [Authorize(Roles = UserRoles.Admin)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<ActionResult> HideProduct([FromRoute] int id)
     {
-        await _mediator.Send(new RecoverProduct(id));
+        await _mediator.Send(new HideProduct(id));
         return Ok();
     }
     
-    [HttpPost("{id:int}/reveal")]
+    [HttpPut("{id:int}/reveal")]
     [Authorize(Roles = UserRoles.Admin)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<ActionResult> RevealProduct([FromRoute] int id)
     {
-        await _mediator.Send(new RecoverProduct(id));
+        await _mediator.Send(new RevealProduct(id));
         return Ok();
     }
     

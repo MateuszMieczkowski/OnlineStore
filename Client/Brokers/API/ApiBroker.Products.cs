@@ -1,5 +1,4 @@
 ﻿using OnlineStore.Shared.Infrastructure;
-using OnlineStore.Shared.Models;
 using OnlineStore.Shared.Products;
 
 namespace OnlineStore.Client.Brokers.API;
@@ -10,7 +9,7 @@ public partial class ApiBroker
 
     public async Task<PagedResult<ProductListItemDto>> GetProductsAsync(GetProductList query)
     {
-        var queryParams = $"?pageNumber={query.PageNumber}&pageSize={query.PageSize}";
+        var queryParams = $"?pageNumber={query.PageNumber}&pageSize={query.PageSize}&includeHidden={query.IncludeHidden}&includeDeleted={query.IncludeDeleted}";
         return await GetAsync<PagedResult<ProductListItemDto>>($"{ProductRelativeUrl}{queryParams}");
     }
 
@@ -29,8 +28,34 @@ public partial class ApiBroker
         await PutAsync($"{ProductRelativeUrl}/{id}", dto);
     }
 
-    public async Task<bool> RemoveProductAsync(int id)
+
+    public async Task HideProductAsync(int id)
     {
-        return await DeleteAsync(ProductRelativeUrl + $"/{id}");
+        await PutAsync($"{ProductRelativeUrl}/{id}/hide");
+    }
+    
+    public async Task RecoverProductAsync(int id)
+    {
+        await PutAsync($"{ProductRelativeUrl}/{id}/recover");
+    }
+    
+    public async Task RevealProductAsync(int id)
+    {
+        await PutAsync($"{ProductRelativeUrl}/{id}/reveal");
+    }
+
+    public async Task SoftDeleteProductAsync(int id)
+    {
+        await DeleteAsync($"{ProductRelativeUrl}/{id}/soft-delete");
+    }
+    
+    public async Task HardDeleteProductAsync(int id)
+    {
+        await DeleteAsync($"{ProductRelativeUrl}/{id}/hard-delete");
+    }
+
+    public async Task<IReadOnlyCollection<TaxRateDto>> GetTaxRates()
+    {
+        return await GetAsync<IReadOnlyCollection<TaxRateDto>>($"{ProductRelativeUrl}/taxRates");
     }
 }

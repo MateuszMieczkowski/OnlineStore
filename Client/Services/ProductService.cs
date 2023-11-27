@@ -1,20 +1,29 @@
 ﻿using OnlineStore.Client.Brokers.API;
 using OnlineStore.Client.Products.Models;
 using OnlineStore.Shared.Infrastructure;
-using OnlineStore.Shared.Models;
 using OnlineStore.Shared.Products;
 
 namespace OnlineStore.Client.Services;
 
 public interface IProductService
 {
-    Task<PagedResult<ProductListItemDto>> GetProductList(int pageNumber = 1, int pageSize = 50);
+    Task<PagedResult<ProductListItemDto>> GetProductList(
+        int pageNumber = 1,
+        int pageSize = 50,
+        bool includeHidden = false,
+        bool onlyDeleted = false);
     
     Task<ProductDto> GetProductById(int id);
     
     Task CreateProducts(ICollection<CreateProductModel> products);
     Task Update(int id, UpdateProductModel model);
-    Task<bool> Remove(int id);
+    Task SoftDelete(int id);
+    Task Hide(int id);
+    Task Reveal(int id);
+    Task Recover(int id);
+    Task HardDelete(int id);
+
+    Task<IReadOnlyCollection<TaxRateDto>> GetTaxRates();
 }
 
 public class ProductService : IProductService
@@ -26,9 +35,13 @@ public class ProductService : IProductService
         _broker = broker;
     }
 
-    public async Task<PagedResult<ProductListItemDto>> GetProductList(int pageNumber = 1, int pageSize = 50)
+    public async Task<PagedResult<ProductListItemDto>> GetProductList(
+        int pageNumber = 1,
+        int pageSize = 50,
+        bool includeHidden = false,
+        bool onlyDeleted = false)
     {
-        var query = new GetProductList(pageNumber, pageSize, IncludeDeleted: false, IncludeHidden: false);
+        var query = new GetProductList(pageNumber, pageSize, IncludeDeleted: onlyDeleted, IncludeHidden: includeHidden);
         return await _broker.GetProductsAsync(query);
     }
 
@@ -54,7 +67,7 @@ public class ProductService : IProductService
                         Quantity: x.Quantity,
                         PriceNet: x.PriceNet,
                         IsHidden: x.IsHidden,
-                        TaxRateId: (int)x.TaxRate,
+                        TaxRateId: x.TaxRate!.TaxRateId,
                         ProductFiles: files);
                 })
             .ToList();
@@ -76,14 +89,27 @@ public class ProductService : IProductService
             PriceNet: model.PriceNet,
             IsHidden: model.IsHidden,
             IsDeleted: false,
-            TaxRateId: (int)model.TaxRate,
+            TaxRateId: model.TaxRate!.TaxRateId,
             ProductFiles: dtoFiles);
         
         await _broker.UpdateProductAsync(id, dto);
     }
 
-    public async Task<bool> Remove(int id)
-    {
-        return await _broker.RemoveProductAsync(id);
-    }
+    public async Task SoftDelete(int id)
+        => await _broker.SoftDeleteProductAsync(id);
+
+    public async Task Hide(int id)
+        => await _broker.HideProductAsync(id);
+
+    public async Task Reveal(int id)
+        => await _broker.RevealProductAsync(id);
+
+    public async Task Recover(int id)
+        => await _broker.RecoverProductAsync(id);
+
+    public async Task HardDelete(int id)
+        => await _broker.HardDeleteProductAsync(id);
+
+    public async Task<IReadOnlyCollection<TaxRateDto>> GetTaxRates()
+        => await _broker.GetTaxRates();
 }

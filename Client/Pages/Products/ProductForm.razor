@@ -1,9 +1,10 @@
 @using OnlineStore.Client.Products.Models
 @using OnlineStore.Client.Extensions
 @using OnlineStore.Shared.Products
-@using TaxRateDto = OnlineStore.Shared.Enums.TaxRateDto
 @using Microsoft.AspNetCore.Http
 @using Microsoft.AspNetCore.Http.Internal
+@using System.Collections.ObjectModel
+@inject IProductService ProductService
 @inject ISnackbar Snackbar
 @typeparam TFile where TFile:ProductFileModel, new()
 
@@ -59,9 +60,9 @@
                              Label="Cena netto *"/>
 
             <MudSelect T="TaxRateDto" Label="Stawka podatku *" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" @bind-Value="_model.TaxRate">
-                @foreach (var value in Enum.GetValues<TaxRateDto>())
+                @foreach (var taxRate in _taxRates)
                 {
-                    <MudSelectItem T="TaxRateDto" Value="@value">@EnumHelper.GetDescription(value)</MudSelectItem>
+                    <MudSelectItem T="TaxRateDto" Value="@taxRate">@taxRate.Description</MudSelectItem>
                 }
             </MudSelect>
             <MudNumericField
@@ -157,7 +158,6 @@
             }
         </MudList>
     </MudCardContent>
-@* </MudForm> *@
 
 
 @code {
@@ -165,7 +165,14 @@
     [Parameter]
     public ProductModel<TFile> _model { get; set; }
 
-    private decimal PriceGross => _model.TaxRate != TaxRateDto.Vat0 && _model.TaxRate != TaxRateDto.VatZw ? Math.Round(_model.PriceNet * (1 + (decimal)_model.TaxRate / 100), 2) : _model.PriceNet;
+    private IReadOnlyCollection<TaxRateDto> _taxRates = new Collection<TaxRateDto>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _taxRates = await ProductService.GetTaxRates();
+    }
+
+    private decimal PriceGross => _model.TaxRate?.Amount > 0 ? Math.Round(_model.PriceNet * (1 + (decimal)_model.TaxRate.Amount / 100), 2) : _model.PriceNet;
 
     private async Task UploadFiles(IReadOnlyList<IBrowserFile> files, ProductFileTypeDto fileType)
     {
@@ -180,7 +187,7 @@
         var maxAllowedSize = 1024 * 1000;
         if (file.Size > maxAllowedSize)
         {
-            Snackbar.Add($"Zdjęcie o nazwie {file.Name} ma zbyt duży rozmiar (max. 1 MB)", Severity.Warning);
+            Snackbar.Add($"Zdjęcie/plik o nazwie {file.Name} ma zbyt duży rozmiar (max. 1 MB)", Severity.Warning);
             return;
         }
 

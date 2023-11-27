@@ -1,6 +1,5 @@
 @page "/products/{id:int}/edit"
 @using OnlineStore.Client.Products.Models
-@using OnlineStore.Shared.Enums
 @inject IJSRuntime JsRuntime
 @inject ISnackbar Snackbar
 @inject IProductService ProductService 
@@ -63,7 +62,7 @@
             IsHidden = productDto.IsHidden,
             PriceNet = productDto.PriceNet,
             Quantity = productDto.Quantity,
-            TaxRate = (TaxRateDto)productDto.TaxRate.Amount, // TODO fix tax rates
+            TaxRate = productDto.TaxRate,
             ThumbnailImageSource = productDto.ThumbnailUri,
             ProductFiles = fileModels
         };
