@@ -17,9 +17,7 @@ public class GetProductQueryHandler : IQueryHandler<GetProduct, ProductDto>
     public async Task<ProductDto> Handle(GetProduct query, CancellationToken cancellationToken)
     {
         var result = await _dbContext.Products
-            .Where(x => x.Id == query.Id
-                && (query.IncludeDeleted || !x.IsDeleted)
-                && (query.IncludeHidden || !x.IsHidden))
+            .Where(x => x.Id == query.Id)
             .Select(x => new ProductDto(
                 x.Name,
                 x.ReferenceNumber,
