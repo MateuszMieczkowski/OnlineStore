@@ -22,6 +22,12 @@ jobs:
           dotnet-version: '6.0.x'
           include-prerelease: true
 
+      - name: Build with dotnet
+        run: dotnet build Server --configuration Release
+
+      - name: dotnet publish
+        run: dotnet publish Server -c Release -o ${{env.DOTNET_ROOT}}/myapp
+
       - name: App Settings Variable Substitution
         uses: microsoft/variable-substitution@v1
         with:
@@ -31,12 +37,6 @@ jobs:
           Smtp.Password: ${{ env.EMAILPASSWORD }}
           BlobStorage.ConnectionString: ${{ env.BLOBCONNECTIONSTRING }}
           BlobStorage.ContainerName: 'productfiles'
-
-      - name: Build with dotnet
-        run: dotnet build Server --configuration Release
-
-      - name: dotnet publish
-        run: dotnet publish Server -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
