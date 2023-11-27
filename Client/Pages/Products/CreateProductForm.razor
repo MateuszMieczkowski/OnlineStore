@@ -25,7 +25,7 @@
                     <EditForm Model="@product" Context="productContext">
                         <DataAnnotationsValidator/>
                         @AddEditForm(productContext)
-                        <ProductForm _model="@product"/>
+                        <ProductForm TFile="CreateProductFileModel" _model="@product"/>
                     </EditForm>
                 </MudCardContent>
             </MudCard>
