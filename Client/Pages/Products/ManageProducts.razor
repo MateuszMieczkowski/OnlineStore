@@ -78,13 +78,14 @@
         await RefreshProducts();
     }
 
-    private async Task RefreshProducts()
+    private async Task RefreshProducts(string? searchPhrase = null)
     {
         _isLoading = true;
-        var response = await ProductService.GetProductList(_pageNumber, _pageSize);
+        var response = await ProductService.GetProductList(_pageNumber, _pageSize, searchPhrase: searchPhrase);
         products = response.Items;
         _pageCount = response.TotalPages;
         _isLoading = false;
+        StateHasChanged();
     }
 
     private async Task PageChanged(int i)
