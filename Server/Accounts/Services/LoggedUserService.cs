@@ -5,6 +5,7 @@ namespace OnlineStore.Server.Accounts.Services;
 public interface ILoggedUserService
 {
     string? GetUserRole();
+    int GetUserId();
 }
 public class LoggedUserService : ILoggedUserService
 {
@@ -15,7 +16,19 @@ public class LoggedUserService : ILoggedUserService
         _contextAccessor = contextAccessor;
     }
 
-    public string? GetUserRole()
+	public int GetUserId()
+	{
+		var userClaims = _contextAccessor.HttpContext?.User?.Claims ?? Enumerable.Empty<Claim>();
+
+		var userId = userClaims
+			.Where(x => x.Type == ClaimTypes.NameIdentifier)
+			.Select(x => int.Parse(x.Value))
+			.FirstOrDefault();
+
+		return userId;
+	}
+
+	public string? GetUserRole()
     {
         var userClaims = _contextAccessor.HttpContext?.User?.Claims ?? Enumerable.Empty<Claim>();
 
@@ -26,4 +39,5 @@ public class LoggedUserService : ILoggedUserService
 
         return role;
     }
+
 }

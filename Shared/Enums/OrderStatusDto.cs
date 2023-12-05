@@ -2,7 +2,8 @@
 
 public enum OrderStatusDto
 {
-    Created,
-    Processing,
-    Completed
+    Created = 1,
+    Processing = 2,
+    Completed = 3,
+    Cancelled = 4,
 }
