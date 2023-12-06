@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OnlineStore.Server;
 
@@ -11,9 +12,11 @@ using OnlineStore.Server;
 namespace OnlineStore.Server.Migrations
 {
     [DbContext(typeof(OnlineStoreDbContext))]
-    partial class OnlineStoreDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231203210552_RemoveProductFromOrderItem")]
+    partial class RemoveProductFromOrderItem
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -471,67 +474,7 @@ namespace OnlineStore.Server.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsOne("OnlineStore.Server.Entities.OrderItemProduct", "Product", b1 =>
-                        {
-                            b1.Property<int>("OrderItemId")
-                                .HasColumnType("int");
-
-                            b1.Property<string>("Description")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<int>("Id")
-                                .HasColumnType("int");
-
-                            b1.Property<bool>("IsDeleted")
-                                .HasColumnType("bit");
-
-                            b1.Property<bool>("IsHidden")
-                                .HasColumnType("bit");
-
-                            b1.Property<string>("Name")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<decimal>("PriceGross")
-                                .HasColumnType("decimal(18,2)");
-
-                            b1.Property<decimal>("PriceNet")
-                                .HasColumnType("decimal(18,2)");
-
-                            b1.Property<int?>("ProductCategoryId")
-                                .HasColumnType("int");
-
-                            b1.Property<int>("Quantity")
-                                .HasColumnType("int");
-
-                            b1.Property<string>("ReferenceNumber")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("ShortDescription")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<int>("TaxRateId")
-                                .HasColumnType("int");
-
-                            b1.Property<string>("ThumbnailBlobUri")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.HasKey("OrderItemId");
-
-                            b1.ToTable("OrdersItems");
-
-                            b1.ToJson("Product");
-
-                            b1.WithOwner()
-                                .HasForeignKey("OrderItemId");
-                        });
-
                     b.Navigation("Order");
-
-                    b.Navigation("Product")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("OnlineStore.Server.Entities.Product", b =>

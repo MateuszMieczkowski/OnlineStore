@@ -18,16 +18,15 @@ public class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
         builder.Property(e => e.PriceGross)
             .IsRequired();
 
-        builder.HasOne(e => e.Product)
-            .WithMany()
-            .HasForeignKey(e => e.ProductId)
-            .IsRequired()
-            .OnDelete(DeleteBehavior.Cascade);
-
         builder.HasOne(e => e.Order)
             .WithMany(order => order.OrderItems)
             .HasForeignKey(e => e.OrderId)
             .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.OwnsOne(e => e.Product, x =>
+        {
+            x.ToJson();
+        });
     }
 }
