@@ -1,6 +1,6 @@
 using OnlineStore.Shared.Enums;
 
-namespace OnlineStore.Client.Models;
+namespace OnlineStore.Client.Models.Accounts;
 
 public class ChangePreferencesModel
 {

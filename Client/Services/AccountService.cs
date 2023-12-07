@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using OnlineStore.Client.Brokers.API;
 using OnlineStore.Client.Models;
+using OnlineStore.Client.Models.Accounts;
 using OnlineStore.Client.Providers;
 using OnlineStore.Shared.Accounts;
 using OnlineStore.Shared.Infrastructure;

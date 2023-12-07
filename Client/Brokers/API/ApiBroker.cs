@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Headers;
+﻿using Newtonsoft.Json;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using OnlineStore.Client.Providers;
 
@@ -18,7 +19,17 @@ public partial class ApiBroker : IApiBroker
     public async Task<T> GetAsync<T>(string relativeUrl)
     {
         await IncludeAuthenticationToken();
-        return await _httpClient.GetFromJsonAsync<T>(relativeUrl);
+        var response = await _httpClient.GetAsync(relativeUrl);
+        await Validate(response);
+
+        var json = await response.Content.ReadAsStringAsync();
+        if (string.IsNullOrEmpty(json))
+        {
+            return default!;
+        } 
+        
+        var result = JsonConvert.DeserializeObject<T>(json);
+        return result;
     }
 
     public async Task<bool> PostAsync<T>(string relativeUrl, T content)
@@ -43,7 +54,7 @@ public partial class ApiBroker : IApiBroker
         var response = await _httpClient.PutAsJsonAsync(relativeUrl, content);
         return await Validate(response);
     }
-    
+
     public async Task PutAsync(string relativeUrl)
     {
         await IncludeAuthenticationToken();

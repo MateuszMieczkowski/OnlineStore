@@ -6,6 +6,7 @@ namespace OnlineStore.Shared.Products;
 public record GetProduct(int Id) : IQuery<ProductDto>;
 
 public record ProductDto(
+    int Id,
     string Name,
     string ReferenceNumber,
     string? ShortDescription,

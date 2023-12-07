@@ -34,5 +34,7 @@ public class OrderAddressConfiguration : IEntityTypeConfiguration<OrderAddress>
         builder.Property(e => e.Country)
             .IsRequired()
             .HasMaxLength(100);
+
+        builder.HasOne(e => e.User).WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.SetNull);
     }
 }

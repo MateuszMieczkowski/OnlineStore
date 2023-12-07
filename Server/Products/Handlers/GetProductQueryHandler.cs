@@ -30,10 +30,11 @@ public class GetProductQueryHandler : IQueryHandler<GetProduct, ProductDto>
         
         var result = await dbQuery
             .Select(x => new ProductDto(
+                x.Id,
                 x.Name,
                 x.ReferenceNumber,
                 x.ShortDescription,
-                x.Description ?? "", // TOOD establish if description is nullable or not
+                x.Description ?? "",
                 x.ThumbnailBlobUri,
                 x.Quantity,
                 x.PriceNet,

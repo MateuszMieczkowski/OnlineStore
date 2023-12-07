@@ -3,6 +3,7 @@
 @using OnlineStore.Client.Models
 @using OnlineStore.Client.Shared
 @using Blazored.LocalStorage
+@using OnlineStore.Client.Models.Accounts
 @using OnlineStore.Shared.Clients
 @inject ISnackbar Snackbar
 @inject IClientService ClientService
@@ -67,8 +68,6 @@
 @code {
 
     public ChangePreferencesModel Model { get; set; } = new();
-
-    // private MudTheme _theme = new();
 
     [CascadingParameter]
     MainLayout MainLayout { get; set; }

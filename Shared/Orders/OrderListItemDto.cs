@@ -6,7 +6,9 @@ public record OrderListItemDto(
     int Id,
     decimal TotalNet,
     decimal TotalGorss,
-    OrderStatusDto Status,
     int ClientId,
     DateTime CreatedDate,
-    DateTime ModifiedDate);
+    DateTime ModifiedDate)
+{
+    public OrderStatusDto Status { get; set; }
+};
