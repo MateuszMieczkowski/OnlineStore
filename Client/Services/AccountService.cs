@@ -67,6 +67,7 @@ public class AccountService : IAccountService
     public async Task Logout()
     {
         await ((ApiAuthenticationStateProvider)_authenticationStateProvider).LoggedOut();
+        await _localStorage.RemoveItemsAsync(new []{LocalStorageKeys.UserPreferences});
     }
 
     public async Task ChangeUserPassword(ChangePasswordModel model)

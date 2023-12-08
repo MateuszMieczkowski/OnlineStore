@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OnlineStore.Server;
 
@@ -11,9 +12,11 @@ using OnlineStore.Server;
 namespace OnlineStore.Server.Migrations
 {
     [DbContext(typeof(OnlineStoreDbContext))]
-    partial class OnlineStoreDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231203214139_AddProductJsonColumnToOrderItem")]
+    partial class AddProductJsonColumnToOrderItem
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -157,12 +160,7 @@ namespace OnlineStore.Server.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("OrdersAddresses");
                 });
@@ -466,16 +464,6 @@ namespace OnlineStore.Server.Migrations
                     b.Navigation("Address");
 
                     b.Navigation("Client");
-                });
-
-            modelBuilder.Entity("OnlineStore.Server.Entities.OrderAddress", b =>
-                {
-                    b.HasOne("OnlineStore.Server.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("OnlineStore.Server.Entities.OrderItem", b =>
