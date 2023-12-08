@@ -1,5 +1,7 @@
 ﻿using System.Net;
 using System.Net.Mail;
+using System.Net.Mime;
+using System.Text;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -54,10 +56,17 @@ public class EmailSenderJob : IJob
         var mailMessage = new MailMessage
         {
             From = new MailAddress(_smtpOptions.Username),
+            HeadersEncoding = null,
             Subject = email.Subject,
+            SubjectEncoding = null,
             Body = email.HtmlContent,
-            To = { email.RecipientEmail },
+            BodyEncoding = Encoding.UTF8,
+            To =
+            {
+                email.RecipientEmail
+            },
             IsBodyHtml = true,
+            Priority = MailPriority.Normal,
         };
         email.AttemptCount++;
 

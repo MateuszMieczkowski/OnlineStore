@@ -25,4 +25,23 @@ public class EmailService : IEmailService
         _dbContext.Emails.Add(email);
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
+
+    public async Task SendEmailAsync(
+        string recipientEmail,
+        string recipientName,
+        string htmlContent,
+        string subject,
+        CancellationToken cancellationToken)
+    {
+        var builder = _emailBuilderFactory.Create();
+        var email = await builder.AddSubject(subject)
+            .AddRecipientName(recipientName)
+            .AddRecipientEmail(recipientEmail)
+            .AddHtmlBody(htmlContent)
+            .BuildAsync(cancellationToken);
+        
+        _dbContext.Emails.Add(email);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        
+    }
 }

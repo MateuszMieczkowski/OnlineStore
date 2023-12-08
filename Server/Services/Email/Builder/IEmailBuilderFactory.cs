@@ -9,16 +9,15 @@ public interface IEmailBuilderFactory
 
 public class EmailBuilderFactory : IEmailBuilderFactory
 {
-    private readonly IServiceProvider _serviceProvider;
+    private readonly IEmailTemplateServiceFactory _emailTemplateServiceFactory;
 
-    public EmailBuilderFactory(IServiceProvider serviceProvider)
+    public EmailBuilderFactory(IEmailTemplateServiceFactory serviceProvider)
     {
-        _serviceProvider = serviceProvider;
+        _emailTemplateServiceFactory = serviceProvider;
     }
 
     public IEmailBuilder Create()
     {
-        var emailTemplateServiceFactory = _serviceProvider.GetRequiredService<IEmailTemplateServiceFactory>();
-        return new EmailBuilder(emailTemplateServiceFactory);
+        return new EmailBuilder(_emailTemplateServiceFactory);
     }
 }
