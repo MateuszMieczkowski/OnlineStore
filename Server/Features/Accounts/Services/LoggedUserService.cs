@@ -5,7 +5,7 @@ namespace OnlineStore.Server.Features.Accounts.Services;
 public interface ILoggedUserService
 {
     string? GetUserRole();
-    int? GetUserId();
+    int GetUserId();
 }
 
 public class LoggedUserService : ILoggedUserService
@@ -19,10 +19,10 @@ public class LoggedUserService : ILoggedUserService
 
     public string? GetUserRole() => GetClaim(ClaimTypes.Role);
 
-    public int? GetUserId()
+    public int GetUserId()
     {
         var userIdString = GetClaim(ClaimTypes.NameIdentifier);
-        var userId = userIdString != null ? int.Parse(userIdString) : (int?)null;        
+        var userId = int.Parse(userIdString!);
         return userId;
     }
     

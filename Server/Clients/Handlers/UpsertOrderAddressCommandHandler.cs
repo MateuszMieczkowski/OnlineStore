@@ -1,5 +1,5 @@
-using OnlineStore.Server.Accounts.Services;
 using OnlineStore.Server.Clients.Mappings;
+using OnlineStore.Server.Features.Accounts.Services;
 using OnlineStore.Server.Infrastructure;
 using OnlineStore.Shared.Orders;
 
@@ -14,7 +14,6 @@ public class UpsertOrderAddressCommandHandler : ICommandHandler<UpsertOrderAddre
     {
         _loggedUserService = loggedUserService;
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
-
     }
 
     public async Task Handle(UpsertOrderAddress command, CancellationToken cancellationToken)

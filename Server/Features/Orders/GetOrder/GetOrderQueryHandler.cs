@@ -38,12 +38,13 @@ public class GetOrderQueryHandler : IQueryHandler<Shared.Orders.GetOrder, OrderD
 			?? throw new NotFoundException($"Order with id {query.Id} not found");
 
 		var addressDto = new OrderAddressDto(
-			order.OrderAddressId,
-			order.Address.StreetNumber,
-			order.Address.City,
-			order.Address.State,
-			order.Address.PostalCode,
-			order.Address.Country);
+			Id: order.OrderAddressId,
+			Street: order.Address.Street,
+			StreetNumber: order.Address.StreetNumber,
+			City: order.Address.City,
+			State: order.Address.State,
+			PostalCode: order.Address.PostalCode,
+			Country: order.Address.Country);
 
 		var orderItems = order.OrderItems
 			.Select(x => new OrderItemDto(

@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using OnlineStore.Server.Accounts.Services;
 using OnlineStore.Server.Clients.Mappings;
+using OnlineStore.Server.Features.Accounts.Services;
 using OnlineStore.Server.Infrastructure;
 using OnlineStore.Shared.Orders;
 
