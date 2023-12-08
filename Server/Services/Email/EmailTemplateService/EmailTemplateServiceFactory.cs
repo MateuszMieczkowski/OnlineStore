@@ -9,19 +9,19 @@ public interface IEmailTemplateServiceFactory
 
 public class EmailTemplateServiceFactory : IEmailTemplateServiceFactory
 {
-    private readonly IServiceProvider _serviceProvider;
 
-    public EmailTemplateServiceFactory(IServiceProvider serviceProvider)
+    private readonly OnlineStoreDbContext _dbContext;
+    private readonly IMemoryCache _memoryCache;
+	public EmailTemplateServiceFactory(OnlineStoreDbContext dbContext, IMemoryCache memoryCache)
+	{
+		_dbContext = dbContext;
+		_memoryCache = memoryCache;
+	}
+
+	public IEmailTemplateService Create()
     {
-        _serviceProvider = serviceProvider;
-    }
+        var dbEmailTemplateService = new DbEmailTemplateService(_dbContext);
 
-    public IEmailTemplateService Create()
-    {
-        var dbContext = _serviceProvider.GetRequiredService<OnlineStoreDbContext>();
-        var memoryCache = _serviceProvider.GetRequiredService<IMemoryCache>();
-        var dbEmailTemplateService = new DbEmailTemplateService(dbContext);
-
-        return new CachedEmailTemplateService(memoryCache, dbEmailTemplateService);
+        return new CachedEmailTemplateService(_memoryCache, dbEmailTemplateService);
     }
 }
