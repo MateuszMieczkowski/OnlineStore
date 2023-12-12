@@ -1,5 +1,10 @@
 ﻿@using OnlineStore.Shared.Products
 @using System.Reflection.Metadata.Ecma335
+@using Blazored.LocalStorage
+@using OnlineStore.Client.Products.Models
+@using OnlineStore.Shared.Clients
+@using OnlineStore.Shared.Enums
+@inject ILocalStorageService LocalStorage
 @inject IProductService ProductService
 
 <div class="w-100 mb-4">
@@ -7,7 +12,7 @@
         <MudContainer MaxWidth="MaxWidth.Medium">
             <MudGrid Justify="Justify.FlexStart">
                 <MudItem xs="8">
-                    <MudTextField Variant="Variant.Outlined" @bind-Value="_searchString" DebounceInterval="400" OnDebounceIntervalElapsed="StageFilter" Label="Szukaj"/>
+                    <MudTextField Variant="Variant.Outlined" @bind-Value="_filter.SearchPhrase" DebounceInterval="400" OnDebounceIntervalElapsed="StageFilter" Label="Szukaj"/>
                 </MudItem>
                 <MudItem Class="mt-3">
                     <MudButton StartIcon="@Icons.Material.Filled.Clear" Variant="Variant.Outlined" Color="Color.Secondary" OnClick="Reset">Wyczyść</MudButton>
@@ -18,48 +23,52 @@
             </MudGrid>
             @if (_showFilters)
             {
-                <MudTextField DebounceInterval="400" Variant="Variant.Outlined" Label="Nazwa" @bind-Value="_filter.Name"/>
-                <MudTextField DebounceInterval="400" Variant="Variant.Outlined" Label="Opis" @bind-Value="_filter.Description"/>
-                <MudTextField DebounceInterval="400" Variant="Variant.Outlined" Label="Numer referencyjny" @bind-Value="_filter.ReferenceNumber"/>
+                <MudTextField OnDebounceIntervalElapsed="StageFilter" DebounceInterval="400" Variant="Variant.Outlined" Label="Nazwa" @bind-Value="_filter.Name"/>
+                <MudTextField OnDebounceIntervalElapsed="StageFilter" DebounceInterval="400" Variant="Variant.Outlined" Label="Krótki opis" @bind-Value="_filter.ShortDescription"/>
+                <MudTextField OnDebounceIntervalElapsed="StageFilter" DebounceInterval="400" Variant="Variant.Outlined" Label="Numer referencyjny" @bind-Value="_filter.ReferenceNumber"/>
                 <div class="d-flex gap-2">
-                    <MudNumericField Format="N2" DebounceInterval="400" Variant="Variant.Outlined" Label="Cena od" @bind-Value="_filter.MinPrice"/>
-                    <MudNumericField Format="N2" DebounceInterval="400" Variant="Variant.Outlined" Label="Cena do" @bind-Value="_filter.MaxPrice"/>
+                    <MudNumericField OnDebounceIntervalElapsed="StageFilter" Format="N2" DebounceInterval="400" Variant="Variant.Outlined" Label="Cena od" @bind-Value="_filter.MinPrice"/>
+                    <MudNumericField OnDebounceIntervalElapsed="StageFilter" Format="N2" DebounceInterval="400" Variant="Variant.Outlined" Label="Cena do" @bind-Value="_filter.MaxPrice"/>
                 </div>
-                <MudSwitch Color="Color.Secondary" Label="Produkty ukryte" @bind-Checked="_filter.HiddenOnly"/>
+                <MudSwitch T="bool" CheckedChanged="@((e) => StageGrossFilter(e))" Checked="_filter.FilterGrossPrice" Color="Color.Secondary" Label="Filtruj ceny brutto"/>
+                <MudSwitch T="bool" CheckedChanged="@((e) => StageHiddenFilter(e))" Checked="_filter.HiddenOnly" Color="Color.Secondary" Label="Produkty ukryte"/>
             }
         </MudContainer>
     </MudPaper>
 </div>
 
 @code {
-    [Parameter] public EventCallback<string> OnSearchStringChanged { get; set; }
-
-    private string? _searchString = string.Empty;
+    [Parameter] public EventCallback<ProductFilterModel> OnFilterChanged { get; set; }
 
     private bool _showFilters;
-    private ProductFilter _filter = new();
+    private ProductFilterModel _filter = new();
 
-    private async Task StageFilter(string filter)
+    protected override async Task OnInitializedAsync()
     {
-        _searchString = filter;
-        await OnSearchStringChanged.InvokeAsync(_searchString);
+        var userPreferences = await LocalStorage.GetItemAsync<UserPreferencesDto>(LocalStorageKeys.UserPreferences);
+        _filter.FilterGrossPrice = userPreferences?.DisplayedPrice == DisplayedPriceDto.Gross;
+    }
+
+    private async Task StageHiddenFilter(bool hiddenOnly)
+    {
+        _filter.HiddenOnly = hiddenOnly;
+        await StageFilter();
+    }
+    
+    private async Task StageGrossFilter(bool filterGrossPrice)
+    {
+        _filter.FilterGrossPrice = filterGrossPrice;
+        await StageFilter();
+    }
+    
+    private async Task StageFilter()
+    {
+        await OnFilterChanged.InvokeAsync(_filter);
     }
 
     private async Task Reset()
     {
-        _searchString = string.Empty;
-        await StageFilter("");
+       _filter.Clear();
+        await StageFilter();
     }
-
-    public class ProductFilter
-    {
-        public string Name { get; set; }
-        public string ReferenceNumber { get; set; }
-        public string Description { get; set; }
-        public decimal MinPrice { get; set; }
-        public decimal MaxPrice { get; set; }
-        public bool HiddenOnly { get; set; }
-        public bool DeletedOnly { get; set; }
-    }
-
 }

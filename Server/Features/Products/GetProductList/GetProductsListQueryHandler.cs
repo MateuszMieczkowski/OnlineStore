@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
 using OnlineStore.Server.Authentication;
+using OnlineStore.Server.Entities;
 using OnlineStore.Server.Features.Accounts.Services;
 using OnlineStore.Server.Features.Products.Mapping;
 using OnlineStore.Server.Infrastructure;
@@ -27,7 +29,7 @@ public class GetProductsListQueryHandler : IQueryHandler<Shared.Products.GetProd
     public async Task<PagedResult<ProductListItemDto>> Handle(Shared.Products.GetProductList query, CancellationToken cancellationToken)
     {
         
-        bool isAdmin = _loggedUserService.GetUserRole() == UserRoles.Admin;
+        var isAdmin = _loggedUserService.GetUserRole() == UserRoles.Admin;
         
         var dbQueryBase = _dbContext.Products
             .AsNoTracking();
@@ -56,14 +58,29 @@ public class GetProductsListQueryHandler : IQueryHandler<Shared.Products.GetProd
                 || x.Description!.Contains(searchPhrase));
         }
 
-        if (query.PriceGrossFrom.HasValue)
+        if (!string.IsNullOrWhiteSpace(query.Name))
         {
-            dbQueryBase = dbQueryBase.Where(x => x.PriceGross >= query.PriceGrossFrom);
+            dbQueryBase = dbQueryBase.Where(x => x.Name.Contains(query.Name));
+        }
+        
+        if (!string.IsNullOrWhiteSpace(query.ReferenceNumber))
+        {
+            dbQueryBase = dbQueryBase.Where(x => x.ReferenceNumber.Contains(query.ReferenceNumber));
+        }
+        
+        if (!string.IsNullOrWhiteSpace(query.ShortDescription))
+        {
+            dbQueryBase = dbQueryBase.Where(x => x.ShortDescription!.Contains(query.ShortDescription));
+        }
+        
+        if (query.PriceFrom.HasValue)
+        {
+            dbQueryBase = query.FilterGrossPrice ? dbQueryBase.Where(x => x.PriceGross >= query.PriceFrom) : dbQueryBase.Where(x => x.PriceNet >= query.PriceFrom);
         }
 
-        if (query.PriceGrossTo.HasValue)
+        if (query.PriceTo.HasValue)
         {
-            dbQueryBase = dbQueryBase.Where(x => x.PriceGross <= query.PriceGrossTo);
+            dbQueryBase = query.FilterGrossPrice ? dbQueryBase.Where(x => x.PriceGross <= query.PriceTo) : dbQueryBase.Where(x => x.PriceNet <= query.PriceTo);
         }
         
         var result = await _resultPaginator.GetPagedResult(dbQueryBase, query, x => x.ToListItemDto(), cancellationToken);

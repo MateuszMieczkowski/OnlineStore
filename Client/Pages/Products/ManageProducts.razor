@@ -5,6 +5,7 @@
 @using OnlineStore.Shared.Enums
 @using OnlineStore.Shared.Products
 @using Blazored.LocalStorage
+@using OnlineStore.Client.Products.Models
 @inject ILocalStorageService LocalStorage
 @inject IProductService ProductService
 @inject ISnackbar Snackbar
@@ -12,7 +13,7 @@
 <PageTitle>Zarządzanie produktami</PageTitle>
 
 <MudContainer>
-    <ProductsFilter OnSearchStringChanged="@RefreshProducts"/>
+    <ProductsFilter OnFilterChanged="@RefreshProducts"/>
     <MudTable Items="@products" Hover="true" Loading="@_isLoading" LoadingProgressColor="Color.Info">
         <HeaderContent>
             <MudTh>Nazwa</MudTh>
@@ -78,10 +79,10 @@
         await RefreshProducts();
     }
 
-    private async Task RefreshProducts(string? searchPhrase = null)
+    private async Task RefreshProducts(ProductFilterModel? filter = null)
     {
         _isLoading = true;
-        var response = await ProductService.GetProductList(_pageNumber, _pageSize, searchPhrase: searchPhrase);
+        var response = await ProductService.GetProductList(_pageNumber, _pageSize, filter ?? new ProductFilterModel());
         products = response.Items;
         _pageCount = response.TotalPages;
         _isLoading = false;

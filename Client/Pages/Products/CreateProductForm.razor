@@ -1,7 +1,7 @@
 ﻿@page "/create"
 @using OnlineStore.Client.Products.Models
 @using ISnackbar = MudBlazor.ISnackbar
-@* @attribute [Authorize(Roles = "Admin")] TODO uncomment it *@
+@attribute [Authorize(Roles = "Admin")]
 @inject IJSRuntime JsRuntime
 @inject IProductService ProductService
 @inject ISnackbar Snackbar
