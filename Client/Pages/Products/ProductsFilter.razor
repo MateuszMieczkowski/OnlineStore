@@ -31,7 +31,9 @@
                     <MudNumericField OnDebounceIntervalElapsed="StageFilter" Format="N2" DebounceInterval="400" Variant="Variant.Outlined" Label="Cena do" @bind-Value="_filter.MaxPrice"/>
                 </div>
                 <MudSwitch T="bool" CheckedChanged="@((e) => StageGrossFilter(e))" Checked="_filter.FilterGrossPrice" Color="Color.Secondary" Label="Filtruj ceny brutto"/>
-                <MudSwitch T="bool" CheckedChanged="@((e) => StageHiddenFilter(e))" Checked="_filter.HiddenOnly" Color="Color.Secondary" Label="Produkty ukryte"/>
+                <AuthorizeView Roles="Admin">
+                    <MudSwitch T="bool" CheckedChanged="@((e) => StageHiddenFilter(e))" Checked="_filter.HiddenOnly" Color="Color.Secondary" Label="Tylko produkty ukryte"/>
+                </AuthorizeView>
             }
         </MudContainer>
     </MudPaper>
@@ -54,13 +56,13 @@
         _filter.HiddenOnly = hiddenOnly;
         await StageFilter();
     }
-    
+
     private async Task StageGrossFilter(bool filterGrossPrice)
     {
         _filter.FilterGrossPrice = filterGrossPrice;
         await StageFilter();
     }
-    
+
     private async Task StageFilter()
     {
         await OnFilterChanged.InvokeAsync(_filter);
@@ -68,7 +70,8 @@
 
     private async Task Reset()
     {
-       _filter.Clear();
+        _filter.Clear();
         await StageFilter();
     }
+
 }
