@@ -22,8 +22,8 @@ public class OrderCreatedSummaryEmail : EmailDefinition
         {
             new("{{OrderId}}", _order.Id.ToString()),
             new("{{OrderCreatedDate}}", _order.CreatedDate.ToShortDateString()),
-            new("{{ClientName}}", $"{_order.Client.FirstName} {_order.Client.LastName}"),
-            new("{{ClientEmail}}", _order.Client.Email),
+            new("{{ClientName}}", $"{_order.User.FullName}"),
+            new("{{ClientEmail}}", _order.User.Email),
             new("{{OrderAddressStreet}}", _order.Address.Street),
             new("{{OrderAddressStreetNumber}}", _order.Address.StreetNumber),
             new("{{OrderAddressPostalCode}}", _order.Address.PostalCode),

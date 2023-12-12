@@ -9,6 +9,8 @@ public interface ICallContext
 {
     Task<int> GetUserId();
     
+    Task<bool> IsAuthenticated();
+
     Task<AuthenticationState> GetAuthenticationStateAsync();
 }
 
@@ -26,6 +28,12 @@ public class ApiAuthenticationStateProvider : AuthenticationStateProvider, ICall
     public async Task<string> GetAuthenticationJwtToken()
     {
         return await _localStorage.GetItemAsync<string>("accessToken");
+    }
+
+    public async Task<bool> IsAuthenticated()
+    {
+        var authenticationState = await GetAuthenticationStateAsync();
+        return authenticationState.User.Identity?.IsAuthenticated == true;
     }
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()

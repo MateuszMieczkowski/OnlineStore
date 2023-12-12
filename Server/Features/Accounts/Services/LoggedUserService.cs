@@ -7,6 +7,7 @@ public interface ILoggedUserService
     string? GetUserRole();
     int GetUserId();
 }
+
 public class LoggedUserService : ILoggedUserService
 {
     private readonly IHttpContextAccessor _contextAccessor;
@@ -16,28 +17,23 @@ public class LoggedUserService : ILoggedUserService
         _contextAccessor = contextAccessor;
     }
 
-	public int GetUserId()
-	{
-		var userClaims = _contextAccessor.HttpContext?.User?.Claims ?? Enumerable.Empty<Claim>();
+    public string? GetUserRole() => GetClaim(ClaimTypes.Role);
 
-		var userId = userClaims
-			.Where(x => x.Type == ClaimTypes.NameIdentifier)
-			.Select(x => int.Parse(x.Value))
-			.FirstOrDefault();
-
-		return userId;
-	}
-
-	public string? GetUserRole()
+    public int GetUserId()
     {
-        var userClaims = _contextAccessor.HttpContext?.User?.Claims ?? Enumerable.Empty<Claim>();
-
-        var role = userClaims
-            .Where(x => x.Type == ClaimTypes.Role)
+        var userIdString = GetClaim(ClaimTypes.NameIdentifier);
+        var userId = int.Parse(userIdString!);
+        return userId;
+    }
+    
+    private string? GetClaim(string type)
+    {
+        var claims = _contextAccessor.HttpContext?.User.Claims ?? Enumerable.Empty<Claim>();
+        var claim = claims
+            .Where(x => x.Type == type)
             .Select(x => x.Value)
             .FirstOrDefault();
 
-        return role;
+        return claim;
     }
-
 }

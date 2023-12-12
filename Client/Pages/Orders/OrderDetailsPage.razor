@@ -1,0 +1,62 @@
+@page "/orders/{id:int}"
+@using OnlineStore.Shared.Orders
+@inject IOrderService OrderService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JsRuntime
+
+@if (_order == null)
+{
+    return;
+}
+
+<MudContainer>
+    <MudPaper Elevation="3" Class="p-4">
+        @if (ShowConfirmation == true)
+        {
+            <MudText Typo="Typo.h5" Class="mb-4">Potwierdzenie Zamówienia</MudText>
+
+            <div class="mb-4">
+                <MudText Typo="Typo.body2">Dziękujemy za złożenie zamówienia!</MudText>
+            </div>
+        }
+
+       <div class="mb-4">
+           <MudText Typo="Typo.h5">Szczegóły zamówienia:</MudText>
+       
+           <ul>
+               @foreach (var item in _order.Items)
+               {
+                   <li>@item.ProductId - @item.Quantity szt.</li>
+               }
+           </ul>
+       </div>
+       
+       <div class="mb-4">
+           <MudTypography Typo="Typo.body2">Adres dostawy:</MudTypography>
+           <div>@_order.OrderAddress.Street, @_order.OrderAddress.City, @_order.OrderAddress.PostalCode</div>
+       </div>
+
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="GoBack">Powrót do poprzedniej strony</MudButton>
+    </MudPaper>
+</MudContainer>
+
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public bool? ShowConfirmation { get; set; }
+    
+    [Parameter]
+    public int Id { get; set; }
+
+    private OrderDto? _order;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _order = await OrderService.GetOrder(Id);
+    }
+
+    private async Task GoBack()
+    {
+        await JsRuntime.InvokeVoidAsync("history.back");
+    }
+}

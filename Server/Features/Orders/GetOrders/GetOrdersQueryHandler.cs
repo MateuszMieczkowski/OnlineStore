@@ -31,10 +31,22 @@ public class GetOrdersQueryHandler : IQueryHandler<Shared.Orders.GetOrders, Page
 			.Select(Enum.Parse<OrderStatus>);
 		orderStatuses ??= Enum.GetValues<OrderStatus>();
 
+		
 		var dbQuery = _dbContext.Orders
 			.AsNoTracking()
-			.Where(x => x.ClientId == clientId
-				&& orderStatuses.Contains(x.Status));
+			.Where(x => orderStatuses.Contains(x.Status));
+
+		var isAdmin = Enum.Parse<UserRole>(_loggedUserService.GetUserRole()!) == UserRole.Admin;
+
+		if (!isAdmin)
+		{
+			dbQuery = dbQuery.Where(x => x.ClientId == clientId);
+		}
+		
+		if(query.ClientId != null && isAdmin)
+		{
+			dbQuery = dbQuery.Where(x => x.ClientId == query.ClientId);
+		}
 
 		var result = await _resultPaginator.GetPagedResult(dbQuery, query, x => x.ToListItemDto(), cancellationToken);
 		return result;

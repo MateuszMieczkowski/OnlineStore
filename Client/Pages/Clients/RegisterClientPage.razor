@@ -5,38 +5,41 @@
 @inject IClientService ClientService
 @inject ISnackbar Snackbar
 
-<h3>Zarejestruj się</h3>
-<EditForm Model="RegisterClientDto" OnInvalidSubmit="OnInvalidSubmit" OnValidSubmit="OnSubmit">
-    <DataAnnotationsValidator></DataAnnotationsValidator>
+<MudContainer MaxWidth="MaxWidth.Medium">
 
-    <div class="form-group">
-        <MudTextField @bind-Value="RegisterClientDto.FirstName" Label="Imię" Placeholder="Wpisz" For="@(() => RegisterClientDto.FirstName)"/>
-    </div>
+    <h3>Zarejestruj się</h3>
+    <EditForm Model="RegisterClientDto" OnInvalidSubmit="OnInvalidSubmit" OnValidSubmit="OnSubmit">
+        <DataAnnotationsValidator></DataAnnotationsValidator>
 
-    <div class="form-group">
-        <MudTextField @bind-Value="RegisterClientDto.LastName" Label="Nazwisko" Placeholder="Wpisz" For="@(() => RegisterClientDto.LastName)"/>
-    </div>
+        <div class="form-group">
+            <MudTextField Variant="Variant.Outlined" @bind-Value="RegisterClientDto.FirstName" Label="Imię" Placeholder="Wpisz" For="@(() => RegisterClientDto.FirstName)"/>
+        </div>
 
-    <div class="form-group">
-        <MudTextField @bind-Value="RegisterClientDto.Email" Label="E-mail" Placeholder="Wpisz" For="@(() => RegisterClientDto.Email)"/>
-    </div>
+        <div class="form-group">
+            <MudTextField Variant="Variant.Outlined" @bind-Value="RegisterClientDto.LastName" Label="Nazwisko" Placeholder="Wpisz" For="@(() => RegisterClientDto.LastName)"/>
+        </div>
 
-    <div class="form-group">
-        <MudTextField @bind-Value="RegisterClientDto.PhoneNumber" Label="Numer telefonu" Placeholder="Wpisz" For="@(() => RegisterClientDto.PhoneNumber)"/>
-    </div>
+        <div class="form-group">
+            <MudTextField Variant="Variant.Outlined" @bind-Value="RegisterClientDto.Email" Label="E-mail" Placeholder="Wpisz" For="@(() => RegisterClientDto.Email)"/>
+        </div>
 
-    <div class="form-group">
-        <MudTextField @bind-Value="RegisterClientDto.Password" Label="Hasło" Placeholder="Wpisz" InputType="InputType.Password" For="@(() => RegisterClientDto.Password)"/>
-    </div>
+        <div class="form-group">
+            <MudTextField Variant="Variant.Outlined" @bind-Value="RegisterClientDto.PhoneNumber" Label="Numer telefonu" Placeholder="Wpisz" For="@(() => RegisterClientDto.PhoneNumber)"/>
+        </div>
 
-    <div class="form-group">
-        <MudTextField @bind-Value="RegisterClientDto.ConfirmPassword" Label="Potwierdź hasło" Placeholder="Wpisz" InputType="InputType.Password" For="@(() => RegisterClientDto.ConfirmPassword)"/>
-    </div>
+        <div class="form-group">
+            <MudTextField Variant="Variant.Outlined" @bind-Value="RegisterClientDto.Password" Label="Hasło" Placeholder="Wpisz" InputType="InputType.Password" For="@(() => RegisterClientDto.Password)"/>
+        </div>
 
-    <MudCheckBox  @bind-Checked="RegisterClientDto.IsSubscribedToNewsletter">Subskrybcja do newslettera</MudCheckBox>
+        <div class="form-group">
+            <MudTextField Variant="Variant.Outlined" @bind-Value="RegisterClientDto.ConfirmPassword" Label="Potwierdź hasło" Placeholder="Wpisz" InputType="InputType.Password" For="@(() => RegisterClientDto.ConfirmPassword)"/>
+        </div>
 
-    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Zarejestruj</MudButton>
-</EditForm>
+        <MudCheckBox @bind-Checked="RegisterClientDto.IsSubscribedToNewsletter">Subskrybcja do newslettera</MudCheckBox>
+
+        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Zarejestruj</MudButton>
+    </EditForm>
+</MudContainer>
 
 @code
 {

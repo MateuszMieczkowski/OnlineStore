@@ -1,8 +1,11 @@
-﻿namespace OnlineStore.Shared.Enums
+﻿using System.ComponentModel;
+
+namespace OnlineStore.Shared.Enums;
+
+public enum UserRoleDto
 {
-    public enum UserRoleDto
-    {
-        User = 1,
-        Admin = 2
-    }
+    [Description("Klient")]
+    User = 1,
+    [Description("Administrator")]
+    Admin = 2
 }

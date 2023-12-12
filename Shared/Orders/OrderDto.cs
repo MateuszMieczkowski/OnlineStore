@@ -5,7 +5,7 @@ namespace OnlineStore.Shared.Orders;
 public record OrderDto(
     int Id,
     decimal TotalNet,
-    decimal TotalGorss,
+    decimal TotalGross,
     OrderStatusDto Status,
     int ClientId,
     DateTime CreatedDate,

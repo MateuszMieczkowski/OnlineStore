@@ -19,7 +19,7 @@ public class GetUserListQueryHandler : IQueryHandler<Shared.Accounts.GetUserList
 
     public async Task<PagedResult<UserDto>> Handle(Shared.Accounts.GetUserList query, CancellationToken cancellationToken)
     {
-        var dbQueryBase = _dbContext.Users.Where(x => x.UserRole == UserRole.Admin).AsQueryable();
+        var dbQueryBase = _dbContext.Users.AsQueryable();
         var result = await _resultPaginator.GetPagedResult(dbQueryBase, query, x => x.ToDto(), cancellationToken);
         return result;
     }

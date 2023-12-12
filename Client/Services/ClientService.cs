@@ -1,8 +1,10 @@
 ﻿using Blazored.LocalStorage;
 using OnlineStore.Client.Brokers.API;
 using OnlineStore.Client.Models;
+using OnlineStore.Client.Models.Accounts;
 using OnlineStore.Client.Providers;
 using OnlineStore.Shared.Clients;
+using OnlineStore.Shared.Orders;
 
 namespace OnlineStore.Client.Services;
 
@@ -11,6 +13,10 @@ public interface IClientService
     Task Register(RegisterClient command);
 
     Task ChangeUserPreferences(ChangePreferencesModel model);
+
+    Task UpsertOrderAddress(UpsertAddressModel model);
+    
+    Task<UpsertAddressModel?> GetOrderAddress();
 }
 
 public class ClientService : IClientService
@@ -49,5 +55,40 @@ public class ClientService : IClientService
                 model.DisplayedPrice,
                 model.IsSubscribedToNewsLetter,
                 model.PageSize));
+    }
+
+    public async Task UpsertOrderAddress(UpsertAddressModel model)
+    {
+        var command = new UpsertOrderAddress(
+            Id: model.Id,
+            Street: model.Street,
+            StreetNumber: model.StreetNumber,
+            City: model.City,
+            State: model.State,
+            PostalCode: model.PostalCode,
+            Country: model.Country);
+
+        await _broker.UpsertOrderAddress(command);
+    }
+
+    public async Task<UpsertAddressModel?> GetOrderAddress()
+    {
+        var addressDto = await _broker.GetOrderAddress();
+        Console.WriteLine(addressDto);
+        if (addressDto is null)
+        {
+            return null;
+        }
+
+        return new UpsertAddressModel
+        {
+            Id = addressDto.Id,
+            City = addressDto.City,
+            Country = addressDto.Country,
+            PostalCode = addressDto.PostalCode,
+            State = addressDto.State,
+            Street = addressDto.Street,
+            StreetNumber = addressDto.StreetNumber
+        };
     }
 }

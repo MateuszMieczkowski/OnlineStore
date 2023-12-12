@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace OnlineStore.Client.Models;
+namespace OnlineStore.Client.Models.Accounts;
 
 public class ResetPasswordModel
 {

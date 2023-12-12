@@ -1,0 +1,82 @@
+@using OnlineStore.Client.Models.Accounts
+@using System.Security.Cryptography
+@inject IClientService ClientService 
+@inject ISnackbar Snackbar
+
+@if (IsReadonly && _addressModel.Id == null)
+{
+    <MudContainer>
+        <h4>Nie zdefiniowano adresu dostawy dla konta</h4>
+    </MudContainer>
+    return;
+}
+
+<MudCard>
+    <MudCardHeader>
+        <MudText Typo="Typo.h6">Adres dostawy</MudText>
+    </MudCardHeader>
+    <MudCardContent>
+        <EditForm Model="_addressModel" OnValidSubmit="OnAddAddressSubmit">
+            <DataAnnotationsValidator></DataAnnotationsValidator>
+            <MudGrid Spacing="1">
+                <MudItem xs="8">
+                    <MudTextField ReadOnly="@IsReadonly" @bind-Value="_addressModel.Street" Variant="Variant.Outlined" Label="Ulica" For="@(() => _addressModel.Street)"/>
+                </MudItem>
+                <MudItem xs="4">
+                    <MudTextField ReadOnly="@IsReadonly" @bind-Value="_addressModel.StreetNumber" Variant="Variant.Outlined" Label="Numer" For="@(() => _addressModel.StreetNumber)"/>
+                </MudItem>
+                <MudItem xs="4">
+                    <MudTextField ReadOnly="@IsReadonly" @bind-Value="_addressModel.PostalCode" Variant="Variant.Outlined" Label="Kod pocztowy" For="@(() => _addressModel.PostalCode)"/>
+                </MudItem>
+                <MudItem xs="8">
+                    <MudTextField ReadOnly="@IsReadonly" @bind-Value="_addressModel.City" Variant="Variant.Outlined" Label="Miasto" For="@(() => _addressModel.City)"/>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField ReadOnly="@IsReadonly" @bind-Value="_addressModel.State" Variant="Variant.Outlined" Label="Województwo" For="@(() => _addressModel.State)"/>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTextField ReadOnly="@IsReadonly" @bind-Value="_addressModel.Country" Variant="Variant.Outlined" Label="Kraj" For="@(() => _addressModel.Country)"/>
+                </MudItem>
+                @if (!IsReadonly)
+                {
+                    <MudItem xs="6">
+                        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Zapisz adres</MudButton>
+                    </MudItem>
+                }
+            </MudGrid>
+        </EditForm>
+    </MudCardContent>
+</MudCard>
+
+
+@code {
+    private UpsertAddressModel _addressModel = new();
+
+    [Parameter]
+    public bool IsReadonly { get; set; }
+
+    
+    [Parameter]
+    public EventCallback<int?> OnAddressChanged { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var orderAddress = await ClientService.GetOrderAddress();
+        _addressModel = orderAddress ?? new UpsertAddressModel();
+        StateHasChanged();
+        await OnAddressChanged.InvokeAsync(_addressModel.Id);
+    }
+
+    private async Task OnAddAddressSubmit()
+    {
+        try
+        {
+            await ClientService.UpsertOrderAddress(_addressModel);
+            Snackbar.Add("Zapisano adres", Severity.Success);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+    }
+}

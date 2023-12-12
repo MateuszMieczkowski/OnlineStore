@@ -1,0 +1,97 @@
+@page "/orders/checkout"
+@using OnlineStore.Client.Models.Orders
+@using OnlineStore.Client.Pages.Clients
+@inject IOrderService OrderService
+@inject IShoppingCartService ShoppingCartService
+@inject ISnackbar Snackbar
+@inject NavigationManager NavigationManager
+
+@if (!_cartModel.Items.Any())
+{
+    <MudContainer>
+        <h2>Brak produktów w koszyku</h2>
+    </MudContainer>
+    return;
+}
+
+<MudContainer>
+    <h2 Class="mb-2">Koszyk zakupowy</h2>
+    <MudPaper Elevation="3" Class="p-4 mb-2">
+        @foreach (var item in _cartModel.Items)
+        {
+            <MudGrid Justify="Justify.SpaceAround">
+                <MudItem xs="3" Class="d-flex gap-3 align-items-center">
+                    <MudImage Src="@item.ThumbnailUri" Height="100" Alt="Zdjęcie produktu"/>
+                    <MudText Typo="Typo.h6">@item.Name</MudText>
+                </MudItem>
+                <MudItem xs="3" Class="d-flex align-items-center">
+                    <MudIconButton Size="Size.Large" Icon="@Icons.Material.Filled.Remove" Variant="Variant.Outlined" Color="Color.Secondary" OnClick="@(() => ChangeItemCount(item, -1))"/>
+                    <MudInput
+                        Error="true"
+                        T="int"
+                        @bind-Value="item.Count"
+                        For="@(() => item.Count)"
+                        Variant="Variant.Outlined"
+                        Adornment="Adornment.End"
+                        AdornmentText="szt."
+                        Label="Ilość"/>
+                    <MudIconButton Size="Size.Large" Icon="@Icons.Material.Filled.Add" Variant="Variant.Outlined" Color="Color.Secondary" OnClick="@(() => ChangeItemCount(item, 1))"/>
+                </MudItem>
+                <MudItem Class="d-flex align-items-center gap-2">
+                    <MudIconButton Size="Size.Large" Icon="@Icons.Material.Filled.RemoveShoppingCart" Variant="Variant.Outlined" Color="Color.Secondary" OnClick="@(() => RemoveItem(item))"/>
+                </MudItem>
+            </MudGrid>
+            <hr class="my-3"/>
+        }
+    </MudPaper>
+    <h2>Dane dostawy</h2>
+    <MudPaper Elevation="3" Class="p-4">
+        <MudGrid>
+            <AddressForm OnAddressChanged="@(x => _cartModel.AddressId = x ?? 0)" IsReadonly="true"/>
+        </MudGrid>
+        <div class="mt-5 text-right">
+            <MudButton EndIcon="@Icons.Material.Filled.ShoppingCartCheckout" Variant="Variant.Filled" Color="Color.Primary" OnClick="@PlaceOrder">Złóż zamówienie</MudButton>
+        </div>
+    </MudPaper>
+</MudContainer>
+
+@code {
+    private CartModel _cartModel = new();
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _cartModel = await ShoppingCartService.GetCart();
+    }
+
+    private async Task ChangeItemCount(CartItemModel item, int count)
+    {
+        item.Count += count;
+        if (item.Count < 0)
+        {
+            item.Count = 0;
+        }
+
+        await ShoppingCartService.AddToCartAsync(item, count);
+    }
+
+    private async Task RemoveItem(CartItemModel item)
+    {
+        _cartModel.Items.Remove(item);
+        await ShoppingCartService.RemoveFromCart(item.ProductId);
+    }
+
+    private async Task PlaceOrder()
+    {
+        try
+        {
+            var orderId = await OrderService.CreateOrder(_cartModel);
+            await ShoppingCartService.ClearCart();
+            Snackbar.Add("Złożono zamówienie", Severity.Success);
+            NavigationManager.NavigateTo($"/orders/{orderId}?showConfirmation=true");
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+    }
+}

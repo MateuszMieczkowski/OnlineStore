@@ -19,17 +19,19 @@
             </AuthorizeView>
         </div>
 
-        <div class="nav">
+        <div class="nav gap-3">
             <AuthorizeView>
                 <Authorized>
-                    <MudButton Variant="Variant.Text" Href="/clients/settings">Ustawienia</MudButton>
+                    <MudButton Href="/orders/checkout" StartIcon="@Icons.Material.Filled.ShoppingCart">Koszyk</MudButton>
+                    <MudButton StartIcon="@Icons.Material.Filled.ShoppingBag" Variant="Variant.Text" Href="/orders">Zamówienia</MudButton>
+                    <MudButton StartIcon="@Icons.Material.Filled.Settings" Variant="Variant.Text" Href="/clients/settings">Ustawienia</MudButton>
                 </Authorized>
             </AuthorizeView>
             <AuthorizeView >
                 <Authorized>
                     <div>
                         <b>@Email</b>
-                        <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="users/logout">Wyloguj</MudButton>
+                        <MudButton Class="ml-2" Variant="Variant.Filled" Color="Color.Primary" Href="users/logout">Wyloguj</MudButton>
                     </div>
                 </Authorized>
                 <NotAuthorized>
@@ -42,43 +44,6 @@
         </div>
     </div>
 </nav>
-@* <MudAppBar> *@
-@*     $1$ <MudPaper Elevation="25"> #1# *@
-@*     <MudToolBar> *@
-@*         <MudNavLink Href="/home">Strona główna</MudNavLink> *@
-@* *@
-@*         <AuthorizeView Roles="Admin"> *@
-@*             <Authorized> *@
-@*                 <MudIconButton Icon="@Icons.Material.Outlined.Add" href="create">Dodaj produkt</MudIconButton> *@
-@*                 <MudNavLink Href="/configuration">Zarządzanie produktami</MudNavLink> *@
-@*                 <MudNavLink Href="/accounts/manage">Zarządzanie administratorami</MudNavLink> *@
-@*             </Authorized> *@
-@*         </AuthorizeView> *@
-@* *@
-@*         <MudSpacer/> *@
-@* *@
-@*         <AuthorizeView Roles="User"> *@
-@*             <Authorized> *@
-@*                 <MudNavLink Href="/clients/settings">Ustawienia</MudNavLink> *@
-@*             </Authorized> *@
-@*         </AuthorizeView> *@
-@* *@
-@*         <AuthorizeView> *@
-@*             <Authorized> *@
-@*                 <MudTypography Edge="Edge.End" Variant="Typo.body2"> *@
-@*                     <strong>@Email</strong> *@
-@*                 </MudTypography> *@
-@*                 <MudButton Variant="Variant.Filled" Edge="Edge.End" href="users/logout">Wyloguj</MudButton> *@
-@*             </Authorized> *@
-@*             <NotAuthorized> *@
-@*                 <MudButton Variant="Variant.Filled" Href="clients/register">Rejestracja</MudButton> *@
-@*                 <MudButton Variant="Variant.Filled" Href="users/login">Zaloguj</MudButton> *@
-@*                 <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit"/> *@
-@*             </NotAuthorized> *@
-@*         </AuthorizeView> *@
-@*     </MudToolBar> *@
-@*     $1$ </MudPaper> #1# *@
-@* </MudAppBar> *@
 
 @code{
 

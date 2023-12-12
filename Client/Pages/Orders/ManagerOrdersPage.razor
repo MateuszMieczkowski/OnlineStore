@@ -1,0 +1,134 @@
+@page "/orders"
+@attribute [Authorize]
+@using OnlineStore.Client.Extensions
+@using OnlineStore.Shared.Clients
+@using OnlineStore.Shared.Enums
+@using Blazored.LocalStorage
+@using OnlineStore.Client.Providers
+@using OnlineStore.Shared.Orders
+@inject ICallContext CallContext
+@inject IJSRuntime JsRuntime
+@inject ILocalStorageService LocalStorage
+@inject IOrderService OrderService
+@inject ISnackbar Snackbar
+@inject NavigationManager NavigationManager
+<PageTitle>Zarządzanie produktami</PageTitle>
+
+<MudContainer>
+    @if (ClientId != null)
+    {
+        <h2>Zamówienia użytkownika z ID: @ClientId</h2>
+        <div class="m-2">
+            <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="NavigateBack">Powrót do zamówień</MudButton>
+        </div>
+    }
+    <MudTable Items="@_orders" Hover="true" Loading="@_isLoading" LoadingProgressColor="Color.Info">
+        <HeaderContent>
+            <MudTh>Nr. zamówienia</MudTh>
+            <MudTh>Cena netto</MudTh>
+            <MudTh>Cena brutto</MudTh>
+            <MudTh>Status</MudTh>
+            <MudTh>Data utworzenia</MudTh>
+            <MudTh>Data ostatniej modyfikacji</MudTh>
+            <MudTh>Akcje</MudTh>
+        </HeaderContent>
+        <RowTemplate Context="item">
+            <MudTd>@item.Id</MudTd>
+            <MudTd>@item.TotalNet</MudTd>
+            <MudTd>@item.TotalGross</MudTd>
+            <MudTd>@EnumHelper.GetDescription(item.Status)</MudTd>
+            <MudTd>@item.CreatedDate.ToLocalTime().ToString("dd.MM.yyyy HH:MM")</MudTd>
+            <MudTd>@(item.ModifiedDate != DateTime.MinValue ? item.ModifiedDate.ToLocalTime().ToString("dd.MM.yyyy HH:MM") : "-")</MudTd>
+            <MudTd>
+                <AuthorizeView Roles="User">
+                    <Authorized>
+                        <MudButtonGroup Variant="Variant.Outlined" Color="Color.Secondary">
+                            <MudMenu Icon="@Icons.Material.Filled.MoreVert" ActivationEvent="@MouseEvent.MouseOver" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight">
+                                <MudMenuItem Icon="@Icons.Material.Filled.Info" OnClick="@(() => NavigationManager.NavigateTo($"/orders/{item.Id}"))">Szczegóły</MudMenuItem>
+                                @if (item.ClientId == _clientId)
+                                {
+                                    <MudMenuItem Icon="@Icons.Material.Filled.ShoppingCartCheckout" OnClick="@(() => NavigationManager.NavigateTo($"/orders/{item.Id}"))">Zamów ponownie</MudMenuItem>
+                                }
+                            </MudMenu>
+                        </MudButtonGroup>
+                    </Authorized>
+                </AuthorizeView>
+                <AuthorizeView Roles="Admin">
+                    <Authorized>
+                        <MudButtonGroup Variant="Variant.Outlined" Color="Color.Secondary">
+                            <MudMenu Icon="@Icons.Material.Filled.MoreVert" ActivationEvent="@MouseEvent.MouseOver" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight">
+                                <MudMenuItem Icon="@Icons.Material.Filled.Info" OnClick="@(() => NavigationManager.NavigateTo($"/orders/{item.Id}"))">Szczegóły</MudMenuItem>
+                                @if (item.ClientId == _clientId)
+                                {
+                                    <MudMenuItem Icon="@Icons.Material.Filled.ShoppingCartCheckout" OnClick="@(() => NavigationManager.NavigateTo($"/orders/{item.Id}"))">Zamów ponownie</MudMenuItem>
+                                }
+                                <MudMenuItem Icon="@Icons.Material.Filled.LocalShipping" OnClick="@(() => ExecuteAction(item, OrderStatusDto.Processing))">Realizuj</MudMenuItem>
+                                <MudMenuItem Icon="@Icons.Material.Filled.DoneOutline" OnClick="@(() => ExecuteAction(item, OrderStatusDto.Completed))">Zrealizuj</MudMenuItem>
+                                <MudMenuItem Icon="@Icons.Material.Filled.Cancel" OnClick="@(() => ExecuteAction(item, OrderStatusDto.Cancelled))">Anuluj</MudMenuItem>
+                            </MudMenu>
+                        </MudButtonGroup>
+                    </Authorized>
+                </AuthorizeView>
+            </MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <div class="d-flex flex-column align-center">
+                <MudPagination Size="Size.Large" Variant="Variant.Filled" Color="Color.Secondary" SelectedChanged="PageChanged" Count="@_pageCount" Class="pa-4"/>
+            </div>
+        </PagerContent>
+    </MudTable>
+</MudContainer>
+
+@code
+{
+    [Parameter] [SupplyParameterFromQuery] public int? ClientId { get; set; }
+
+    private IReadOnlyCollection<OrderListItemDto> _orders = new List<OrderListItemDto>();
+    private bool _isLoading;
+    private int _pageSize;
+    private int _pageNumber = 1;
+    private int _pageCount;
+    private int _clientId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _clientId = await CallContext.GetUserId();
+        var userPreferences = await LocalStorage.GetItemAsync<UserPreferencesDto>(LocalStorageKeys.UserPreferences);
+        _pageSize = userPreferences?.PageSize > 0 ? userPreferences.PageSize : 20;
+        await RefreshProducts();
+    }
+
+    private async Task RefreshProducts()
+    {
+        _isLoading = true;
+        var response = await OrderService.GetOrders(_pageNumber, _pageSize, ClientId);
+        _orders = response.Items;
+        _pageCount = response.TotalPages;
+        _isLoading = false;
+        StateHasChanged();
+    }
+
+    private async Task PageChanged(int i)
+    {
+        _pageNumber = i;
+        await RefreshProducts();
+    }
+
+    private async Task ExecuteAction(OrderListItemDto product,
+        // Func<int, Task> action, 
+        OrderStatusDto newStatus)
+    {
+        // await action(product.Id);
+        // var updatedProduct = product with { Status = newStatus };
+        product.Status = newStatus;
+        product.ModifiedDate = DateTime.UtcNow;
+        StateHasChanged();
+        Snackbar.Add("Zaktualizowano stan zamówienia i wysłano powierdzenie!");
+    }
+    
+    private async Task NavigateBack()
+    {
+        await JsRuntime.InvokeVoidAsync("history.back");
+    }
+}
+

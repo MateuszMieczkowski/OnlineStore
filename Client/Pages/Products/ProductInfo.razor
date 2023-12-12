@@ -1,15 +1,14 @@
 @page "/products/{id:int}"
 @using OnlineStore.Shared.Products
+@using OnlineStore.Client.Components.Orders
 @inject IProductService ProductService
-@inject IJSRuntime JSRuntime
+@inject IJSRuntime JsRuntime
 
 @if (_product is null)
 {
-
 }
 else
 {
-
     <MudContainer>
         <MudText Typo="Typo.h2">Informacje o produkcie</MudText>
         <MudCard>
@@ -27,9 +26,7 @@ else
                 <div class="my-4">
                     <MudCard Outlined="false">
                         <MudCardHeader>
-                            <MudChip Color="Color.Primary" Size="Size.Large">
-                                <MudText Typo="Typo.h4">Opis szczegółowy</MudText>
-                            </MudChip>
+                            <MudText Typo="Typo.h4">Opis szczegółowy</MudText>
                         </MudCardHeader>
                         <MudDivider/>
                         <MudCardContent Class="p-2">
@@ -43,9 +40,7 @@ else
                     <div class="mt-4">
                         <MudCard>
                             <MudCardHeader>
-                                <MudChip Color="Color.Primary" Size="Size.Large">
-                                    <MudText Typo="Typo.h4">Zdjęcia</MudText>
-                                </MudChip>
+                                <MudText Typo="Typo.h4">Zdjęcia</MudText>
                             </MudCardHeader>
                             <MudDivider/>
                             <MudCardContent Class="p-2">
@@ -91,9 +86,7 @@ else
                 <div class="mt-4">
                     <MudCard>
                         <MudCardHeader>
-                            <MudChip Color="Color.Primary" Size="Size.Large">
-                                <MudText Typo="Typo.h4">Parametry produktu</MudText>
-                            </MudChip>
+                            <MudText Typo="Typo.h4">Parametry produktu</MudText>
 
                         </MudCardHeader>
                         <MudDivider/>
@@ -119,8 +112,7 @@ else
                 </div>
 
                 <div class="mt-4">
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.AddShoppingCart">Dodaj do koszyka</MudButton>
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.ShoppingCartCheckout">Kup teraz</MudButton>
+                    <BuyActionsComponent Product="@_product"/>
                 </div>
 
                 <div class="mt-4">
@@ -133,8 +125,7 @@ else
 
 @code {
 
-    [Parameter]
-    public int Id { get; set; }
+    [Parameter] public int Id { get; set; }
 
     private ProductDto? _product;
 
@@ -145,6 +136,6 @@ else
 
     private async Task NavigateBack()
     {
-        await JSRuntime.InvokeVoidAsync("history.back");
+        await JsRuntime.InvokeVoidAsync("history.back");
     }
 }

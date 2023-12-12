@@ -157,7 +157,12 @@ namespace OnlineStore.Server.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("OrdersAddresses");
                 });
@@ -461,6 +466,16 @@ namespace OnlineStore.Server.Migrations
                     b.Navigation("Address");
 
                     b.Navigation("Client");
+                });
+
+            modelBuilder.Entity("OnlineStore.Server.Entities.OrderAddress", b =>
+                {
+                    b.HasOne("OnlineStore.Server.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("OnlineStore.Server.Entities.OrderItem", b =>

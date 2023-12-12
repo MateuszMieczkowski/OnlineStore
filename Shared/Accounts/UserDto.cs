@@ -1,3 +1,5 @@
-﻿namespace OnlineStore.Shared.Accounts;
+﻿using OnlineStore.Shared.Enums;
 
-public record UserDto(int Id, string Email);
+namespace OnlineStore.Shared.Accounts;
+
+public record UserDto(int Id, string Email, UserRoleDto Role);

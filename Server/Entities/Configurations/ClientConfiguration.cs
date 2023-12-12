@@ -9,12 +9,6 @@ public class ClientConfiguration : IEntityTypeConfiguration<Client>
     {
         builder.HasBaseType<User>();
 
-        builder.HasMany(e => e.Orders)
-            .WithOne(e => e.Client)
-            .HasForeignKey(e => e.ClientId)
-            .IsRequired()
-            .OnDelete(DeleteBehavior.Cascade);
-
         builder.Property(e => e.FirstName)
             .IsRequired()
             .HasMaxLength(100);

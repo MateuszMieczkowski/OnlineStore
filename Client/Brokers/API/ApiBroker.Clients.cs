@@ -1,4 +1,5 @@
 ﻿using OnlineStore.Shared.Clients;
+using OnlineStore.Shared.Orders;
 
 namespace OnlineStore.Client.Brokers.API;
 
@@ -17,4 +18,13 @@ public partial class ApiBroker
         var commandUrl = $"{ClientsRelativeUrl}/change-user-preferences";
         await PutAsync(commandUrl, command);
     }
+    
+    public async Task UpsertOrderAddress(UpsertOrderAddress command)
+    {
+        var commandUrl = $"{ClientsRelativeUrl}/order-address";
+        await PutAsync(commandUrl, command);
+    }
+
+    public async Task<OrderAddressDto?> GetOrderAddress()
+        => await GetAsync<OrderAddressDto?>($"{ClientsRelativeUrl}/order-address");
 }

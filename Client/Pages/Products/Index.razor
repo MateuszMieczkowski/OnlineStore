@@ -1,28 +1,31 @@
 ﻿@page "/"
-@using OnlineStore.Shared.Products
 @using Blazored.LocalStorage
+@using OnlineStore.Client.Components.Orders
 @using OnlineStore.Shared.Clients
 @using OnlineStore.Shared.Enums
+@using OnlineStore.Shared.Products
 @inject NavigationManager NavigationManager
-@inject IProductService ProductService
 @inject ILocalStorageService LocalStorage
+@inject IProductService ProductService
 
 <PageTitle>Dostępne produkty</PageTitle>
 
-<ProductsFilter OnSearchStringChanged="@GetProducts"/>
+<MudContainer MaxWidth="MaxWidth.ExtraLarge">
+    <ProductsFilter OnSearchStringChanged="@GetProducts"/>
 
-@if (_isLoading)
-{
-    <div class="d-flex align-content-center justify-content-center mb-5">
-        <MudProgressCircular Color="Color.Primary" Size="Size.Large" Indeterminate="true"/>
-    </div>
-}
-else
-{
-    <MudGrid Spacing="7" Justify="Justify.Center" Class="mb-5">
-        @foreach (var product in _products)
-        {
-            <MudItem xs="3">
+    @if (_isLoading)
+    {
+        <div class="d-flex align-content-center justify-content-center mb-5">
+            <MudProgressCircular Color="Color.Primary" Size="Size.Large" Indeterminate="true"/>
+        </div>
+    }
+    else
+    {
+
+        <MudGrid Spacing="6" Justify="Justify.Center" Class="mb-5">
+            @foreach (var product in _products)
+            {
+                <MudItem xs="3">
                     <MudCard @onclick="@(() => NavigationManager.NavigateTo($"products/{product.Id}"))" class="pointer">
                         <MudCardHeader>
                             <CardHeaderContent>
@@ -41,18 +44,18 @@ else
                             <MudText Typo="Typo.body2">Ilość: @product.Quantity</MudText>
                         </MudCardContent>
                         <MudCardActions>
-                            <MudButton Variant="Variant.Text" Color="Color.Primary" StartIcon="@Icons.Material.Filled.AddShoppingCart">Dodaj do koszyka</MudButton>
-                            <MudButton Variant="Variant.Text" Color="Color.Primary" StartIcon="@Icons.Material.Filled.ShoppingCartCheckout">Kup teraz</MudButton>
+                            <BuyActionsComponent Product="product"/>
                         </MudCardActions>
                     </MudCard>
-            </MudItem>
-        }
-    </MudGrid>
-    <div class="d-flex flex-column align-center">
-        <MudPagination Size="Size.Large" Variant="Variant.Filled" Color="Color.Secondary" @bind-Selected="@PageNumber" Count="@_pageCount" Class="pa-4"/>
-    </div>
+                </MudItem>
+            }
+        </MudGrid>
+        <div class="d-flex flex-column align-center">
+            <MudPagination Size="Size.Large" Variant="Variant.Filled" Color="Color.Secondary" @bind-Selected="@PageNumber" Count="@_pageCount" Class="pa-4"/>
+        </div>
 
-}
+    }
+</MudContainer>
 
 @code {
 
@@ -93,7 +96,7 @@ else
         _isLoading = false;
         StateHasChanged();
     }
-
+    
     private async Task PageChanged(int i)
     {
         _pageNumber = i;
