@@ -1,7 +1,5 @@
-﻿using System.Linq.Expressions;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using OnlineStore.Server.Authentication;
-using OnlineStore.Server.Entities;
 using OnlineStore.Server.Features.Accounts.Services;
 using OnlineStore.Server.Features.Products.Mapping;
 using OnlineStore.Server.Infrastructure;
@@ -34,11 +32,6 @@ public class GetProductsListQueryHandler : IQueryHandler<Shared.Products.GetProd
         var dbQueryBase = _dbContext.Products
             .AsNoTracking();
         
-        if (!isAdmin)
-        {
-            dbQueryBase = dbQueryBase.Where(x => !x.IsHidden && !x.IsDeleted);
-        }
-        
         if (query is { DeletedOnly: true, HiddenOnly: false } && isAdmin)
         {
             dbQueryBase = dbQueryBase.Where(x => x.IsDeleted);
@@ -47,6 +40,11 @@ public class GetProductsListQueryHandler : IQueryHandler<Shared.Products.GetProd
         if (query is { HiddenOnly: true, DeletedOnly: false } && isAdmin)
         {
             dbQueryBase = dbQueryBase.Where(x => x.IsHidden);
+        }
+
+        if (query is { HiddenOnly: false, DeletedOnly: false } || !isAdmin)
+        {
+            dbQueryBase = dbQueryBase.Where(x => !x.IsHidden && !x.IsDeleted);
         }
         
         if (!string.IsNullOrWhiteSpace(query.SearchPhrase))
