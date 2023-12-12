@@ -1,15 +1,12 @@
 ﻿@page "/"
-@using OnlineStore.Shared.Products
 @using Blazored.LocalStorage
-@using OnlineStore.Client.Providers
+@using OnlineStore.Client.Components.Orders
 @using OnlineStore.Shared.Clients
 @using OnlineStore.Shared.Enums
+@using OnlineStore.Shared.Products
 @inject NavigationManager NavigationManager
 @inject ILocalStorageService LocalStorage
 @inject IProductService ProductService
-@inject IShoppingCartService ShoppingCartService
-@inject ISnackbar Snackbar
-@inject ICallContext CallContext
 
 <PageTitle>Dostępne produkty</PageTitle>
 
@@ -47,8 +44,7 @@
                             <MudText Typo="Typo.body2">Ilość: @product.Quantity</MudText>
                         </MudCardContent>
                         <MudCardActions>
-                            <MudButton Variant="Variant.Text" Color="Color.Primary" StartIcon="@Icons.Material.Filled.AddShoppingCart" OnClick="@(() => AddToCart(product))">Dodaj do koszyka</MudButton>
-                            <MudButton Variant="Variant.Text" Color="Color.Primary" StartIcon="@Icons.Material.Filled.ShoppingCartCheckout" OnClick="@(() => BuyNow(product))">Kup teraz</MudButton>
+                            <BuyActionsComponent Product="product"/>
                         </MudCardActions>
                     </MudCard>
                 </MudItem>
@@ -100,49 +96,10 @@
         _isLoading = false;
         StateHasChanged();
     }
-
-    private async Task AddToCart(ProductListItemDto item, bool skipAlert = false)
-    {
-        if (!await ValidateCartAction())
-        {
-            return;
-        }
-        
-        await ShoppingCartService.AddToCartAsync(item, 1);
-
-        if (skipAlert)
-        {
-            return;
-        }
-        Snackbar.Add("Dodano produkt do koszyka", Severity.Info);
-    }
     
-    private async Task BuyNow(ProductListItemDto item)
-    {
-        if (!await ValidateCartAction())
-        {
-            return;
-        }
-        
-        await AddToCart(item);
-        NavigationManager.NavigateTo("/orders/checkout");
-    }
-
-
     private async Task PageChanged(int i)
     {
         _pageNumber = i;
         await GetProducts();
-    }
-
-    private async Task<bool> ValidateCartAction()
-    {
-        if (!await CallContext.IsAuthenticated())
-        {
-            Snackbar.Add("Tylko zalogowany użytkownik może dokonywać zakupów i dodawać produkty do koszyka", Severity.Warning);
-            return false;
-        }
-
-        return true;
     }
 }

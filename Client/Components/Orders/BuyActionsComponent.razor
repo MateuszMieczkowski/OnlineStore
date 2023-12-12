@@ -1,0 +1,84 @@
+@using OnlineStore.Shared.Products
+@using OnlineStore.Client.Providers
+@using OnlineStore.Client.Models.Orders
+@inject NavigationManager NavigationManager
+@inject ICallContext CallContext
+@inject IShoppingCartService ShoppingCartService
+@inject ISnackbar Snackbar
+
+<MudButton Variant="Variant.Text" Color="Color.Primary" StartIcon="@Icons.Material.Filled.AddShoppingCart" OnClick="@(() => AddToCart(Product))">Dodaj do koszyka</MudButton>
+<MudButton Variant="Variant.Text" Color="Color.Primary" StartIcon="@Icons.Material.Filled.ShoppingCartCheckout" OnClick="@(() => BuyNow(Product))">Kup teraz</MudButton>
+
+@code {
+    [Parameter]
+    public object Product { get; set; }
+    
+    private async Task AddToCart(object product, bool skipAlert = false)
+    {
+        var cartItem = MapCartItem(product);
+        
+        if (!await ValidateCartAction())
+        {
+            return;
+        }
+        
+        await ShoppingCartService.AddToCartAsync(cartItem, 1);
+
+        if (skipAlert)
+        {
+            return;
+        }
+        Snackbar.Add("Dodano produkt do koszyka", Severity.Info);
+    }
+    
+    private async Task BuyNow(object item)
+    {
+        if (!await ValidateCartAction())
+        {
+            return;
+        }
+        
+        await AddToCart(item);
+        NavigationManager.NavigateTo("/orders/checkout");
+    }
+    
+    private async Task<bool> ValidateCartAction()
+    {
+        if (!await CallContext.IsAuthenticated())
+        {
+            Snackbar.Add("Tylko zalogowany użytkownik może dokonywać zakupów i dodawać produkty do koszyka", Severity.Warning);
+            return false;
+        }
+
+        return true;
+    }
+
+    private CartItemModel MapCartItem(object product)
+    {
+        var productCart = new CartItemModel();
+        
+        if (product is ProductListItemDto productListItemDto)
+        {
+            productCart = new CartItemModel
+            {
+                ProductId = productListItemDto.Id,
+                Name = productListItemDto.Name,
+                ThumbnailUri = productListItemDto.ThumbnailUri,
+                Count = 1
+            };
+        }
+
+        if (product is ProductDto productDto)
+        {
+            productCart = new CartItemModel
+            {
+                ProductId = productDto.Id,
+                Name = productDto.Name,
+                ThumbnailUri = productDto.ThumbnailUri,
+                Count = 1
+            };
+        }
+
+        return productCart;
+    }
+}

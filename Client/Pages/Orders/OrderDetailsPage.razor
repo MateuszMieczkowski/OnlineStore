@@ -1,7 +1,8 @@
 @page "/orders/{id:int}"
 @using OnlineStore.Shared.Orders
-@using OnlineStore.Shared.Enums
+@inject IOrderService OrderService
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JsRuntime
 
 @if (_order == null)
 {
@@ -10,17 +11,17 @@
 
 <MudContainer>
     <MudPaper Elevation="3" Class="p-4">
-        @if (ShowConfirmation)
+        @if (ShowConfirmation == true)
         {
-            <MudTypography Typo="Typo.h4" Class="mb-4">Potwierdzenie Zamówienia</MudTypography>
+            <MudText Typo="Typo.h5" Class="mb-4">Potwierdzenie Zamówienia</MudText>
 
             <div class="mb-4">
-                <MudTypography Typo="Typo.body1">Dziękujemy za złożenie zamówienia!</MudTypography>
+                <MudText Typo="Typo.body2">Dziękujemy za złożenie zamówienia!</MudText>
             </div>
         }
 
        <div class="mb-4">
-           <MudTypography Typo="Typo.body2">Szczegóły zamówienia:</MudTypography>
+           <MudText Typo="Typo.h5">Szczegóły zamówienia:</MudText>
        
            <ul>
                @foreach (var item in _order.Items)
@@ -35,30 +36,27 @@
            <div>@_order.OrderAddress.Street, @_order.OrderAddress.City, @_order.OrderAddress.PostalCode</div>
        </div>
 
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="GoToHomePage">Powrót do Strony Głównej</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="GoBack">Powrót do poprzedniej strony</MudButton>
     </MudPaper>
 </MudContainer>
 
 @code {
-
     [Parameter]
-    public bool ShowConfirmation { get; set; }
+    [SupplyParameterFromQuery]
+    public bool? ShowConfirmation { get; set; }
+    
+    [Parameter]
+    public int Id { get; set; }
 
     private OrderDto? _order;
 
     protected override async Task OnInitializedAsync()
     {
-        _order = new OrderDto(Id: 1, TotalNet: 100.00m, TotalGorss: 120.00m, Status: OrderStatusDto.Processing, ClientId: 123, CreatedDate: DateTime.Now, ModifiedDate: DateTime.Now, 
-            OrderAddress: new OrderAddressDto(Id: 1, Street: "Test Street", City: "Test City", PostalCode: "12345", StreetNumber: "Test Street nr", State: null, Country: "Poland"), 
-            Items: new List<OrderItemDto>
-        {
-            new(Id: 1, PriceNet: 30.00m, PriceGross: 36.00m, Quantity: 2, ProductId: 101),
-            new(Id: 2, PriceNet: 40.00m, PriceGross: 48.00m, Quantity: 1, ProductId: 102),
-        });
+        _order = await OrderService.GetOrder(Id);
     }
 
-    private void GoToHomePage()
+    private async Task GoBack()
     {
-        NavigationManager.NavigateTo("/");
+        await JsRuntime.InvokeVoidAsync("history.back");
     }
 }

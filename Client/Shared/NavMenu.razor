@@ -19,19 +19,19 @@
             </AuthorizeView>
         </div>
 
-        <div class="nav">
+        <div class="nav gap-3">
             <AuthorizeView>
                 <Authorized>
-                    <MudButton Variant="Variant.Text" Href="/orders/manage">Zamówienia</MudButton>
                     <MudButton Href="/orders/checkout" StartIcon="@Icons.Material.Filled.ShoppingCart">Koszyk</MudButton>
-                    <MudButton Variant="Variant.Text" Href="/clients/settings">Ustawienia</MudButton>
+                    <MudButton StartIcon="@Icons.Material.Filled.ShoppingBag" Variant="Variant.Text" Href="/orders">Zamówienia</MudButton>
+                    <MudButton StartIcon="@Icons.Material.Filled.Settings" Variant="Variant.Text" Href="/clients/settings">Ustawienia</MudButton>
                 </Authorized>
             </AuthorizeView>
             <AuthorizeView >
                 <Authorized>
                     <div>
                         <b>@Email</b>
-                        <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="users/logout">Wyloguj</MudButton>
+                        <MudButton Class="ml-2" Variant="Variant.Filled" Color="Color.Primary" Href="users/logout">Wyloguj</MudButton>
                     </div>
                 </Authorized>
                 <NotAuthorized>

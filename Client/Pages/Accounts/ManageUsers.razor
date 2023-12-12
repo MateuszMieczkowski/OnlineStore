@@ -1,52 +1,58 @@
 ﻿@page "/accounts/manage"
 @using OnlineStore.Shared.Accounts
 @using OnlineStore.Shared.Infrastructure
+@using OnlineStore.Client.Extensions
+@inject NavigationManager NavigationManager 
 @inject IAccountService AccountService
 @attribute [Authorize(Roles = "Admin")]
 
 <MudContainer>
-    
-<h3>Lista użytkowników</h3>
-<a class="btn btn-primary mb-2" href="/accounts/register">Dodaj nowego administratotra</a>
 
-@if (items.Any())
-{
-    <table class="table">
-        <thead>
-        <tr>
-            <th>Email</th>
-            <th>Akcje</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (var user in items)
-        {
-            <tr>
-                <td>@user.Email</td>
-                <td>
-                </td>
-            </tr>
-        }
-        </tbody>
-    </table>
-}
-else
-{
-    <p>Brak użytkowników.</p>
-}
+    <h3>Lista użytkowników</h3>
+    <MudButton Href="/accounts/register" Color="Color.Secondary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.SupervisedUserCircle">Dodaj nowego administratora</MudButton>
 
-@code {
-    private IReadOnlyCollection<UserDto> items = new List<UserDto>();
-    private PagedResult<UserDto> userListResponse;
-
-    private int PageSize { get; set; } = 20;
-
-    private int PageNumber { get; set; } = 1;
-
-    protected override async Task OnInitializedAsync()
+    @if (items.Any())
     {
-        var userListDto = await AccountService.GetUserList(PageNumber, PageSize);
-        items = userListDto.Items;
+        <MudTable Class="mt-2" Items="@items" Hover="true" LoadingProgressColor="Color.Info">
+            <HeaderContent>
+                <MudTh>ID</MudTh>
+                <MudTh>Email</MudTh>
+                <MudTh>Rola</MudTh>
+                <MudTh>Akcje</MudTh>
+            </HeaderContent>
+            <RowTemplate Context="item">
+                <MudTd>@item.Id</MudTd>
+                <MudTd>@item.Email</MudTd>
+                <MudTd>@EnumHelper.GetDescription(item.Role)</MudTd>
+                <MudTd>
+                    <AuthorizeView Roles="Admin">
+                        <MudMenu Icon="@Icons.Material.Filled.MoreVert" ActivationEvent="@MouseEvent.MouseOver" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight">
+                            <MudMenuItem Icon="@Icons.Material.Filled.ShoppingBag" OnClick="@(() => NavigationManager.NavigateTo($"/orders?clientId={item.Id}"))">Zamówienia</MudMenuItem>
+                        </MudMenu>
+                    </AuthorizeView>
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
     }
-}
+    else
+    {
+        <p>Brak użytkowników.</p>
+    }
+
+    @code {
+        private IReadOnlyCollection<UserDto> items = new List<UserDto>();
+        private PagedResult<UserDto> userListResponse;
+
+        private int PageSize { get; set; } = 20;
+
+        private int PageNumber { get; set; } = 1;
+
+        protected override async Task OnInitializedAsync()
+        {
+            var userListDto = await AccountService.GetUserList(PageNumber, PageSize);
+            items = userListDto.Items;
+        }
+
+    }
+
 </MudContainer>

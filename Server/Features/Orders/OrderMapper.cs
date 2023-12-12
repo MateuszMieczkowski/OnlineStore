@@ -12,9 +12,11 @@ public static class OrderMapper
 			Id: order.Id,
 			TotalNet: order.TotalNet,
 			TotalGross: order.TotalGross,
-			Status: (OrderStatusDto)order.Status,
 			ClientId: order.ClientId,
-			CreatedDate: order.CreatedDate,
-			ModifiedDate: order.ModifiedDate);
+			CreatedDate: order.CreatedDate)
+		{
+			ModifiedDate = order.ModifiedDate,
+			Status = (OrderStatusDto)order.Status
+		};
 	}
 }

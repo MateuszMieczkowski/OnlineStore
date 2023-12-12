@@ -24,18 +24,16 @@ namespace OnlineStore.Server.Controllers
 		{
 			await _mediator.Send(command);
 
-			return Created("/orders", null);
+			return Created("/orders", command.CreatedId);
 		}
 
 		[HttpGet]
-		[Authorize(Roles = UserRoles.User)]
 		public async Task<PagedResult<OrderListItemDto>> GetOrders([FromQuery] GetOrders query)
 		{
 			return await _mediator.Send(query);
 		}
 
 		[HttpGet("{id:int}")]
-		[Authorize]
 		public async Task<OrderDto> GetOrder([FromRoute] int id)
 		{
 			return await _mediator.Send(new GetOrder(id));

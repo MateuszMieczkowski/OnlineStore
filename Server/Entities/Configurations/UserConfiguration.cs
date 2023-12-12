@@ -9,6 +9,12 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
     {
         builder.HasKey(e => e.Id);
 
+        builder.HasMany(e => e.Orders)
+            .WithOne(e => e.User)
+            .HasForeignKey(e => e.ClientId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Cascade);
+        
         builder.Property(e => e.Email)
             .IsRequired()
             .HasMaxLength(255);

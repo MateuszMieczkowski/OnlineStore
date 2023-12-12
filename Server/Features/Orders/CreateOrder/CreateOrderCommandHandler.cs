@@ -28,7 +28,7 @@ public class CreateOrderCommandHandler : ICommandHandler<Shared.Orders.CreateOrd
     public async Task Handle(Shared.Orders.CreateOrder request, CancellationToken cancellationToken)
     {
         var userId = _loggedUserService.GetUserId();
-        var client = await _dbContext.Clients
+        var client = await _dbContext.Users
             .FirstAsync(x => x.Id == userId, cancellationToken);
 
         var requestProductIds = request.Items.Select(x => x.ProductId);
@@ -65,7 +65,7 @@ public class CreateOrderCommandHandler : ICommandHandler<Shared.Orders.CreateOrd
         var order = new Order
         {
             ClientId = userId,
-            Client = client,
+            User = client,
             Address = orderAddress,
             OrderAddressId = orderAddress.Id,
             Status = OrderStatus.Created,
@@ -78,11 +78,13 @@ public class CreateOrderCommandHandler : ICommandHandler<Shared.Orders.CreateOrd
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         var orderCreatedEmail = new OrderCreatedSummaryEmail(
-            order,
-            client.Email,
-            client.FirstName,
-            client.LastName);
+            order: order,
+            recipientEmail: client.Email,
+            recipientName: client.FullName,
+            senderEmail: null);
 
         await _emailService.SendEmailFromDefinitionAsync(orderCreatedEmail, cancellationToken);
+
+        request.CreatedId = order.Id;
     }
 }

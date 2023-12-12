@@ -47,7 +47,7 @@
     <h2>Dane dostawy</h2>
     <MudPaper Elevation="3" Class="p-4">
         <MudGrid>
-            <AddressForm OnAddressChanged="@((x) => _cartModel.AddressId = x ?? 0)" IsReadonly="true"/>
+            <AddressForm OnAddressChanged="@(x => _cartModel.AddressId = x ?? 0)" IsReadonly="true"/>
         </MudGrid>
         <div class="mt-5 text-right">
             <MudButton EndIcon="@Icons.Material.Filled.ShoppingCartCheckout" Variant="Variant.Filled" Color="Color.Primary" OnClick="@PlaceOrder">Złóż zamówienie</MudButton>
@@ -84,9 +84,10 @@
     {
         try
         {
-            // await OrderService.CreateOrder(_cartModel); TODO uncomment it when backend will be implemented
+            var orderId = await OrderService.CreateOrder(_cartModel);
+            await ShoppingCartService.ClearCart();
             Snackbar.Add("Złożono zamówienie", Severity.Success);
-            NavigationManager.NavigateTo("/orders/{id:int}?showConfirmation=true"); // TOOD
+            NavigationManager.NavigateTo($"/orders/{orderId}?showConfirmation=true");
         }
         catch (Exception ex)
         {
