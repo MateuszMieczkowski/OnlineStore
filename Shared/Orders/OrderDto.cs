@@ -13,4 +13,4 @@ public record OrderDto(
     OrderAddressDto OrderAddress,
     IReadOnlyCollection<OrderItemDto> Items);
 
-public record OrderItemDto(int Id, decimal PriceNet, decimal PriceGross, int Quantity, int ProductId);
+public record OrderItemDto(int Id, decimal PriceNet, decimal PriceGross, int Quantity, int ProductId, string? ProductName = null, string? ProductThumbnailUri = null);
