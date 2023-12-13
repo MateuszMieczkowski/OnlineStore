@@ -2,7 +2,6 @@
 @using OnlineStore.Shared.Products
 @using OnlineStore.Client.Components.Orders
 @inject IProductService ProductService
-@inject IJSRuntime JsRuntime
 
 @if (_product is null)
 {
@@ -116,7 +115,7 @@ else
                 </div>
 
                 <div class="mt-4">
-                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="NavigateBack">Powrót</MudButton>
+                    <BackButton/>
                 </div>
             </MudCardContent>
         </MudCard>
@@ -132,10 +131,5 @@ else
     protected override async Task OnInitializedAsync()
     {
         _product = await ProductService.GetProductById(Id);
-    }
-
-    private async Task NavigateBack()
-    {
-        await JsRuntime.InvokeVoidAsync("history.back");
     }
 }

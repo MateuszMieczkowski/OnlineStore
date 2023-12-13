@@ -1,0 +1,12 @@
+@inject IJSRuntime JsRuntime 
+
+<MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="NavigateBack">Powrót</MudButton>
+
+@code {
+
+    private async Task NavigateBack()
+    {
+        await JsRuntime.InvokeVoidAsync("history.back");
+    }
+
+}

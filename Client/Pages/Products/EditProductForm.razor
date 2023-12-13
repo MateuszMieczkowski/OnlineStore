@@ -73,18 +73,6 @@
 
         try
         {
-            // var isValidate = true;
-            //     if (!editContext.Validate())
-            //     {
-            //         isValidate = false;
-            //     }
-            // if (!isValidate)
-            // {
-            //     throw new Exception("Popraw formularz");
-            // }
-            //
-            // StateHasChanged();
-            
             await ProductService.Update(Id, _product);
             Snackbar.Add("Zaktualizowano produkt", Severity.Success);
             await GoBack();

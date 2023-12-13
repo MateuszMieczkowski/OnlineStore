@@ -1,6 +1,7 @@
 @using OnlineStore.Shared.Products
 @using OnlineStore.Client.Providers
 @using OnlineStore.Client.Models.Orders
+@using OnlineStore.Client.Shared
 @inject NavigationManager NavigationManager
 @inject ICallContext CallContext
 @inject IShoppingCartService ShoppingCartService
@@ -39,7 +40,7 @@
         }
         
         await AddToCart(item);
-        NavigationManager.NavigateTo("/orders/checkout");
+        NavigationManager.NavigateTo(@NavPaths.OrderCheckout);
     }
     
     private async Task<bool> ValidateCartAction()

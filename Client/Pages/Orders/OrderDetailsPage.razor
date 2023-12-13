@@ -1,8 +1,6 @@
 @page "/orders/{id:int}"
 @using OnlineStore.Shared.Orders
 @inject IOrderService OrderService
-@inject NavigationManager NavigationManager
-@inject IJSRuntime JsRuntime
 
 @if (_order == null)
 {
@@ -36,7 +34,7 @@
            <div>@_order.OrderAddress.Street, @_order.OrderAddress.City, @_order.OrderAddress.PostalCode</div>
        </div>
 
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="GoBack">Powrót do poprzedniej strony</MudButton>
+        <BackButton/>
     </MudPaper>
 </MudContainer>
 
@@ -53,10 +51,5 @@
     protected override async Task OnInitializedAsync()
     {
         _order = await OrderService.GetOrder(Id);
-    }
-
-    private async Task GoBack()
-    {
-        await JsRuntime.InvokeVoidAsync("history.back");
     }
 }
