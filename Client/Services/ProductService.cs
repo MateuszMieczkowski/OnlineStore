@@ -7,14 +7,7 @@ namespace OnlineStore.Client.Services;
 
 public interface IProductService
 {
-    Task<PagedResult<ProductListItemDto>> GetProductList(
-        int pageNumber = 1,
-        int pageSize = 50,
-        bool hiddenOnly = false,
-        bool deletedOnly = false,
-        string? searchPhrase = null,
-        decimal? priceGrossFrom = null,
-        decimal? priceGrossTo = null);
+    Task<PagedResult<ProductListItemDto>> GetProductList(int pageNumber, int pageSize, ProductFilterModel filter);
 
     Task<ProductDto> GetProductById(int id);
 
@@ -39,22 +32,23 @@ public class ProductService : IProductService
     }
 
     public async Task<PagedResult<ProductListItemDto>> GetProductList(
-        int pageNumber = 1,
-        int pageSize = 50,
-        bool includeHidden = false,
-        bool onlyDeleted = false,
-        string? searchPhrase = null,
-        decimal? priceGrossFrom = null,
-        decimal? priceGrossTo = null)
+        int pageNumber,
+        int pageSize,
+        ProductFilterModel filter)
     {
         var query = new GetProductList(
             PageNumber: pageNumber,
             PageSize: pageSize,
-            DeletedOnly: onlyDeleted,
-            HiddenOnly: includeHidden,
-            SearchPhrase: searchPhrase,
-            PriceGrossFrom: priceGrossFrom,
-            PriceGrossTo: priceGrossTo);
+            DeletedOnly: filter.DeletedOnly,
+            HiddenOnly: filter.HiddenOnly,
+            SearchPhrase: filter.SearchPhrase,
+            Name: filter.Name,
+            ReferenceNumber: filter.ReferenceNumber,
+            ShortDescription: filter.ShortDescription,
+            FilterGrossPrice: filter.FilterGrossPrice,
+            PriceFrom: filter.MinPrice,
+            PriceTo: filter.MaxPrice);
+        
         return await _broker.GetProductsAsync(query);
     }
 

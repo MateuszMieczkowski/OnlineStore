@@ -27,15 +27,10 @@ public class GetProductsListQueryHandler : IQueryHandler<Shared.Products.GetProd
     public async Task<PagedResult<ProductListItemDto>> Handle(Shared.Products.GetProductList query, CancellationToken cancellationToken)
     {
         
-        bool isAdmin = _loggedUserService.GetUserRole() == UserRoles.Admin;
+        var isAdmin = _loggedUserService.GetUserRole() == UserRoles.Admin;
         
         var dbQueryBase = _dbContext.Products
             .AsNoTracking();
-        
-        if (!isAdmin)
-        {
-            dbQueryBase = dbQueryBase.Where(x => !x.IsHidden && !x.IsDeleted);
-        }
         
         if (query is { DeletedOnly: true, HiddenOnly: false } && isAdmin)
         {
@@ -45,6 +40,11 @@ public class GetProductsListQueryHandler : IQueryHandler<Shared.Products.GetProd
         if (query is { HiddenOnly: true, DeletedOnly: false } && isAdmin)
         {
             dbQueryBase = dbQueryBase.Where(x => x.IsHidden);
+        }
+
+        if (query is { HiddenOnly: false, DeletedOnly: false } || !isAdmin)
+        {
+            dbQueryBase = dbQueryBase.Where(x => !x.IsHidden && !x.IsDeleted);
         }
         
         if (!string.IsNullOrWhiteSpace(query.SearchPhrase))
@@ -56,14 +56,29 @@ public class GetProductsListQueryHandler : IQueryHandler<Shared.Products.GetProd
                 || x.Description!.Contains(searchPhrase));
         }
 
-        if (query.PriceGrossFrom.HasValue)
+        if (!string.IsNullOrWhiteSpace(query.Name))
         {
-            dbQueryBase = dbQueryBase.Where(x => x.PriceGross >= query.PriceGrossFrom);
+            dbQueryBase = dbQueryBase.Where(x => x.Name.Contains(query.Name));
+        }
+        
+        if (!string.IsNullOrWhiteSpace(query.ReferenceNumber))
+        {
+            dbQueryBase = dbQueryBase.Where(x => x.ReferenceNumber.Contains(query.ReferenceNumber));
+        }
+        
+        if (!string.IsNullOrWhiteSpace(query.ShortDescription))
+        {
+            dbQueryBase = dbQueryBase.Where(x => x.ShortDescription!.Contains(query.ShortDescription));
+        }
+        
+        if (query.PriceFrom.HasValue)
+        {
+            dbQueryBase = query.FilterGrossPrice ? dbQueryBase.Where(x => x.PriceGross >= query.PriceFrom) : dbQueryBase.Where(x => x.PriceNet >= query.PriceFrom);
         }
 
-        if (query.PriceGrossTo.HasValue)
+        if (query.PriceTo.HasValue)
         {
-            dbQueryBase = dbQueryBase.Where(x => x.PriceGross <= query.PriceGrossTo);
+            dbQueryBase = query.FilterGrossPrice ? dbQueryBase.Where(x => x.PriceGross <= query.PriceTo) : dbQueryBase.Where(x => x.PriceNet <= query.PriceTo);
         }
         
         var result = await _resultPaginator.GetPagedResult(dbQueryBase, query, x => x.ToListItemDto(), cancellationToken);

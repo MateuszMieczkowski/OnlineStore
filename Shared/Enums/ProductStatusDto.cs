@@ -10,4 +10,6 @@ public enum ProductStatusDto
     Hidden = 2,
     [Description("W koszu")]
     Deleted = 3,
+    [Description("Trwale usunięty")]
+    HardDeleted = 4,
 }

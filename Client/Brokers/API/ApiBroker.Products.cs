@@ -1,4 +1,5 @@
-﻿using OnlineStore.Shared.Infrastructure;
+﻿using System.Text;
+using OnlineStore.Shared.Infrastructure;
 using OnlineStore.Shared.Products;
 
 namespace OnlineStore.Client.Brokers.API;
@@ -9,11 +10,19 @@ public partial class ApiBroker
 
     public async Task<PagedResult<ProductListItemDto>> GetProductsAsync(GetProductList query)
     {
-        var queryParams = $"?pageNumber={query.PageNumber}&pageSize={query.PageSize}&hiddenOnly={query.HiddenOnly}&deletedOnly={query.DeletedOnly}";
-        if (query.SearchPhrase != null)
-        {
-            queryParams += $"&searchPhrase={query.SearchPhrase}";
-        }
+        var queryParams = new StringBuilder()
+            .Append($"?pageNumber={query.PageNumber}")
+            .Append($"&pageSize={query.PageSize}")
+            .Append($"&searchPhrase={query.SearchPhrase}")
+            .Append($"&name={query.Name}")
+            .Append($"&referenceNumber={query.ReferenceNumber}")
+            .Append($"&shortDescription={query.ShortDescription}")
+            .Append($"&filterGrossPrice={query.FilterGrossPrice}")
+            .Append($"&priceFrom={query.PriceFrom}")
+            .Append($"&priceTo={query.PriceTo}")
+            .Append($"&hiddenOnly={query.HiddenOnly}")
+            .Append($"&deletedOnly={query.DeletedOnly}")
+            .ToString();
         
         return await GetAsync<PagedResult<ProductListItemDto>>($"{ProductRelativeUrl}{queryParams}");
     }

@@ -1,6 +1,7 @@
 ﻿@page "/"
 @using Blazored.LocalStorage
 @using OnlineStore.Client.Components.Orders
+@using OnlineStore.Client.Products.Models
 @using OnlineStore.Shared.Clients
 @using OnlineStore.Shared.Enums
 @using OnlineStore.Shared.Products
@@ -11,7 +12,7 @@
 <PageTitle>Dostępne produkty</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.ExtraLarge">
-    <ProductsFilter OnSearchStringChanged="@GetProducts"/>
+    <ProductsFilter OnFilterChanged="@GetProducts"/>
 
     @if (_isLoading)
     {
@@ -86,11 +87,11 @@
         await GetProducts();
     }
 
-    private async Task GetProducts(string? filter = null)
+    private async Task GetProducts(ProductFilterModel? filter = null)
     {
         _isLoading = true;
 
-        var response = await ProductService.GetProductList(_pageNumber, _pageSize, searchPhrase: filter);
+        var response = await ProductService.GetProductList(_pageNumber, _pageSize, filter ?? new ProductFilterModel());
         _products = response.Items;
         _pageCount = response.TotalPages;
         _isLoading = false;

@@ -9,8 +9,12 @@ public record GetProductList(
     bool DeletedOnly = false,
     bool HiddenOnly = false,
     string? SearchPhrase = null,
-    decimal? PriceGrossFrom = null,
-    decimal? PriceGrossTo = null) : IPagedQuery<ProductListItemDto>;
+    string? Name = null,
+    string? ReferenceNumber = null,
+    string? ShortDescription = null,
+    bool FilterGrossPrice = true,
+    decimal? PriceFrom = null,
+    decimal? PriceTo = null) : IPagedQuery<ProductListItemDto>;
 
 
 public record ProductListItemDto(
