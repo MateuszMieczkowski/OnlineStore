@@ -13,8 +13,8 @@
             <AuthorizeView Roles="Admin">
                 <Authorized>
                     <MudButton StartIcon="@Icons.Material.Outlined.Add" href="@NavPaths.ProductsCreate">Dodaj produkt</MudButton>
-                    <MudButton StartIcon="@Icons.Material.Filled.ListAlt" Href="@NavPaths.ProductsManage">Zarządzanie produktami</MudButton>
-                    <MudButton StartIcon="@Icons.Material.Filled.SupervisorAccount" Href="@NavPaths.UsersManage">Zarządzanie użytkownikami</MudButton>
+                    <MudButton StartIcon="@Icons.Material.Filled.ListAlt" Href="@NavPaths.ProductsManage">Produkty</MudButton>
+                    <MudButton StartIcon="@Icons.Material.Filled.SupervisorAccount" Href="@NavPaths.UsersManage">Użytkownicy</MudButton>
                 </Authorized>
             </AuthorizeView>
         </div>
@@ -22,7 +22,7 @@
         <div class="nav gap-3">
             <AuthorizeView>
                 <Authorized>
-                    <MudButton Href="/orders/checkout" StartIcon="@Icons.Material.Filled.ShoppingCart">Koszyk</MudButton>
+                    <MudButton Href="@NavPaths.OrderCheckout" StartIcon="@Icons.Material.Filled.ShoppingCart">Koszyk</MudButton>
                     <MudButton StartIcon="@Icons.Material.Filled.ShoppingBag" Href="@NavPaths.OrderManage">Zamówienia</MudButton>
                     <MudButton StartIcon="@Icons.Material.Filled.Settings" Href="@NavPaths.UsersSettings">Ustawienia</MudButton>
                 </Authorized>
