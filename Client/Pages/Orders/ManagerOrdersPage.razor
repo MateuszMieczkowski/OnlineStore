@@ -5,9 +5,10 @@
 @using OnlineStore.Shared.Enums
 @using Blazored.LocalStorage
 @using OnlineStore.Client.Providers
+@using OnlineStore.Client.Shared
 @using OnlineStore.Shared.Orders
 @inject ICallContext CallContext
-@inject IJSRuntime JsRuntime
+@inject IShoppingCartService ShoppingCartService
 @inject ILocalStorageService LocalStorage
 @inject IOrderService OrderService
 @inject ISnackbar Snackbar
@@ -15,16 +16,19 @@
 <PageTitle>Zarządzanie produktami</PageTitle>
 
 <MudContainer>
+    <h3>Lista zamówień</h3>
+    
     @if (ClientId != null)
     {
-        <h2>Zamówienia użytkownika z ID: @ClientId</h2>
+        <h2>Zamówienia użytkownika - ID: @ClientId</h2>
         <div class="m-2">
-            <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="NavigateBack">Powrót do zamówień</MudButton>
+            <BackButton/>
         </div>
     }
     <MudTable Items="@_orders" Hover="true" Loading="@_isLoading" LoadingProgressColor="Color.Info">
         <HeaderContent>
             <MudTh>Nr. zamówienia</MudTh>
+            <MudTh>Klient</MudTh>
             <MudTh>Cena netto</MudTh>
             <MudTh>Cena brutto</MudTh>
             <MudTh>Status</MudTh>
@@ -34,6 +38,7 @@
         </HeaderContent>
         <RowTemplate Context="item">
             <MudTd>@item.Id</MudTd>
+            <MudTd>@item.ClientId (zamienić na email)</MudTd>
             <MudTd>@item.TotalNet</MudTd>
             <MudTd>@item.TotalGross</MudTd>
             <MudTd>@EnumHelper.GetDescription(item.Status)</MudTd>
@@ -44,10 +49,10 @@
                     <Authorized>
                         <MudButtonGroup Variant="Variant.Outlined" Color="Color.Secondary">
                             <MudMenu Icon="@Icons.Material.Filled.MoreVert" ActivationEvent="@MouseEvent.MouseOver" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight">
-                                <MudMenuItem Icon="@Icons.Material.Filled.Info" OnClick="@(() => NavigationManager.NavigateTo($"/orders/{item.Id}"))">Szczegóły</MudMenuItem>
+                                <MudMenuItem Icon="@Icons.Material.Filled.Info" OnClick="@(() => NavigationManager.NavigateTo($"{NavPaths.OrderManage}/{item.Id}"))">Szczegóły</MudMenuItem>
                                 @if (item.ClientId == _clientId)
                                 {
-                                    <MudMenuItem Icon="@Icons.Material.Filled.ShoppingCartCheckout" OnClick="@(() => NavigationManager.NavigateTo($"/orders/{item.Id}"))">Zamów ponownie</MudMenuItem>
+                                    <MudMenuItem Icon="@Icons.Material.Filled.ShoppingCartCheckout" OnClick="@(() => Reorder(item.Id))">Zamów ponownie</MudMenuItem>
                                 }
                             </MudMenu>
                         </MudButtonGroup>
@@ -57,10 +62,10 @@
                     <Authorized>
                         <MudButtonGroup Variant="Variant.Outlined" Color="Color.Secondary">
                             <MudMenu Icon="@Icons.Material.Filled.MoreVert" ActivationEvent="@MouseEvent.MouseOver" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight">
-                                <MudMenuItem Icon="@Icons.Material.Filled.Info" OnClick="@(() => NavigationManager.NavigateTo($"/orders/{item.Id}"))">Szczegóły</MudMenuItem>
+                                <MudMenuItem Icon="@Icons.Material.Filled.Info" OnClick="@(() => NavigationManager.NavigateTo($"{NavPaths.OrderManage}/{item.Id}"))">Szczegóły</MudMenuItem>
                                 @if (item.ClientId == _clientId)
                                 {
-                                    <MudMenuItem Icon="@Icons.Material.Filled.ShoppingCartCheckout" OnClick="@(() => NavigationManager.NavigateTo($"/orders/{item.Id}"))">Zamów ponownie</MudMenuItem>
+                                    <MudMenuItem Icon="@Icons.Material.Filled.ShoppingCartCheckout" OnClick="@(() => Reorder(item.Id))">Zamów ponownie</MudMenuItem>
                                 }
                                 <MudMenuItem Icon="@Icons.Material.Filled.LocalShipping" OnClick="@(() => ExecuteAction(item, OrderStatusDto.Processing))">Realizuj</MudMenuItem>
                                 <MudMenuItem Icon="@Icons.Material.Filled.DoneOutline" OnClick="@(() => ExecuteAction(item, OrderStatusDto.Completed))">Zrealizuj</MudMenuItem>
@@ -126,9 +131,11 @@
         Snackbar.Add("Zaktualizowano stan zamówienia i wysłano powierdzenie!");
     }
     
-    private async Task NavigateBack()
+    private async Task Reorder(int orderId)
     {
-        await JsRuntime.InvokeVoidAsync("history.back");
+        await ShoppingCartService.Reorder(orderId);
+        Snackbar.Add("Dodano do koszyka pozycje z zamówienia!");
+        NavigationManager.NavigateTo("/orders/checkout");
     }
 }
 

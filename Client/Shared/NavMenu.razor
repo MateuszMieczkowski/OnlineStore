@@ -12,9 +12,9 @@
         <div class="nav" style="margin-right: auto;">
             <AuthorizeView Roles="Admin">
                 <Authorized>
-                    <MudButton StartIcon="@Icons.Material.Outlined.Add" href="create">Dodaj produkt</MudButton>
-                    <MudButton Variant="Variant.Text" Href="/configuration">Zarządzanie produktami</MudButton>
-                    <MudButton Variant="Variant.Text" Href="/accounts/manage">Zarządzanie użytkownikami</MudButton>
+                    <MudButton StartIcon="@Icons.Material.Outlined.Add" href="@NavPaths.ProductsCreate">Dodaj produkt</MudButton>
+                    <MudButton StartIcon="@Icons.Material.Filled.ListAlt" Href="@NavPaths.ProductsManage">Produkty</MudButton>
+                    <MudButton StartIcon="@Icons.Material.Filled.SupervisorAccount" Href="@NavPaths.UsersManage">Użytkownicy</MudButton>
                 </Authorized>
             </AuthorizeView>
         </div>
@@ -22,22 +22,22 @@
         <div class="nav gap-3">
             <AuthorizeView>
                 <Authorized>
-                    <MudButton Href="/orders/checkout" StartIcon="@Icons.Material.Filled.ShoppingCart">Koszyk</MudButton>
-                    <MudButton StartIcon="@Icons.Material.Filled.ShoppingBag" Variant="Variant.Text" Href="/orders">Zamówienia</MudButton>
-                    <MudButton StartIcon="@Icons.Material.Filled.Settings" Variant="Variant.Text" Href="/clients/settings">Ustawienia</MudButton>
+                    <MudButton Href="@NavPaths.OrderCheckout" StartIcon="@Icons.Material.Filled.ShoppingCart">Koszyk</MudButton>
+                    <MudButton StartIcon="@Icons.Material.Filled.ShoppingBag" Href="@NavPaths.OrderManage">Zamówienia</MudButton>
+                    <MudButton StartIcon="@Icons.Material.Filled.Settings" Href="@NavPaths.UsersSettings">Ustawienia</MudButton>
                 </Authorized>
             </AuthorizeView>
             <AuthorizeView >
                 <Authorized>
                     <div>
                         <b>@Email</b>
-                        <MudButton Class="ml-2" Variant="Variant.Filled" Color="Color.Primary" Href="users/logout">Wyloguj</MudButton>
+                        <MudButton Class="ml-2" Variant="Variant.Filled" Color="Color.Primary" Href="@NavPaths.UsersLogout">Wyloguj</MudButton>
                     </div>
                 </Authorized>
                 <NotAuthorized>
                     <div>
-                        <MudButton Class="mr-2" Variant="Variant.Filled" Color="Color.Primary" Href="clients/register">Rejestracja</MudButton>
-                        <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="users/login">Zaloguj</MudButton>
+                        <MudButton Class="mr-2" Variant="Variant.Filled" Color="Color.Primary" Href="@NavPaths.UsersRegister">Rejestracja</MudButton>
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="@NavPaths.UsersLogin">Zaloguj</MudButton>
                     </div>
                 </NotAuthorized>
             </AuthorizeView>

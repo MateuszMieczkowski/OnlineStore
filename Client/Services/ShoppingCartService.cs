@@ -12,15 +12,19 @@ public interface IShoppingCartService
     Task RemoveFromCart(int productId);
     
     Task ClearCart();
+
+    Task Reorder(int orderId);
 }
 
 public class ShoppingCartService : IShoppingCartService
 {
     private readonly ILocalStorageService _localStorageService;
+    private readonly IOrderService _orderService;
 
-    public ShoppingCartService(ILocalStorageService localStorageService)
+    public ShoppingCartService(ILocalStorageService localStorageService, IOrderService orderService)
     {
         _localStorageService = localStorageService ?? throw new ArgumentNullException(nameof(localStorageService));
+        _orderService = orderService ?? throw new ArgumentNullException(nameof(orderService));
     }
 
     public async Task<CartModel> GetCart()
@@ -60,6 +64,21 @@ public class ShoppingCartService : IShoppingCartService
     public async Task ClearCart()
     {
         await _localStorageService.RemoveItemAsync(LocalStorageKeys.Cart);
+    }
+
+    public async Task Reorder(int orderId)
+    {
+        var order = await _orderService.GetOrder(orderId);
+        var cartItems = order.Items.Select(x => new CartItemModel
+        {
+            Count = x.Quantity,
+            Name = x.ProductName ?? string.Empty,
+            ThumbnailUri = x.ProductThumbnailUri ?? string.Empty,
+            ProductId = x.ProductId
+        }).ToList();
+        
+        var cart = new CartModel { Items = cartItems };
+        await SetCart(cart);
     }
 
     private async Task SetCart(CartModel cart)

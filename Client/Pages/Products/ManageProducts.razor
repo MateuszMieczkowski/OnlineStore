@@ -13,7 +13,9 @@
 <PageTitle>Zarządzanie produktami</PageTitle>
 
 <MudContainer>
-    <MudText Class="mb-2" Typo="Typo.h4">@(ShowBin ? "Kosz" : "Zarządzanie produktami")</MudText>
+    <div class="mb-4">
+        <h3>@(ShowBin ? "Kosz" : "Zarządzanie produktami")</h3>
+    </div>
     <ProductsFilter ShowBin="@ShowBin" OnFilterChanged="@RefreshProducts"/>
     <MudTable Items="@products" Hover="true" Loading="@_isLoading" LoadingProgressColor="Color.Info">
         <HeaderContent>
@@ -74,9 +76,7 @@
 
 @code
 {
-    [Parameter]
-    [SupplyParameterFromQuery]
-    public bool ShowBin { get; set; }
+    [Parameter] [SupplyParameterFromQuery] public bool ShowBin { get; set; }
 
     private IReadOnlyCollection<ProductListItemDto> products = new List<ProductListItemDto>();
     private bool _isLoading;

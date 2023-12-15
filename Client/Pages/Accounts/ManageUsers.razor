@@ -2,6 +2,7 @@
 @using OnlineStore.Shared.Accounts
 @using OnlineStore.Shared.Infrastructure
 @using OnlineStore.Client.Extensions
+@using OnlineStore.Client.Shared
 @inject NavigationManager NavigationManager 
 @inject IAccountService AccountService
 @attribute [Authorize(Roles = "Admin")]
@@ -9,7 +10,7 @@
 <MudContainer>
 
     <h3>Lista użytkowników</h3>
-    <MudButton Href="/accounts/register" Color="Color.Secondary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.SupervisedUserCircle">Dodaj nowego administratora</MudButton>
+    <MudButton Href="@NavPaths.UsersRegister" Color="Color.Secondary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.SupervisedUserCircle">Dodaj nowego administratora</MudButton>
 
     @if (items.Any())
     {
@@ -27,7 +28,7 @@
                 <MudTd>
                     <AuthorizeView Roles="Admin">
                         <MudMenu Icon="@Icons.Material.Filled.MoreVert" ActivationEvent="@MouseEvent.MouseOver" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight">
-                            <MudMenuItem Icon="@Icons.Material.Filled.ShoppingBag" OnClick="@(() => NavigationManager.NavigateTo($"/orders?clientId={item.Id}"))">Zamówienia</MudMenuItem>
+                            <MudMenuItem Icon="@Icons.Material.Filled.ShoppingBag" OnClick="@(() => NavigationManager.NavigateTo($"{NavPaths.OrderManage}?clientId={item.Id}"))">Zamówienia</MudMenuItem>
                         </MudMenu>
                     </AuthorizeView>
                 </MudTd>
