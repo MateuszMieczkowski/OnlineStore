@@ -103,16 +103,15 @@ public class UpdateProductCommandHandler : ICommandHandler<Shared.Products.Updat
             return;
         }
 
-        if (updateProductFileDto.FileBase64 is null)
-        {
-            return;
-        }
-        
         productFile.FileName = updateProductFileDto.FileName;
         productFile.Description = updateProductFileDto.Description;
-        productFile.FileType = (ProductFileType)updateProductFileDto.ProductFileType;
-        productFile.BlobUri = await _blobStorage.UploadAsync(new BlobFileName(productFile.BlobId, productFile.FileName),
+        
+        if (updateProductFileDto.FileBase64 != null)
+        {
+            productFile.FileType = (ProductFileType)updateProductFileDto.ProductFileType;
+            productFile.BlobUri = await _blobStorage.UploadAsync(new BlobFileName(productFile.BlobId, productFile.FileName),
             updateProductFileDto.FileBase64, cancellationToken);
+        }
         
         if (productFile.FileType == ProductFileType.Thumbnail)
         {

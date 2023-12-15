@@ -7,8 +7,8 @@
 @inject IShoppingCartService ShoppingCartService
 @inject ISnackbar Snackbar
 
-<MudButton Variant="Variant.Text" Color="Color.Primary" StartIcon="@Icons.Material.Filled.AddShoppingCart" OnClick="@(() => AddToCart(Product))">Dodaj do koszyka</MudButton>
-<MudButton Variant="Variant.Text" Color="Color.Primary" StartIcon="@Icons.Material.Filled.ShoppingCartCheckout" OnClick="@(() => BuyNow(Product))">Kup teraz</MudButton>
+<MudButton Size="Size.Small" Variant="Variant.Text" Color="Color.Primary" StartIcon="@Icons.Material.Filled.AddShoppingCart" OnClick="@(() => AddToCart(Product))">Dodaj do koszyka</MudButton>
+<MudButton Size="Size.Small" Variant="Variant.Text" Color="Color.Primary" StartIcon="@Icons.Material.Filled.ShoppingCartCheckout" OnClick="@(() => BuyNow(Product))">Kup teraz</MudButton>
 
 @code {
     [Parameter]
