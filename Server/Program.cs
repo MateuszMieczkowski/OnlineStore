@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using NLog.Web;
 using OnlineStore.Server;
 using OnlineStore.Server.Authentication;
+using OnlineStore.Server.Controllers;
 using OnlineStore.Server.Entities;
 using OnlineStore.Server.Features.Accounts.RegisterUser;
 using OnlineStore.Server.Features.Accounts.Repositories;
@@ -16,6 +17,7 @@ using OnlineStore.Server.Features.Orders.CreateOrder;
 using OnlineStore.Server.Features.Products.CreateProduct;
 using OnlineStore.Server.Features.Products.Services;
 using OnlineStore.Server.Features.Products.UpdateProduct;
+using OnlineStore.Server.Features.ShoppingCart;
 using OnlineStore.Server.Infrastructure;
 using OnlineStore.Server.Jobs;
 using OnlineStore.Server.Middleware;
@@ -89,8 +91,10 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ITokenGenerator, TokenGenerator>();
 builder.Services.AddScoped<ITaxService, TaxService>();
 builder.Services.AddScoped<ILoggedUserService, LoggedUserService>();
-builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IShoppingCartCookieService, ShoppingCartService>();
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
+builder.Services.AddSession();
 builder.Services.AddMemoryCache();
 
 builder.Services.Configure<SmtpOptions>(builder.Configuration.GetSection("Smtp"));
@@ -108,8 +112,6 @@ builder.Services.AddCors(options =>
         p.AllowAnyMethod()
             .AllowAnyHeader()
             .AllowAnyOrigin()
-            // .WithOrigins(builder.Configuration["AllowedOrigins"],
-            //              builder.Configuration["ClientAddress"])
     );
 });
 
@@ -152,8 +154,9 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseAuthorization();
+app.UseSession();
 
+app.UseAuthorization();
 app.MapRazorPages();
 app.MapControllers();
 app.MapFallbackToFile("index.html");

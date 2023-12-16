@@ -61,7 +61,7 @@
     
     protected override async Task OnInitializedAsync()
     {
-        _cartModel = await ShoppingCartService.GetCart();
+        _cartModel = await ShoppingCartService.GetCartFromStorage();
     }
 
     private async Task ChangeItemCount(CartItemModel item, int count)

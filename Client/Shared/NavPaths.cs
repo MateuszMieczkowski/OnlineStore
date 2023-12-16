@@ -8,6 +8,7 @@ public static class NavPaths
     public const string UsersRegister = "/accounts/register";
     public const string UsersManage = "/accounts/manage";
     public const string UsersSettings = "/clients/settings";
+    public const string ClientsRegister = "/clients/register";
 
     #endregion
 

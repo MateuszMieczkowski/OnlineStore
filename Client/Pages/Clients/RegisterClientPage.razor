@@ -35,8 +35,6 @@
             <MudTextField Variant="Variant.Outlined" @bind-Value="RegisterClientDto.ConfirmPassword" Label="Potwierdź hasło" Placeholder="Wpisz" InputType="InputType.Password" For="@(() => RegisterClientDto.ConfirmPassword)"/>
         </div>
 
-        <MudCheckBox @bind-Checked="RegisterClientDto.IsSubscribedToNewsletter">Subskrybcja do newslettera</MudCheckBox>
-
         <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Zarejestruj</MudButton>
     </EditForm>
 </MudContainer>
