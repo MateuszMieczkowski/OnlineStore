@@ -39,22 +39,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Newsletter:</label>
-
-                        <MudRadioGroup @bind-SelectedOption="@Model.IsSubscribedToNewsLetter">
-                            <MudRadio Option="true" Color="Color.Secondary" Size="Size.Medium">Tak</MudRadio>
-                            <MudRadio Option="false" Color="Color.Secondary" Size="Size.Medium">Nie</MudRadio>
-                        </MudRadioGroup>
-                    </div>
-                    
-                    <div class="form-group">
-                        <MudNumericField @bind-Value="@Model.PageSize"
-                                                     For="@(() => @Model.PageSize)"
-                                                     Variant="Variant.Outlined"
-                                                     Min="1"
-                                                     Max="200"
-                                                     Step="1"
-                                                     Label="Liczba produktów na stronie:"/>
+                        <MudNumericField @bind-Value="@Model.PageSize" For="@(() => @Model.PageSize)" Variant="Variant.Outlined" Min="1" Max="200" Step="1" Label="Liczba produktów na stronie:"/>
                     </div>
 
                     <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Zapisz preferencje</MudButton>

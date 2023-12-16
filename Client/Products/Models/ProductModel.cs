@@ -11,9 +11,11 @@ public abstract class ProductModel<T> where T : ProductFileModel, new()
     [Required(ErrorMessage = "Numer referencyjny jest wymagany.")]
     public string ReferenceNumber { get; set; }
 
-    public string? ShortDescription { get; set; }
+    [Required(ErrorMessage = "Opis krótki jest wymagany.")]
+    public string ShortDescription { get; set; }
 
     [Required(ErrorMessage = "Opis szczegółowy jest wymagany.")]
+    [MaxLength(2000, ErrorMessage = "Opis może zawierać maksymalnie 2000 znaków.")]
     public string Description { get; set; }
 
     [Required(ErrorMessage = "Ilość jest wymagana.")]
@@ -28,9 +30,9 @@ public abstract class ProductModel<T> where T : ProductFileModel, new()
 
     [Required(ErrorMessage = "Stawka podatku jest wymagana.")]
     public TaxRateDto? TaxRate { get; set; }
-    
+
     [Required(ErrorMessage = "Miniaturka zdjęcia jest wymagana.")]
     public string ThumbnailImageSource { get; set; }
-    
+
     public ICollection<T> ProductFiles { get; set; } = new List<T>();
 }
