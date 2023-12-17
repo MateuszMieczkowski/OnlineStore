@@ -39,8 +39,8 @@
         <RowTemplate Context="item">
             <MudTd>@item.Id</MudTd>
             <MudTd>@item.ClientEmail</MudTd>
-            <MudTd>@item.TotalNet</MudTd>
-            <MudTd>@item.TotalGross</MudTd>
+            <MudTd>@item.TotalNet zł</MudTd>
+            <MudTd>@item.TotalGross zł</MudTd>
             <MudTd>@EnumHelper.GetDescription(item.Status)</MudTd>
             <MudTd>@item.CreatedDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</MudTd>
             <MudTd>@(item.ModifiedDate > DateTime.MinValue ? item.ModifiedDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm") : "-")</MudTd>
