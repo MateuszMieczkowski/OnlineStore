@@ -4,27 +4,26 @@
 @inject NavigationManager NavManager
 @inject ISnackbar Snackbar
 
-<div class="container p-5">
-    <MudItem>
-        <MudItem>
-            <EditForm Model="_authenticateUser" OnValidSubmit="HandleLogin">
-                <DataAnnotationsValidator></DataAnnotationsValidator>
-                <div class="form-group">
-                    <MudTextField Variant="Variant.Outlined" @bind-Value="_authenticateUser.Email" Label="E-mail" Placeholder="Wpisz" Type="InputType.Email" Class="mb-4" id="email" For="@(() => _authenticateUser.Email)"/>
-                </div>
-                <div class="form-group">
-                    <MudTextField Variant="Variant.Outlined" @bind-Value="_authenticateUser.Password" Label="Hasło" Placeholder="Wpisz" InputType="InputType.Password" Class="mb-4" id="password" For="@(() => _authenticateUser.Password)"/>
-                </div>
+<MudContainer MaxWidth="MaxWidth.Small">
+    <MudPaper Class="p-5" Elevation="5">
+        <MudText Typo="Typo.h5">Zaloguj się</MudText>
+        <EditForm Model="_authenticateUser" OnValidSubmit="HandleLogin">
+            <DataAnnotationsValidator></DataAnnotationsValidator>
+            <div class="form-group">
+                <MudTextField Variant="Variant.Outlined" @bind-Value="_authenticateUser.Email" Label="E-mail" Placeholder="Wpisz" Type="InputType.Email" Class="mb-4" id="email" For="@(() => _authenticateUser.Email)"/>
+            </div>
+            <div class="form-group">
+                <MudTextField Variant="Variant.Outlined" @bind-Value="_authenticateUser.Password" Label="Hasło" Placeholder="Wpisz" InputType="InputType.Password" Class="mb-4" id="password" For="@(() => _authenticateUser.Password)"/>
+            </div>
 
-                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Zaloguj</MudButton>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Zaloguj</MudButton>
 
-                <div class="form-group mt-4">
-                    <NavLink href="users/forgot-password">Nie pamiętasz hasła?</NavLink>
-                </div>
-            </EditForm>
-        </MudItem>
-    </MudItem>
-</div>
+            <div class="form-group mt-4">
+                <NavLink href="users/forgot-password">Nie pamiętasz hasła?</NavLink>
+            </div>
+        </EditForm>
+    </MudPaper>
+</MudContainer>
 
 @code
 {
