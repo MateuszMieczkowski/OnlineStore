@@ -10,4 +10,10 @@ public partial interface IApiBroker
     Task<PagedResult<OrderListItemDto>> GetOrdersAsync(GetOrders query);
     
     Task<OrderDto> GetOrderAsync(int id);
+    
+    Task CompleteOrderAsync(int id);
+    
+    Task CancelOrderAsync(int id);
+    
+    Task ProcessOrderAsync(int id);
 }

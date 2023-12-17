@@ -1,4 +1,6 @@
-﻿namespace OnlineStore.Server.Infrastructure;
+﻿using System.Linq.Expressions;
+
+namespace OnlineStore.Server.Infrastructure;
 
 public interface IRepository<T> where T : class
 {
@@ -23,4 +25,5 @@ public interface IRepository<T> where T : class
     Task<int> CountAsync(CancellationToken cancellationToken = default);
     
     Task<bool> AnyAsync(CancellationToken cancellationToken = default);
+    Task<bool> AnyAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default);
 }

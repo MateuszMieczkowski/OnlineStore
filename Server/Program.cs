@@ -13,9 +13,12 @@ using OnlineStore.Server.Features.Accounts.Repositories;
 using OnlineStore.Server.Features.Accounts.Services;
 using OnlineStore.Server.Features.Accounts.Strategies;
 using OnlineStore.Server.Features.Orders.CreateOrder;
+using OnlineStore.Server.Features.Orders.Repository;
 using OnlineStore.Server.Features.Products.CreateProduct;
+using OnlineStore.Server.Features.Products.Repository;
 using OnlineStore.Server.Features.Products.Services;
 using OnlineStore.Server.Features.Products.UpdateProduct;
+using OnlineStore.Server.Features.ShoppingCart;
 using OnlineStore.Server.Infrastructure;
 using OnlineStore.Server.Jobs;
 using OnlineStore.Server.Middleware;
@@ -86,12 +89,13 @@ builder.Services.AddScoped<IResultPaginator, ResultPaginator>();
 builder.Services.AddTransient<IUserFactory<RegisterAdmin>, AdminFactory>();
 builder.Services.AddTransient<IUserFactory<RegisterClient>, ClientFactory>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ITokenGenerator, TokenGenerator>();
 builder.Services.AddScoped<ITaxService, TaxService>();
 builder.Services.AddScoped<ILoggedUserService, LoggedUserService>();
 builder.Services.AddScoped<IShoppingCartCookieService, ShoppingCartService>();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddSession();
@@ -124,7 +128,7 @@ using (var scope = app.Services.CreateScope())
 {
     var dbSeeder = scope.ServiceProvider.GetRequiredService<StoreSeeder>();
     dbSeeder.Seed();
-
+    
     var templateSeeder = scope.ServiceProvider.GetRequiredService<EmailTemplateSeeder>();
     await templateSeeder.SeedAsync();
 }

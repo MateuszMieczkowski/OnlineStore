@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OnlineStore.Server.Entities;
 using OnlineStore.Server.Enums;
+using OnlineStore.Server.Features.Products.Repository;
 using OnlineStore.Server.Features.Products.Services;
 using OnlineStore.Server.Infrastructure;
 using OnlineStore.Server.Services.Exceptions;
@@ -10,34 +11,33 @@ namespace OnlineStore.Server.Features.Products.CreateProduct;
 
 public class CreateProductsBatchCommandHandler : ICommandHandler<CreateProductsBatch>
 {
-    private readonly OnlineStoreDbContext _dbContext;
     private readonly ITaxService _taxService;
     private readonly IBlobStorage _blobStorage;
-
+    private readonly IProductRepository _productRepository;
     public CreateProductsBatchCommandHandler(
-        OnlineStoreDbContext dbContext,
         ITaxService taxService,
-        IBlobStorage blobStorage)
+        IBlobStorage blobStorage, IProductRepository productRepository)
     {
-        _dbContext = dbContext;
         _taxService = taxService;
         _blobStorage = blobStorage;
+        _productRepository = productRepository;
     }
 
     public async Task Handle(CreateProductsBatch command, CancellationToken cancellationToken)
     {
-        var taxRates = await _dbContext.TaxRates
-            .ToListAsync(cancellationToken);
+        var taxRates = await _productRepository.GetTaxRatesAsync(cancellationToken);
         
         await ValidateReferenceNumbers(command, cancellationToken);
 
+        var newProducts = new List<Product>();
+        var taxRatesArr = taxRates as TaxRate[] ?? taxRates.ToArray();
         foreach (var productDto in command.Products)
         {
-            var newProduct = await CreateProductAsync(productDto, taxRates, cancellationToken);
-            _dbContext.Add(newProduct);
+            var newProduct = await CreateProductAsync(productDto, taxRatesArr, cancellationToken);
+            newProducts.Add(newProduct);
         }
 
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await _productRepository.AddRangeAsync(newProducts, cancellationToken);
     }
 
     private async Task ValidateReferenceNumbers(CreateProductsBatch command, CancellationToken cancellationToken)
@@ -45,19 +45,19 @@ public class CreateProductsBatchCommandHandler : ICommandHandler<CreateProductsB
         var newReferenceNumbers = command.Products
             .Select(x => x.ReferenceNumber);
         
-        var anyReferenceNumberExists = await _dbContext.Products
+        var anyReferenceNumberExists = await _productRepository
             .AnyAsync(x => newReferenceNumbers.Contains(x.ReferenceNumber), cancellationToken);
         
         if (anyReferenceNumberExists)
         {
-            throw new DuplicateException("One or more reference numbers already exists.");
+            throw new DuplicateException("Produkt o podanym numerze referencyjnym już istnieje.");
         }
     }
 
     private async Task<Product> CreateProductAsync(CreateProductDto productDto, IEnumerable<TaxRate> taxRates, CancellationToken cancellationToken = default)
     {
         var taxRate = taxRates.FirstOrDefault(x => x.Id == productDto.TaxRateId)
-            ?? throw new NotFoundException($"Tax rate with id {productDto.TaxRateId} was not found.");
+            ?? throw new NotFoundException($"Nie znaleziono stawki podatku o ID {productDto.TaxRateId}");
 
         var product = new Product
         {

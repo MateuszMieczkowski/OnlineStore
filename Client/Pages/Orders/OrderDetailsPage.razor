@@ -26,7 +26,7 @@
            <ul>
                @foreach (var item in _order.Items)
                {
-                   <li>@item.ProductId - @item.Quantity szt.</li>
+                   <OrderItemDetails OrderItem="@item"/>
                }
            </ul>
        </div>

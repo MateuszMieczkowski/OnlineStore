@@ -17,6 +17,11 @@ public class OrderCanceledState : IOrderState
 	public async Task CancelOrderAsync(OrderContext context)
 	{
 		var order = context.Order;
+		if(order.Status == OrderStatus.Canceled)
+		{
+			return;
+		}
+		
 		order.Status = OrderStatus.Canceled;
 
 		var emailDefinition = new OrderStatusChangedEmail(

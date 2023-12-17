@@ -1,5 +1,6 @@
 using OnlineStore.Client.Brokers.API;
 using OnlineStore.Client.Models.Orders;
+using OnlineStore.Shared.Enums;
 using OnlineStore.Shared.Infrastructure;
 using OnlineStore.Shared.Orders;
 
@@ -12,6 +13,8 @@ public interface IOrderService
     Task<PagedResult<OrderListItemDto>> GetOrders(int pageNumber, int pageSize, int? clientId);
     
     Task<OrderDto> GetOrder(int id);
+
+    Task UpdateOrderStatus(int id, OrderStatusDto status);
 }
 
 public class OrderService : IOrderService
@@ -38,5 +41,24 @@ public class OrderService : IOrderService
     public async Task<OrderDto> GetOrder(int id)
     {
         return await _broker.GetOrderAsync(id);
+    }
+
+    public async Task UpdateOrderStatus(int id, OrderStatusDto status)
+    {
+        switch (status)
+        {
+            case OrderStatusDto.Completed:
+                await _broker.CompleteOrderAsync(id);
+                break;
+            case OrderStatusDto.Cancelled:
+                await _broker.CancelOrderAsync(id);
+                break;
+
+            case OrderStatusDto.Processing:
+                await _broker.ProcessOrderAsync(id);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(status), status, null);
+        }
     }
 }

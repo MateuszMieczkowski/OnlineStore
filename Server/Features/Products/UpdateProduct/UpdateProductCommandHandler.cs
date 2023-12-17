@@ -26,13 +26,13 @@ public class UpdateProductCommandHandler : ICommandHandler<Shared.Products.Updat
         var product = await _dbContext.Products
             .Include(x => x.ProductFiles)
             .FirstOrDefaultAsync(x => x.Id == command.Id, cancellationToken) ??
-                throw new NotFoundException($"Product with id {command.Id} was not found.");
+                throw new NotFoundException($"Nie znaleziono produktu o id {command.Id}.");
         
         await ValidateProductReferenceNumberAsync(command.Id, command.ReferenceNumber, cancellationToken);
         
         var taxRate = await _dbContext.TaxRates
             .FirstOrDefaultAsync(x => x.Id == command.TaxRateId, cancellationToken: cancellationToken) ??
-                throw new NotFoundException($"Tax rate with id {command.TaxRateId} was not found.");
+                throw new NotFoundException($"Nie znaleziono stawki podatku o id {command.TaxRateId}");
 
         product.Name = command.Name;
         product.ReferenceNumber = command.ReferenceNumber;
@@ -87,7 +87,7 @@ public class UpdateProductCommandHandler : ICommandHandler<Shared.Products.Updat
         
         if (referenceNumberExists)
         {
-            throw new DuplicateException($"Product with reference number {productReferenceNumber} already exists.");
+            throw new DuplicateException($"Produkt o numerze referencyjnym {productReferenceNumber} już istnieje.");
         }
     }
 

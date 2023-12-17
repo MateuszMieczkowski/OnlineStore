@@ -16,7 +16,7 @@
     <div class="mb-4">
         <h3>@(ShowBin ? "Kosz" : "Zarządzanie produktami")</h3>
     </div>
-    <ProductsFilter ShowBin="@ShowBin" OnFilterChanged="@RefreshProducts"/>
+    <ProductsFilter ShowBin="@ShowBin" OnFilterChanged="@RefreshProducts" OnEmptyBin="@EmptyBin"/>
     <MudTable Items="@products" Hover="true" Loading="@_isLoading" LoadingProgressColor="Color.Info">
         <HeaderContent>
             <MudTh>Nazwa</MudTh>
@@ -115,5 +115,12 @@
         product.Status = newStatus;
         StateHasChanged();
         Snackbar.Add("Zaktualizowano stan produktu pomyślnie!");
+    }
+    
+    private async Task EmptyBin()
+    {
+        await ProductService.EmptyBin(products.Select(x => x.Id));
+        StateHasChanged();
+        Snackbar.Add("Wyczyszczono kosz pomyślnie!");
     }
 }

@@ -1,6 +1,7 @@
 using OnlineStore.Server.Features.Accounts.Repositories;
 using OnlineStore.Server.Features.Accounts.Services;
 using OnlineStore.Server.Infrastructure;
+using OnlineStore.Server.Services.Exceptions;
 
 namespace OnlineStore.Server.Features.Accounts.ChangeUserPassword;
 
@@ -18,7 +19,8 @@ public class ChangeUserPasswordCommandHandler : ICommandHandler<Shared.Accounts.
 
     public async Task Handle(Shared.Accounts.ChangeUserPassword command, CancellationToken cancellationToken)
     {
-        var user = await _userRepository.GetById(command.Id);
+        var user = await _userRepository.GetByIdAsync(command.Id)
+            ?? throw new NotFoundException($"Nie znaleziono użytkownika o ID {command.Id}");
 
         _accountService.AssertHashedPassword(user, command.CurrentPassword);
 

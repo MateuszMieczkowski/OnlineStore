@@ -22,7 +22,12 @@ public class OrderCompletedState : IOrderState
 	public async Task CompleteOrderAsync(OrderContext context)
 	{
 		var order = context.Order;
-		order.Status = OrderStatus.Canceled;
+		if(order.Status == OrderStatus.Completed)
+		{
+			return;
+		}
+		
+		order.Status = OrderStatus.Completed;
 
 		var emailDefinition = new OrderStatusChangedEmail(
 				order: order,

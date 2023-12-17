@@ -38,10 +38,13 @@ public class CreateOrderCommandHandler : ICommandHandler<Shared.Orders.CreateOrd
                 && !x.IsDeleted
                 && !x.IsHidden)
             .ToListAsync(cancellationToken);
-
+        if (!products.Any())
+        {
+            throw new NotFoundException("Nie znaleziono produktów");
+        }
         var orderAddress = await _dbContext.OrdersAddresses
             .FirstOrDefaultAsync(x => x.Id == request.OrderAddressId, cancellationToken)
-            ?? throw new NotFoundException($"Order address with id {request.OrderAddressId} not found");
+            ?? throw new NotFoundException($"Nie znaleziono adresu");
 
         var orderItems = new List<OrderItem>();
         decimal totalPriceNet = 0;
@@ -51,7 +54,7 @@ public class CreateOrderCommandHandler : ICommandHandler<Shared.Orders.CreateOrd
             var requestItem = request.Items.First(x => x.ProductId == product.Id);
             if(product.Quantity < requestItem.Count)
             {
-                throw new BadRequestException($"Product {product.Name} has only {product.Quantity} items in stock");
+                throw new BadRequestException($"Brak wystarczającej ilości produktu {product.Name}");
             }
             var orderItem = new OrderItem
             {
@@ -83,5 +86,7 @@ public class CreateOrderCommandHandler : ICommandHandler<Shared.Orders.CreateOrd
         await orderContext.CreateAsync();
         
         await _dbContext.SaveChangesAsync(cancellationToken);
+        
+        request.CreatedId = order.Id;
     }
 }

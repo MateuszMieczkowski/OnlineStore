@@ -38,7 +38,7 @@
         </HeaderContent>
         <RowTemplate Context="item">
             <MudTd>@item.Id</MudTd>
-            <MudTd>@item.ClientId (zamienić na email)</MudTd>
+            <MudTd>@item.ClientEmail</MudTd>
             <MudTd>@item.TotalNet</MudTd>
             <MudTd>@item.TotalGross</MudTd>
             <MudTd>@EnumHelper.GetDescription(item.Status)</MudTd>
@@ -119,14 +119,12 @@
         await RefreshProducts();
     }
 
-    private async Task ExecuteAction(OrderListItemDto product,
-        // Func<int, Task> action, 
+    private async Task ExecuteAction(OrderListItemDto orderListItem,
         OrderStatusDto newStatus)
     {
-        // await action(product.Id);
-        // var updatedProduct = product with { Status = newStatus };
-        product.Status = newStatus;
-        product.ModifiedDate = DateTime.UtcNow;
+        orderListItem.Status = newStatus;
+        orderListItem.ModifiedDate = DateTime.UtcNow;
+        await OrderService.UpdateOrderStatus(orderListItem.Id, newStatus);
         StateHasChanged();
         Snackbar.Add("Zaktualizowano stan zamówienia i wysłano powierdzenie!");
     }

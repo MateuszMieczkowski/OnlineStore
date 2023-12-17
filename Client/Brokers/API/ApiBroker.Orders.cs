@@ -29,4 +29,21 @@ public partial class ApiBroker
         var queryUrl = $"{OrdersRelativeUrl}/{id}";
         return await GetAsync<OrderDto>(queryUrl);
     }
+
+    public async Task CompleteOrderAsync(int id)
+    {
+        var queryUrl = $"{OrdersRelativeUrl}/{id}/complete";
+        await PostAsync(queryUrl, null as object);
+    }
+    
+    public async Task CancelOrderAsync(int id)
+    {
+        var queryUrl = $"{OrdersRelativeUrl}/{id}/cancel";
+        await PostAsync(queryUrl, null as object);
+    }
+    public async Task ProcessOrderAsync(int id)
+    {
+        var queryUrl = $"{OrdersRelativeUrl}/{id}/process";
+        await PostAsync(queryUrl, null as object);
+    }
 }

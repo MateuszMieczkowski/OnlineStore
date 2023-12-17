@@ -4,20 +4,20 @@ using OnlineStore.Server.Infrastructure;
 using OnlineStore.Server.Services.Email;
 using OnlineStore.Server.Services.Exceptions;
 
-namespace OnlineStore.Server.Features.Orders.CompleteOrder;
+namespace OnlineStore.Server.Features.Orders.CancelOrder;
 
-public class CompleteOrderCommandHandler : ICommandHandler<Shared.Orders.CompleteOrder>
+public class CancelOrderCommandHandler : ICommandHandler<Shared.Orders.CancelOrder>
 {
     private readonly IOrderRepository _orderRepository;
     private readonly IEmailService _emailService;
 
-    public CompleteOrderCommandHandler(IEmailService emailService, IOrderRepository orderRepository)
+    public CancelOrderCommandHandler(IOrderRepository orderRepository, IEmailService emailService)
     {
-        _emailService = emailService;
         _orderRepository = orderRepository;
+        _emailService = emailService;
     }
 
-    public async Task Handle(Shared.Orders.CompleteOrder request, CancellationToken cancellationToken)
+    public async Task Handle(Shared.Orders.CancelOrder request, CancellationToken cancellationToken)
     {
         var order = await _orderRepository.GetByIdAsync(request.OrderId,
                         includeUser: true,
@@ -26,8 +26,8 @@ public class CompleteOrderCommandHandler : ICommandHandler<Shared.Orders.Complet
                         cancellationToken)
                     ?? throw new NotFoundException($"Nie znaleziono zamówienia o ID {request.OrderId}");
 
-        var orderContext = new OrderContext(order, new OrderCompletedState(_emailService));
-        await orderContext.CompleteAsync();
+        var orderContext = new OrderContext(order, new OrderCanceledState(_emailService));
+        await orderContext.CancelAsync();
 
         await _orderRepository.UpdateAsync(order, cancellationToken);
     }

@@ -27,6 +27,10 @@ public class OrderCreatedState : IOrderState
 	public async Task CreateOrderAsync(OrderContext context)
 	{
 		var order = context.Order;
+		if(order.Status == OrderStatus.Created)
+		{
+			return;
+		}
 		var client = order.User;
 
 		order.Status = OrderStatus.Created;

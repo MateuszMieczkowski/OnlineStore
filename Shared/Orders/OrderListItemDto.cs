@@ -7,6 +7,7 @@ public record OrderListItemDto(
     decimal TotalNet,
     decimal TotalGross,
     int ClientId,
+    string ClientEmail,
     DateTime CreatedDate)
 {
     public DateTime ModifiedDate { get; set; }

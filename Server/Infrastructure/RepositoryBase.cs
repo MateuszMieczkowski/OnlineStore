@@ -1,4 +1,6 @@
-﻿namespace OnlineStore.Server.Infrastructure;
+﻿using System.Linq.Expressions;
+
+namespace OnlineStore.Server.Infrastructure;
 
 using Microsoft.EntityFrameworkCore;
 
@@ -85,6 +87,11 @@ public abstract class RepositoryBase<T> : IRepository<T> where T : class
     public virtual async Task<bool> AnyAsync(CancellationToken cancellationToken = default)
     {
         return await _dbContext.Set<T>().AnyAsync(cancellationToken);
+    }
+    
+    public virtual async Task<bool> AnyAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.Set<T>().AnyAsync(predicate, cancellationToken);
     }
     
 }

@@ -31,7 +31,8 @@ public class ResetPasswordCommandHandler : ICommandHandler<ResetPassword>
 
         AssertRemindPasswordRequest(remindPasswordRequest);
         
-        var user = await _userRepository.GetById(remindPasswordRequest.UserId);
+        var user = await _userRepository.GetByIdAsync(remindPasswordRequest.UserId)
+            ??  throw new NotFoundException($"Nie znaleziono użytkownika o ID {remindPasswordRequest.UserId}");
 
         await _accountService.ChangePassword(user, command.Password);
 

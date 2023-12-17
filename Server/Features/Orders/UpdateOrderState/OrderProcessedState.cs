@@ -31,9 +31,14 @@ public class OrderProcessedState : IOrderState
 		return Task.CompletedTask;
 	}
 
-	public Task ProcessOrderAsync(OrderContext context)
+	public async Task ProcessOrderAsync(OrderContext context)
 	{
 		var order = context.Order;
+		if(order.Status == OrderStatus.Processing)
+		{
+			return;
+		}
+		
 		order.Status = OrderStatus.Processing;
 
 		var emailDefinition = new OrderStatusChangedEmail(
@@ -42,6 +47,6 @@ public class OrderProcessedState : IOrderState
 			recipientName: order.User.FullName,
 			senderEmail: null);
 
-		return _emailService.SendEmailFromDefinitionAsync(emailDefinition);
+		await _emailService.SendEmailFromDefinitionAsync(emailDefinition);
 	}
 }

@@ -45,7 +45,7 @@ public class GetProductQueryHandler : IQueryHandler<Shared.Products.GetProduct, 
                 x.ProductFiles.Select(y =>
                     new ProductFileDto(y.Id, y.FileName, y.BlobUri, y.Description, (ProductFileTypeDto)y.FileType))))
             .FirstOrDefaultAsync(cancellationToken) ??
-                throw new NotFoundException($"Product with id {query.Id} not found");
+                throw new NotFoundException($"Nie znaleziono produktu o ID {query.Id}");
 
         return result;
     }

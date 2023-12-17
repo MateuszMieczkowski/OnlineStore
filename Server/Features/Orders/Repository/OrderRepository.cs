@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OnlineStore.Server.Entities;
+using OnlineStore.Server.Enums;
 using OnlineStore.Server.Infrastructure;
 
 namespace OnlineStore.Server.Features.Orders.Repository;
@@ -10,10 +11,31 @@ public class OrderRepository : RepositoryBase<Order>, IOrderRepository
     {
     }
 
-    public async Task<Order?> GetByIdWithIncludedUserAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<Order?> GetByIdAsync(int id,
+        bool includeUser = false,
+        bool includeOrderItems = false,
+        int? userId = null,
+        CancellationToken cancellationToken = default)
     {
-        return await _dbContext.Set<Order>()
-            .Include(x => x.User)
+        var query = _dbContext.Set<Order>()
+            .Include(x => x.Address)
+            .AsQueryable();
+        if (includeUser)
+        {
+            query = query.Include(x => x.User);
+        }
+
+        if (includeOrderItems)
+        {
+            query = query.Include(x => x.OrderItems);
+        }
+
+        if (userId is not null)
+        {
+            query = query.Where(x => x.ClientId == userId);
+        }
+        
+        return await query
             .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 }

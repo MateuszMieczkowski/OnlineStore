@@ -29,7 +29,7 @@ public class OrderContext
     }
 	public async Task CompleteAsync()
     {
-        await _state.CancelOrderAsync(this);
+        await _state.CompleteOrderAsync(this);
     }
 	public async Task CancelAsync()
     {
