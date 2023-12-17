@@ -68,6 +68,12 @@ public partial class ApiBroker
         await DeleteAsync($"{ProductRelativeUrl}/{id}/hard-delete");
     }
 
+    public async Task EmptyProductsBinAsync(IEnumerable<int> ids)
+    {
+        var deleteTasks = ids.Select(HardDeleteProductAsync);
+        await Task.WhenAll(deleteTasks);
+    }
+
     public async Task<IReadOnlyCollection<TaxRateDto>> GetTaxRates()
     {
         return await GetAsync<IReadOnlyCollection<TaxRateDto>>($"{ProductRelativeUrl}/taxRates");

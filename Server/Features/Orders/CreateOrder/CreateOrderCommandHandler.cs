@@ -3,6 +3,7 @@ using OnlineStore.Server.Emails.EmailDefinitions;
 using OnlineStore.Server.Entities;
 using OnlineStore.Server.Enums;
 using OnlineStore.Server.Features.Accounts.Services;
+using OnlineStore.Server.Features.Orders.UpdateOrderState;
 using OnlineStore.Server.Infrastructure;
 using OnlineStore.Server.Services.Email;
 using OnlineStore.Server.Services.Exceptions;
@@ -14,18 +15,17 @@ public class CreateOrderCommandHandler : ICommandHandler<Shared.Orders.CreateOrd
     private readonly OnlineStoreDbContext _dbContext;
     private readonly ILoggedUserService _loggedUserService;
     private readonly IEmailService _emailService;
+	public CreateOrderCommandHandler(
+		OnlineStoreDbContext dbContext,
+		ILoggedUserService loggedUserService,
+		IEmailService emailService)
+	{
+		_dbContext = dbContext;
+		_loggedUserService = loggedUserService;
+		_emailService = emailService;
+	}
 
-    public CreateOrderCommandHandler(
-        OnlineStoreDbContext dbContext,
-        ILoggedUserService loggedUserService,
-        IEmailService emailService)
-    {
-        _dbContext = dbContext;
-        _loggedUserService = loggedUserService;
-        _emailService = emailService;
-    }
-
-    public async Task Handle(Shared.Orders.CreateOrder request, CancellationToken cancellationToken)
+	public async Task Handle(Shared.Orders.CreateOrder request, CancellationToken cancellationToken)
     {
         var userId = _loggedUserService.GetUserId();
         var client = await _dbContext.Users
@@ -49,6 +49,10 @@ public class CreateOrderCommandHandler : ICommandHandler<Shared.Orders.CreateOrd
         foreach (var product in products)
         {
             var requestItem = request.Items.First(x => x.ProductId == product.Id);
+            if(product.Quantity < requestItem.Count)
+            {
+                throw new BadRequestException($"Product {product.Name} has only {product.Quantity} items in stock");
+            }
             var orderItem = new OrderItem
             {
                 Product = new OrderItemProduct(product),
@@ -57,7 +61,8 @@ public class CreateOrderCommandHandler : ICommandHandler<Shared.Orders.CreateOrd
                 PriceGross = product.PriceNet * requestItem.Count,
             };
             orderItems.Add(orderItem);
-
+            
+            product.Quantity -= requestItem.Count;
             totalPriceNet += orderItem.PriceNet;
             totalPriceGross += orderItem.PriceGross;
         }
@@ -68,23 +73,15 @@ public class CreateOrderCommandHandler : ICommandHandler<Shared.Orders.CreateOrd
             User = client,
             Address = orderAddress,
             OrderAddressId = orderAddress.Id,
-            Status = OrderStatus.Created,
             OrderItems = orderItems,
             TotalGross = totalPriceGross,
             TotalNet = totalPriceNet
         };
 
         _dbContext.Orders.Add(order);
+        var orderContext = new OrderContext(order, new OrderCreatedState(_emailService));
+        await orderContext.CreateAsync();
+        
         await _dbContext.SaveChangesAsync(cancellationToken);
-
-        var orderCreatedEmail = new OrderCreatedSummaryEmail(
-            order: order,
-            recipientEmail: client.Email,
-            recipientName: client.FullName,
-            senderEmail: null);
-
-        await _emailService.SendEmailFromDefinitionAsync(orderCreatedEmail, cancellationToken);
-
-        request.CreatedId = order.Id;
     }
 }

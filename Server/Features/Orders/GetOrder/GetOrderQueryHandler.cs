@@ -27,7 +27,7 @@ public class GetOrderQueryHandler : IQueryHandler<Shared.Orders.GetOrder, OrderD
 			.Include(x => x.Address)
 			.Where(x => x.Id == query.Id);
 
-		var isClient = _loggedUserService.GetUserRole() == UserRoles.Admin;
+		var isClient = _loggedUserService.GetUserRole() == UserRoles.User;
 		if (isClient)
 		{
 			var clientId = _loggedUserService.GetUserId();
@@ -52,7 +52,9 @@ public class GetOrderQueryHandler : IQueryHandler<Shared.Orders.GetOrder, OrderD
 				x.PriceNet,
 				x.PriceGross,
 				x.Quantity,
-				x.Product.Id))
+				x.Product.Id,
+				x.Product.Name,
+				x.Product.ThumbnailBlobUri))
 			.ToList();
 
 		return new OrderDto(order.Id,

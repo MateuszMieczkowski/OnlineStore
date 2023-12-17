@@ -101,7 +101,7 @@ public class ProductController : ControllerBase
     }
     
     [HttpGet("taxRates")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IEnumerable<TaxRateDto>> GetTaxRates()
     {
         var response = await _mediator.Send(new GetTaxRates());

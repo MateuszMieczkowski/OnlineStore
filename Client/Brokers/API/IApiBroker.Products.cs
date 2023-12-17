@@ -1,5 +1,4 @@
 ﻿using OnlineStore.Shared.Infrastructure;
-using OnlineStore.Shared.Models;
 using OnlineStore.Shared.Products;
 
 namespace OnlineStore.Client.Brokers.API;
@@ -17,6 +16,7 @@ public partial interface IApiBroker
     Task SoftDeleteProductAsync(int id);
     Task RecoverProductAsync(int id);
     Task HardDeleteProductAsync(int id);
+    Task EmptyProductsBinAsync(IEnumerable<int> ids);
 
     Task<IReadOnlyCollection<TaxRateDto>> GetTaxRates();
 }

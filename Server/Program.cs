@@ -13,6 +13,7 @@ using OnlineStore.Server.Features.Accounts.Repositories;
 using OnlineStore.Server.Features.Accounts.Services;
 using OnlineStore.Server.Features.Accounts.Strategies;
 using OnlineStore.Server.Features.Orders.CreateOrder;
+using OnlineStore.Server.Features.Orders.Repository;
 using OnlineStore.Server.Features.Products.CreateProduct;
 using OnlineStore.Server.Features.Products.Services;
 using OnlineStore.Server.Features.Products.UpdateProduct;
@@ -89,6 +90,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ITokenGenerator, TokenGenerator>();
 builder.Services.AddScoped<ITaxService, TaxService>();
 builder.Services.AddScoped<ILoggedUserService, LoggedUserService>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddMemoryCache();

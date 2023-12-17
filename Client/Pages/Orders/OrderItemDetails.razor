@@ -1,0 +1,30 @@
+﻿@using OnlineStore.Shared.Orders
+@inject NavigationManager NavigationManager
+@inherits MudComponentBase
+
+<MudCard Class="order-item" Elevation="1"  @onclick="@(() => NavigationManager.NavigateTo($"products/{OrderItem.ProductId}"))">
+    <MudCardContent>
+        <div>
+            <strong>Nazwa Produktu:</strong> @OrderItem.ProductName
+        </div>
+        <div>
+            <strong>Cena (Netto):</strong> @OrderItem.PriceNet zł
+        </div>
+        <div>
+            <strong>Cena (Brutto):</strong> @OrderItem.PriceGross zł
+        </div>
+        <div>
+            <strong>Ilość:</strong> @OrderItem.Quantity
+        </div>
+        @if (!string.IsNullOrEmpty(OrderItem.ProductThumbnailUri))
+        {
+            <div>
+                <MudImage Width="100" Src="@OrderItem.ProductThumbnailUri" Alt="Miniatura Produktu" Class="thumbnail" />
+            </div>
+        }
+    </MudCardContent>
+</MudCard>
+
+@code {
+    [Parameter] public OrderItemDto OrderItem { get; set; }
+}
