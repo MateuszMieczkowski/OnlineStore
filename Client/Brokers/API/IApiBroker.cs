@@ -1,4 +1,4 @@
-﻿namespace OnlineStore.Client.Brokers.API;
+namespace OnlineStore.Client.Brokers.API;
 
 public partial interface IApiBroker
 {

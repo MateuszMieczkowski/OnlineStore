@@ -2,6 +2,7 @@
 @using System.Reflection.Metadata.Ecma335
 @using Blazored.LocalStorage
 @using OnlineStore.Client.Products.Models
+@using OnlineStore.Client.Shared
 @using OnlineStore.Shared.Clients
 @using OnlineStore.Shared.Enums
 @inject ILocalStorageService LocalStorage
@@ -105,7 +106,7 @@
     private async Task StageBin(bool showBin)
     {
         var queryParam = showBin ? "?showBin=true" : "";
-        NavigationManager.NavigateTo($"/configuration{queryParam}");
+        NavigationManager.NavigateTo($"{NavPaths.ProductsManage}{queryParam}");
         ShowBin = showBin;
         _filter.DeletedOnly = ShowBin;
         await StageFilter();

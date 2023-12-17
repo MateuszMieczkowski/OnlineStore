@@ -1,13 +1,14 @@
 @using OnlineStore.Shared.Products
 @using OnlineStore.Client.Providers
 @using OnlineStore.Client.Models.Orders
+@using OnlineStore.Client.Shared
 @inject NavigationManager NavigationManager
 @inject ICallContext CallContext
 @inject IShoppingCartService ShoppingCartService
 @inject ISnackbar Snackbar
 
-<MudButton Variant="Variant.Text" Color="Color.Primary" StartIcon="@Icons.Material.Filled.AddShoppingCart" OnClick="@(() => AddToCart(Product))">Dodaj do koszyka</MudButton>
-<MudButton Variant="Variant.Text" Color="Color.Primary" StartIcon="@Icons.Material.Filled.ShoppingCartCheckout" OnClick="@(() => BuyNow(Product))">Kup teraz</MudButton>
+<MudButton Size="Size.Small" Variant="Variant.Text" Color="Color.Primary" StartIcon="@Icons.Material.Filled.AddShoppingCart" OnClick="@(() => AddToCart(Product))">Dodaj do koszyka</MudButton>
+<MudButton Size="Size.Small" Variant="Variant.Text" Color="Color.Primary" StartIcon="@Icons.Material.Filled.ShoppingCartCheckout" OnClick="@(() => BuyNow(Product))">Kup teraz</MudButton>
 
 @code {
     [Parameter]
@@ -39,7 +40,7 @@
         }
         
         await AddToCart(item);
-        NavigationManager.NavigateTo("/orders/checkout");
+        NavigationManager.NavigateTo(@NavPaths.OrderCheckout);
     }
     
     private async Task<bool> ValidateCartAction()

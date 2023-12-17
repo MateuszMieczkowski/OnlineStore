@@ -14,15 +14,15 @@ namespace OnlineStore.Client.Services;
 public interface IAccountService
 {
     Task<bool> AuthenticateAsync(AuthenticateUser authenticateUser);
-    
+
     Task RegisterAdmin(RegisterAdmin registerAdmin);
-    
+
     Task<PagedResult<UserDto>> GetUserList(int pageNumber, int pageSize);
-    
+
     Task Logout();
-    
+
     Task ChangeUserPassword(ChangePasswordModel model);
-    
+
     Task ForgotPassword(string email);
 
     Task ResetUserPassword(string token, ResetPasswordModel model);
@@ -33,13 +33,18 @@ public class AccountService : IAccountService
     private readonly AuthenticationStateProvider _authenticationStateProvider;
     private readonly IApiBroker _broker;
     private readonly ILocalStorageService _localStorage;
+    private readonly IShoppingCartService _shoppingCartService;
 
-    public AccountService(IApiBroker broker, ILocalStorageService localStorage,
-        AuthenticationStateProvider authenticationStateProvider)
+    public AccountService(
+        AuthenticationStateProvider authenticationStateProvider, 
+        IApiBroker broker, 
+        ILocalStorageService localStorage,
+        IShoppingCartService shoppingCartService)
     {
+        _authenticationStateProvider = authenticationStateProvider;
         _broker = broker;
         _localStorage = localStorage;
-        _authenticationStateProvider = authenticationStateProvider;
+        _shoppingCartService = shoppingCartService;
     }
 
     public async Task<bool> AuthenticateAsync(AuthenticateUser authenticateUser)
@@ -49,6 +54,7 @@ public class AccountService : IAccountService
         await _localStorage.SetItemAsync("accessToken", response.Token);
         await _localStorage.SetItemAsync("email", response.Email);
         await _localStorage.SetItemAsync("preferences", response.Preferences);
+        await _shoppingCartService.LoadCartFromServer();
 
         await ((ApiAuthenticationStateProvider)_authenticationStateProvider).LoggedIn();
         return true;
@@ -67,7 +73,9 @@ public class AccountService : IAccountService
     public async Task Logout()
     {
         await ((ApiAuthenticationStateProvider)_authenticationStateProvider).LoggedOut();
-        await _localStorage.RemoveItemsAsync(new []{LocalStorageKeys.UserPreferences});
+        await _localStorage.RemoveItemsAsync(new[] { LocalStorageKeys.UserPreferences });
+        await _shoppingCartService.SaveCartToServer();
+        await _shoppingCartService.ClearCart();
     }
 
     public async Task ChangeUserPassword(ChangePasswordModel model)
@@ -79,7 +87,7 @@ public class AccountService : IAccountService
             CurrentPassword: model.CurrentPassword,
             NewPassword: model.NewPassword,
             ConfirmNewPassword: model.ConfirmNewPassword);
-        
+
         await _broker.ChangeUserPassword(command);
     }
 

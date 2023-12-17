@@ -20,39 +20,31 @@
             </div>
         }
 
-        <div class="mb-4">
-            <MudText Typo="Typo.h5">Szczegóły zamówienia:</MudText>
+       <div class="mb-4">
+           <MudText Typo="Typo.h5">Szczegóły zamówienia:</MudText>
+       
+           <ul>
+               @foreach (var item in _order.Items)
+               {
+                   <li>@item.ProductId - @item.Quantity szt.</li>
+               }
+           </ul>
+       </div>
+       
+       <div class="mb-4">
+           <MudTypography Typo="Typo.body2">Adres dostawy:</MudTypography>
+           <div>@_order.OrderAddress.Street, @_order.OrderAddress.City, @_order.OrderAddress.PostalCode</div>
+       </div>
 
-            <ul>
-                @foreach (var item in _order.Items)
-                {
-                    <li>
-                        <OrderItemDetails OrderItem="item"/>
-                    </li>
-                }
-            </ul>
-        </div>
-
-        <div class="mb-4">
-             <MudText Typo="Typo.h6">Cena całkowita brutto: @_order.TotalGross zł</MudText>
-             <MudText Typo="Typo.h6">Cena całkowita netto: @_order.TotalNet zł</MudText>
-        </div>
-
-        <div class="mb-4">
-            <MudTypography Typo="Typo.body2">Adres dostawy:</MudTypography>
-            <div>@_order.OrderAddress.Street, @_order.OrderAddress.City, @_order.OrderAddress.PostalCode</div>
-        </div>
-
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="GoBack">Powrót do poprzedniej strony</MudButton>
+        <BackButton/>
     </MudPaper>
 </MudContainer>
 
 @code {
-
     [Parameter]
     [SupplyParameterFromQuery]
     public bool? ShowConfirmation { get; set; }
-
+    
     [Parameter]
     public int Id { get; set; }
 
@@ -62,10 +54,4 @@
     {
         _order = await OrderService.GetOrder(Id);
     }
-
-    private async Task GoBack()
-    {
-        await JsRuntime.InvokeVoidAsync("history.back");
-    }
-
 }

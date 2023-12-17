@@ -1,6 +1,7 @@
 @page "/orders/checkout"
 @using OnlineStore.Client.Models.Orders
 @using OnlineStore.Client.Pages.Clients
+@using OnlineStore.Client.Shared
 @inject IOrderService OrderService
 @inject IShoppingCartService ShoppingCartService
 @inject ISnackbar Snackbar
@@ -9,13 +10,13 @@
 @if (!_cartModel.Items.Any())
 {
     <MudContainer>
-        <h2>Brak produktów w koszyku</h2>
+        <h3>Brak produktów w koszyku</h3>
     </MudContainer>
     return;
 }
 
 <MudContainer>
-    <h2 Class="mb-2">Koszyk zakupowy</h2>
+    <h3 Class="mb-2">Koszyk zakupowy</h3>
     <MudPaper Elevation="3" Class="p-4 mb-2">
         @foreach (var item in _cartModel.Items)
         {
@@ -60,7 +61,7 @@
     
     protected override async Task OnInitializedAsync()
     {
-        _cartModel = await ShoppingCartService.GetCart();
+        _cartModel = await ShoppingCartService.GetCartFromStorage();
     }
 
     private async Task ChangeItemCount(CartItemModel item, int count)
@@ -84,10 +85,15 @@
     {
         try
         {
+            if (_cartModel.AddressId == 0)
+            {
+                throw new Exception("Przed wykonaniem zamówienia należy wypełnić adres w ustawieniach konta.");
+            }
+            
             var orderId = await OrderService.CreateOrder(_cartModel);
             await ShoppingCartService.ClearCart();
             Snackbar.Add("Złożono zamówienie", Severity.Success);
-            NavigationManager.NavigateTo($"/orders/{orderId}?showConfirmation=true");
+            NavigationManager.NavigateTo($"{NavPaths.OrderManage}/{orderId}?showConfirmation=true");
         }
         catch (Exception ex)
         {

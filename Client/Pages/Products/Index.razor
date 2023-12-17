@@ -22,16 +22,17 @@
     }
     else
     {
-
-        <MudGrid Spacing="6" Justify="Justify.Center" Class="mb-5">
+        <MudGrid Spacing="6" Justify="Justify.FlexStart" Class="mb-5">
             @foreach (var product in _products)
             {
                 <MudItem xs="3">
                     <MudCard @onclick="@(() => NavigationManager.NavigateTo($"products/{product.Id}"))" class="pointer">
                         <MudCardHeader>
                             <CardHeaderContent>
-                                <MudText Style="text-overflow: clip" Typo="Typo.body1">@product.Name</MudText>
-                                <MudText Typo="Typo.body2">@product.ReferenceNumber</MudText>
+                                <MudTooltip Duration="250" Text="@product.Name" Placement="Placement.Top">
+                                    <MudText Style="width: 16vw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" Typo="Typo.subtitle2">@product.Name</MudText>
+                                </MudTooltip>
+                                <MudText Typo="Typo.caption">@product.ReferenceNumber</MudText>
                             </CardHeaderContent>
                             <CardHeaderActions>
                                 <MudTooltip Duration="250" Text="@product.ShortDescription" Placement="Placement.Top">
@@ -41,8 +42,8 @@
                         </MudCardHeader>
                         <MudCardMedia Image="@product.ThumbnailUri"/>
                         <MudCardContent>
-                            <MudText Typo="Typo.h6">@(_showNetPrice ? product.PriceNet : product.PriceGross) zł</MudText>
-                            <MudText Typo="Typo.body2">Ilość: @product.Quantity</MudText>
+                            <MudText Typo="Typo.subtitle2">@(_showNetPrice ? product.PriceNet : product.PriceGross) zł</MudText>
+                            <MudText Typo="Typo.caption">Ilość: @product.Quantity</MudText>
                         </MudCardContent>
                         <MudCardActions>
                             <BuyActionsComponent Product="product"/>
@@ -54,7 +55,6 @@
         <div class="d-flex flex-column align-center">
             <MudPagination Size="Size.Large" Variant="Variant.Filled" Color="Color.Secondary" @bind-Selected="@PageNumber" Count="@_pageCount" Class="pa-4"/>
         </div>
-
     }
 </MudContainer>
 
@@ -97,10 +97,11 @@
         _isLoading = false;
         StateHasChanged();
     }
-    
+
     private async Task PageChanged(int i)
     {
         _pageNumber = i;
         await GetProducts();
     }
+
 }
