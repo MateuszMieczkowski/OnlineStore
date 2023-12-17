@@ -17,7 +17,7 @@
 
 <MudContainer>
     <h3>Lista zamówień</h3>
-    
+
     @if (ClientId != null)
     {
         <h2>Zamówienia użytkownika - ID: @ClientId</h2>
@@ -42,8 +42,8 @@
             <MudTd>@item.TotalNet</MudTd>
             <MudTd>@item.TotalGross</MudTd>
             <MudTd>@EnumHelper.GetDescription(item.Status)</MudTd>
-            <MudTd>@item.CreatedDate.ToLocalTime().ToString("dd.MM.yyyy HH:MM")</MudTd>
-            <MudTd>@(item.ModifiedDate != DateTime.MinValue ? item.ModifiedDate.ToLocalTime().ToString("dd.MM.yyyy HH:MM") : "-")</MudTd>
+            <MudTd>@item.CreatedDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</MudTd>
+            <MudTd>@(item.ModifiedDate > DateTime.MinValue ? item.ModifiedDate.ToLocalTime().ToString("dd.MM.yyyy HH:mm") : "-")</MudTd>
             <MudTd>
                 <AuthorizeView Roles="User">
                     <Authorized>
@@ -67,9 +67,18 @@
                                 {
                                     <MudMenuItem Icon="@Icons.Material.Filled.ShoppingCartCheckout" OnClick="@(() => Reorder(item.Id))">Zamów ponownie</MudMenuItem>
                                 }
-                                <MudMenuItem Icon="@Icons.Material.Filled.LocalShipping" OnClick="@(() => ExecuteAction(item, OrderStatusDto.Processing))">Realizuj</MudMenuItem>
-                                <MudMenuItem Icon="@Icons.Material.Filled.DoneOutline" OnClick="@(() => ExecuteAction(item, OrderStatusDto.Completed))">Zrealizuj</MudMenuItem>
-                                <MudMenuItem Icon="@Icons.Material.Filled.Cancel" OnClick="@(() => ExecuteAction(item, OrderStatusDto.Cancelled))">Anuluj</MudMenuItem>
+                                @if (item.Status == OrderStatusDto.Created)
+                                {
+                                    <MudMenuItem Icon="@Icons.Material.Filled.LocalShipping" OnClick="@(() => ExecuteAction(item, OrderStatusDto.Processing))">Realizuj</MudMenuItem>
+                                }
+                                @if (item.Status == OrderStatusDto.Processing)
+                                {
+                                    <MudMenuItem Icon="@Icons.Material.Filled.DoneOutline" OnClick="@(() => ExecuteAction(item, OrderStatusDto.Completed))">Zrealizuj</MudMenuItem>
+                                }
+                                @if (item.Status != OrderStatusDto.Completed && item.Status != OrderStatusDto.Cancelled)
+                                {
+                                    <MudMenuItem Icon="@Icons.Material.Filled.Cancel" OnClick="@(() => ExecuteAction(item, OrderStatusDto.Cancelled))">Anuluj</MudMenuItem>
+                                }
                             </MudMenu>
                         </MudButtonGroup>
                     </Authorized>
@@ -123,12 +132,12 @@
         OrderStatusDto newStatus)
     {
         orderListItem.Status = newStatus;
-        orderListItem.ModifiedDate = DateTime.UtcNow;
+        orderListItem.ModifiedDate = DateTime.Now;
         await OrderService.UpdateOrderStatus(orderListItem.Id, newStatus);
         StateHasChanged();
         Snackbar.Add("Zaktualizowano stan zamówienia i wysłano powierdzenie!");
     }
-    
+
     private async Task Reorder(int orderId)
     {
         await ShoppingCartService.Reorder(orderId);
@@ -136,4 +145,3 @@
         NavigationManager.NavigateTo("/orders/checkout");
     }
 }
-

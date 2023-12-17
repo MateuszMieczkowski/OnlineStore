@@ -5,23 +5,26 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject ISnackbar Snackbar
 
-<div class="container p-5">
-    <EditForm Model="RegisterAdminDto" OnInvalidSubmit="OnInvalidSubmit" OnValidSubmit="OnSubmit">
-        <DataAnnotationsValidator/>
-        
-        <div class="form-group">
-            <MudTextField Variant="Variant.Outlined" @bind-Value="RegisterAdminDto.Email" Label="E-mail" Placeholder="Wpisz" InputType="InputType.Email" Class="mb-4" id="email" For="@(() => RegisterAdminDto.Email)"/>
-        </div>
-        <div class="form-group">
-            <MudTextField Variant="Variant.Outlined" @bind-Value="RegisterAdminDto.Password" Label="Hasło" Placeholder="Wpisz" InputType="InputType.Password" Class="mb-4" id="password" For="@(() => RegisterAdminDto.Password)"/>
-        </div>
-        <div class="form-group">
-            <MudTextField Variant="Variant.Outlined" @bind-Value="RegisterAdminDto.ConfirmPassword" Label="Potwierdź hasło" Placeholder="Wpisz" InputType="InputType.Password" Class="mb-4" id="confirmPassword" For="@(() => RegisterAdminDto.ConfirmPassword)"/>
-        </div>
+<MudContainer MaxWidth="MaxWidth.Small">
+    <MudPaper Class="p-5" Elevation="5">
+        <MudText Typo="Typo.h5">Zarejestruj administratora</MudText>
+        <EditForm Model="RegisterAdminDto" OnInvalidSubmit="OnInvalidSubmit" OnValidSubmit="OnSubmit">
+            <DataAnnotationsValidator/>
 
-        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Zarejestruj</MudButton>
-    </EditForm>
-</div>
+            <div class="form-group">
+                <MudTextField Variant="Variant.Outlined" @bind-Value="RegisterAdminDto.Email" Label="E-mail" Placeholder="Wpisz" InputType="InputType.Email" Class="mb-4" id="email" For="@(() => RegisterAdminDto.Email)"/>
+            </div>
+            <div class="form-group">
+                <MudTextField Variant="Variant.Outlined" @bind-Value="RegisterAdminDto.Password" Label="Hasło" Placeholder="Wpisz" InputType="InputType.Password" Class="mb-4" id="password" For="@(() => RegisterAdminDto.Password)"/>
+            </div>
+            <div class="form-group">
+                <MudTextField Variant="Variant.Outlined" @bind-Value="RegisterAdminDto.ConfirmPassword" Label="Potwierdź hasło" Placeholder="Wpisz" InputType="InputType.Password" Class="mb-4" id="confirmPassword" For="@(() => RegisterAdminDto.ConfirmPassword)"/>
+            </div>
+
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Zarejestruj</MudButton>
+        </EditForm>
+    </MudPaper>
+</MudContainer>y
 
 @code
 {
