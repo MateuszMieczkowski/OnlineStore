@@ -37,11 +37,11 @@ public class
         {
             dbQueryBase = dbQueryBase.Where(x => x.IsDeleted);
         }
-        else if (query is { HiddenOnly: true, DeletedOnly: false } && isAdmin)
+        if (query is { HiddenOnly: true, DeletedOnly: false } && isAdmin)
         {
             dbQueryBase = dbQueryBase.Where(x => x.IsHidden);
         }
-        else if (query is { HiddenOnly: false, DeletedOnly: false } || !isAdmin)
+        if (query is {HiddenOnly: false, DeletedOnly: false })
         {
             dbQueryBase = dbQueryBase.Where(x => !x.IsHidden && !x.IsDeleted);
         }
