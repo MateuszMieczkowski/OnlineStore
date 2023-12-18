@@ -81,6 +81,11 @@
     private async Task StageHiddenFilter(bool hiddenOnly)
     {
         _filter.HiddenOnly = hiddenOnly;
+        if(hiddenOnly && ShowBin)
+        {
+            await StageBin(false);
+            return;
+        }
         await StageFilter();
     }
 
@@ -113,6 +118,10 @@
         NavigationManager.NavigateTo($"{NavPaths.ProductsManage}{queryParam}");
         ShowBin = showBin;
         _filter.DeletedOnly = ShowBin;
+        if(showBin)
+        {
+            _filter.HiddenOnly = false;
+        }
         await StageFilter();
     }
 

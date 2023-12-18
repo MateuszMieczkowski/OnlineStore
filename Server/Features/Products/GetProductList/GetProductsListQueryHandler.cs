@@ -3,6 +3,7 @@ using OnlineStore.Server.Authentication;
 using OnlineStore.Server.Features.Accounts.Services;
 using OnlineStore.Server.Features.Products.Mapping;
 using OnlineStore.Server.Infrastructure;
+using OnlineStore.Server.Services.Exceptions;
 using OnlineStore.Shared.Infrastructure;
 using OnlineStore.Shared.Products;
 
@@ -44,6 +45,10 @@ public class
         if (query is {HiddenOnly: false, DeletedOnly: false })
         {
             dbQueryBase = dbQueryBase.Where(x => !x.IsHidden && !x.IsDeleted);
+        }
+        if(query is { DeletedOnly: true, HiddenOnly: true })
+        {
+            throw new BadRequestException("Nie można wybrać jednocześnie opcji 'Usunięte' i 'Ukryte'");
         }
 
         if (!string.IsNullOrWhiteSpace(query.SearchPhrase))
