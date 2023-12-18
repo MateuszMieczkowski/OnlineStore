@@ -72,6 +72,12 @@
             item.Count = 0;
         }
 
+        if (item.Count == 0)
+        {
+            await RemoveItem(item);
+            return;
+        }
+
         await ShoppingCartService.AddToCartAsync(item, count);
     }
 

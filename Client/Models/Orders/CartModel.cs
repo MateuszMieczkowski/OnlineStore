@@ -16,4 +16,6 @@ public class CartItemModel
     public string ThumbnailUri { get; set; }
 
     public int Count { get; set; }
+    
+    public int ProductQuantity { get; set; }
 }

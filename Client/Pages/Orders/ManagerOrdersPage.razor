@@ -25,7 +25,7 @@
             <BackButton/>
         </div>
     }
-    <MudTable Items="@_orders" Hover="true" Loading="@_isLoading" LoadingProgressColor="Color.Info">
+    <MudTable RowsPerPage="_pageSize" Items="@_orders" Hover="true" Loading="@_isLoading" LoadingProgressColor="Color.Info">
         <HeaderContent>
             <MudTh>Nr. zamówienia</MudTh>
             <MudTh>Klient</MudTh>
@@ -85,6 +85,12 @@
                 </AuthorizeView>
             </MudTd>
         </RowTemplate>
+        <NoRecordsContent>
+            <MudText>Brak zamówień...</MudText>
+        </NoRecordsContent>
+        <LoadingContent>
+            <MudText>Ładowanie zamówień...</MudText>
+        </LoadingContent>
         <PagerContent>
             <div class="d-flex flex-column align-center">
                 <MudPagination Size="Size.Large" Variant="Variant.Filled" Color="Color.Secondary" SelectedChanged="PageChanged" Count="@_pageCount" Class="pa-4"/>

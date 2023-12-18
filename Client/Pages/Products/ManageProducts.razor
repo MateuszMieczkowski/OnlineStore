@@ -17,7 +17,7 @@
         <h3>@(ShowBin ? "Kosz" : "Zarządzanie produktami")</h3>
     </div>
     <ProductsFilter ShowBin="@ShowBin" OnFilterChanged="@RefreshProducts" OnEmptyBin="@EmptyBin"/>
-    <MudTable Items="@products" Hover="true" Loading="@_isLoading" LoadingProgressColor="Color.Info">
+    <MudTable Items="@products" RowsPerPage="_pageSize" Hover="true" Loading="@_isLoading" LoadingProgressColor="Color.Info">
         <HeaderContent>
             <MudTh>Nazwa</MudTh>
             <MudTh>Numer referencyjny</MudTh>
@@ -66,6 +66,12 @@
                 </MudButtonGroup>
             </MudTd>
         </RowTemplate>
+        <NoRecordsContent>
+            <MudText>Brak produktów...</MudText>
+        </NoRecordsContent>
+        <LoadingContent>
+            <MudText>Ładowanie produktów...</MudText>
+        </LoadingContent>
         <PagerContent>
             <div class="d-flex flex-column align-center">
                 <MudPagination Size="Size.Large" Variant="Variant.Filled" Color="Color.Secondary" sele SelectedChanged="PageChanged" Count="@_pageCount" Class="pa-4"/>
@@ -76,9 +82,7 @@
 
 @code
 {
-    [Parameter]
-    [SupplyParameterFromQuery]
-    public bool ShowBin { get; set; }
+    [Parameter] [SupplyParameterFromQuery] public bool ShowBin { get; set; }
 
     private IReadOnlyCollection<ProductListItemDto> products = new List<ProductListItemDto>();
     private bool _isLoading;
@@ -96,7 +100,7 @@
     private async Task RefreshProducts(ProductFilterModel? filter = null)
     {
         _isLoading = true;
-        var response = await ProductService.GetProductList(_pageNumber, _pageSize, filter ?? new ProductFilterModel());
+        var response = await ProductService.GetProductList(_pageNumber, _pageSize, filter ?? new ProductFilterModel { DeletedOnly = ShowBin });
         products = response.Items;
         _pageCount = response.TotalPages;
         _isLoading = false;
@@ -116,10 +120,10 @@
         StateHasChanged();
         Snackbar.Add("Zaktualizowano stan produktu pomyślnie!");
     }
-    
+
     private async Task EmptyBin()
     {
-        await ProductService.EmptyBin(products.Select(x => x.Id));
+        await ProductService.EmptyBin(products.Where(x => x.Status == ProductStatusDto.Deleted).Select(x => x.Id));
         StateHasChanged();
         Snackbar.Add("Wyczyszczono kosz pomyślnie!");
     }
