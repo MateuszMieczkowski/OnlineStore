@@ -33,7 +33,7 @@
        
        <div class="mb-4">
            <MudTypography Typo="Typo.body2">Adres dostawy:</MudTypography>
-           <div>@_order.OrderAddress.Street, @_order.OrderAddress.City, @_order.OrderAddress.PostalCode</div>
+           <div>@_order.OrderAddress.Country, @_order.OrderAddress.Street @_order.OrderAddress.StreetNumber, @_order.OrderAddress.City, @_order.OrderAddress.PostalCode</div>
        </div>
 
         <BackButton/>

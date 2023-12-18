@@ -16,7 +16,7 @@ public class HardDeleteProductCommandHandler : ICommandHandler<HardDeleteProduct
     public async Task Handle(HardDeleteProduct request, CancellationToken cancellationToken)
     {
         await _dbContext.Products
-            .Where(x => x.Id == request.Id)
+            .Where(x => x.Id == request.Id && x.IsDeleted)
             .ExecuteDeleteAsync(cancellationToken);
     }
 }

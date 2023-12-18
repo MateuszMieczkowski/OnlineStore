@@ -11,38 +11,44 @@
 <MudButton Size="Size.Small" Variant="Variant.Text" Color="Color.Primary" StartIcon="@Icons.Material.Filled.ShoppingCartCheckout" OnClick="@(() => BuyNow(Product))">Kup teraz</MudButton>
 
 @code {
-    [Parameter]
-    public object Product { get; set; }
-    
+    [Parameter] public object Product { get; set; }
+
     private async Task AddToCart(object product, bool skipAlert = false)
     {
         var cartItem = MapCartItem(product);
-        
+
         if (!await ValidateCartAction())
         {
             return;
         }
         
+        if (cartItem.ProductQuantity < cartItem.Count)
+        {
+            Snackbar.Add("Produkt jest w niewystarczającej ilości", Severity.Warning);
+            return;
+        }
+
         await ShoppingCartService.AddToCartAsync(cartItem, 1);
 
         if (skipAlert)
         {
             return;
         }
+
         Snackbar.Add("Dodano produkt do koszyka", Severity.Info);
     }
-    
+
     private async Task BuyNow(object item)
     {
         if (!await ValidateCartAction())
         {
             return;
         }
-        
+
         await AddToCart(item);
         NavigationManager.NavigateTo(@NavPaths.OrderCheckout);
     }
-    
+
     private async Task<bool> ValidateCartAction()
     {
         if (!await CallContext.IsAuthenticated())
@@ -57,7 +63,7 @@
     private CartItemModel MapCartItem(object product)
     {
         var productCart = new CartItemModel();
-        
+
         if (product is ProductListItemDto productListItemDto)
         {
             productCart = new CartItemModel
@@ -65,7 +71,8 @@
                 ProductId = productListItemDto.Id,
                 Name = productListItemDto.Name,
                 ThumbnailUri = productListItemDto.ThumbnailUri,
-                Count = 1
+                Count = 1,
+                ProductQuantity = productListItemDto.Quantity,
             };
         }
 
@@ -76,10 +83,12 @@
                 ProductId = productDto.Id,
                 Name = productDto.Name,
                 ThumbnailUri = productDto.ThumbnailUri,
-                Count = 1
+                Count = 1,
+                ProductQuantity = productDto.Quantity,
             };
         }
 
         return productCart;
     }
+
 }
