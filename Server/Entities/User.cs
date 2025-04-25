@@ -11,8 +11,6 @@ public class User
     public UserRole UserRole { get; set; }
 
     public virtual string FullName => Email;
-    
-    public ICollection<Order> Orders { get; set; } = default!;
 
     public void UpdatePassword(string passwordHash)
     {

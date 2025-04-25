@@ -43,8 +43,8 @@ public class OrderProcessedState : IOrderState
 
 		var emailDefinition = new OrderStatusChangedEmail(
 			order: order,
-			recipientEmail: order.User.Email,
-			recipientName: order.User.FullName,
+			recipientEmail: order.Client.Email,
+			recipientName: order.Client.FullName,
 			senderEmail: null);
 
 		await _emailService.SendEmailFromDefinitionAsync(emailDefinition);

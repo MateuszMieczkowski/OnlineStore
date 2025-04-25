@@ -52,9 +52,9 @@
                     <MudNumericField OnDebounceIntervalElapsed="StageFilter" Format="N2" DebounceInterval="400" Variant="Variant.Outlined" Label="Cena od" @bind-Value="_filter.MinPrice"/>
                     <MudNumericField OnDebounceIntervalElapsed="StageFilter" Format="N2" DebounceInterval="400" Variant="Variant.Outlined" Label="Cena do" @bind-Value="_filter.MaxPrice"/>
                 </div>
-                <MudSwitch T="bool" CheckedChanged="@((e) => StageGrossFilter(e))" Checked="_filter.FilterGrossPrice" Color="Color.Secondary" Label="Filtruj ceny brutto"/>
+                <MudSwitch T="bool" ValueChanged="@((e) => StageGrossFilter(e))" Checked="_filter.FilterGrossPrice" Color="Color.Secondary" Label="Filtruj ceny brutto"/>
                 <AuthorizeView Roles="Admin">
-                    <MudSwitch T="bool" CheckedChanged="@((e) => StageHiddenFilter(e))" Checked="_filter.HiddenOnly" Color="Color.Secondary" Label="Tylko produkty ukryte"/>
+                    <MudSwitch T="bool" ValueChanged="@((e) => StageHiddenFilter(e))" Checked="_filter.HiddenOnly" Color="Color.Secondary" Label="Tylko produkty ukryte"/>
                 </AuthorizeView>
             }
         </MudContainer>

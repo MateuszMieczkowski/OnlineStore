@@ -19,10 +19,10 @@
                 <EditForm Context="_" Model="Model" OnValidSubmit="OnChangePreferencesSubmit">
                     <div class="form-group">
                         <label>Motyw:</label>
-                        <MudRadioGroup T="UIThemeDto" SelectedOptionChanged="ChangeTheme" SelectedOption="Model.UiTheme">
-                            @foreach (var value in Enum.GetValues<UIThemeDto>())
+                        <MudRadioGroup T="UIThemeDto" ValueChanged="ChangeTheme" bind-Value="@Model.UiTheme">
+                            @foreach (UIThemeDto value in Enum.GetValues<UIThemeDto>())
                             {
-                                <MudRadio Option="@value" Color="Color.Secondary" Size="Size.Medium">@EnumHelper.GetDescription(value)</MudRadio>
+                                <MudRadio T="UIThemeDto" Option="@value" Color="Color.Secondary" Size="Size.Medium">@EnumHelper.GetDescription(value)</MudRadio>
                             }
                         </MudRadioGroup>
                     </div>
@@ -31,9 +31,9 @@
                         <label>Wyświetlana cena:</label>
 
                         <MudRadioGroup T="DisplayedPriceDto" @bind-SelectedOption="@Model.DisplayedPrice">
-                            @foreach (var value in Enum.GetValues<DisplayedPriceDto>())
+                            @foreach (DisplayedPriceDto value in Enum.GetValues<DisplayedPriceDto>())
                             {
-                                <MudRadio Option="@value" Color="Color.Secondary" Size="Size.Medium">@EnumHelper.GetDescription(value)</MudRadio>
+                                <MudRadio T="DisplayedPriceDto" Option="@value" Color="Color.Secondary" Size="Size.Medium">@EnumHelper.GetDescription(value)</MudRadio>
                             }
                         </MudRadioGroup>
                     </div>

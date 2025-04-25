@@ -13,10 +13,10 @@ public class Order :
     public OrderStatus Status { get; set; }
     public int ClientId { get; set; }
     public int OrderAddressId { get; set; }
-    public DateTime CreatedDate { get; private set; } = default!;
-    public DateTime ModifiedDate { get; private set; } = default!;
+    public DateTime CreatedDate { get; private set; }
+    public DateTime ModifiedDate { get; private set; }
 
     public OrderAddress Address { get; set; } = default!;
-    public User User { get; set; } = default!;
+    public Client Client { get; set; } = default!;
     public List<OrderItem> OrderItems { get; set; } = default!;
 }

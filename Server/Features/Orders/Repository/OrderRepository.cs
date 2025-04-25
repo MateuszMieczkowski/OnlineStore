@@ -22,7 +22,7 @@ public class OrderRepository : RepositoryBase<Order>, IOrderRepository
             .AsQueryable();
         if (includeUser)
         {
-            query = query.Include(x => x.User);
+            query = query.Include(x => x.Client);
         }
 
         if (includeOrderItems)

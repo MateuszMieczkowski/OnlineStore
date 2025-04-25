@@ -31,7 +31,7 @@ public class OrderCreatedState : IOrderState
 		{
 			return;
 		}
-		var client = order.User;
+		var client = order.Client;
 
 		order.Status = OrderStatus.Created;
 

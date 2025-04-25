@@ -13,7 +13,7 @@ public static class OrderMapper
 			TotalNet: order.TotalNet,
 			TotalGross: order.TotalGross,
 			ClientId: order.ClientId,
-			ClientEmail: order.User.Email,
+			ClientEmail: order.Client.Email,
 			CreatedDate: order.CreatedDate)
 		{
 			ModifiedDate = order.ModifiedDate,

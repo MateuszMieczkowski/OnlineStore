@@ -34,7 +34,7 @@ public class GetOrdersQueryHandler : IQueryHandler<Shared.Orders.GetOrders, Page
 		
 		var dbQuery = _dbContext.Orders
 			.AsNoTracking()
-			.Include(x => x.User)
+			.Include(x => x.Client)
 			.Where(x => orderStatuses.Contains(x.Status));
 
 		var isAdmin = Enum.Parse<UserRole>(_loggedUserService.GetUserRole()!) == UserRole.Admin;

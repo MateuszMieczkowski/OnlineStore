@@ -1,34 +1,30 @@
 @using OnlineStore.Client.Products.Models
-@using OnlineStore.Client.Extensions
 @using OnlineStore.Shared.Products
-@using Microsoft.AspNetCore.Http
-@using Microsoft.AspNetCore.Http.Internal
 @using System.Collections.ObjectModel
 @inject IProductService ProductService
 @inject ISnackbar Snackbar
-@typeparam TFile where TFile:ProductFileModel, new()
+@typeparam TFile where TFile : ProductFileModel, new()
 
 <MudCardHeader>
     <CardHeaderContent>
         <MudText Typo="Typo.h4">@_model.Name</MudText>
     </CardHeaderContent>
 </MudCardHeader>
-    <MudCardContent Class="d-flex flex-column gap-2">
+<MudCardContent Class="d-flex flex-column gap-2">
 
         @if (!string.IsNullOrEmpty(_model.ThumbnailImageSource))
         {
             <MudImage ObjectFit="ObjectFit.Contain" Src="@_model.ThumbnailImageSource" Alt="thumbnail-mud" Elevation="25" Class="rounded-lg" Height="300"/>
         }
         <MudFileUpload T="IBrowserFile" FilesChanged="file => UploadFile(file, ProductFileTypeDto.Thumbnail)" Accept=".png, .jpg">
-            <ButtonTemplate>
+            <ActivatorContent>
                 <MudButton HtmlTag="label"
                            Variant="Variant.Filled"
                            Color="Color.Secondary"
-                           StartIcon="@Icons.Material.Filled.Photo"
-                           for="@context">
+                           StartIcon="@Icons.Material.Filled.Photo">
                     Dodaj miniaturkę produktu
                 </MudButton>
-            </ButtonTemplate>
+            </ActivatorContent>
         </MudFileUpload>
         <ValidationMessage For="() => _model.ThumbnailImageSource"/>
         <MudTextField @bind-Value="_model.Name"
@@ -45,125 +41,130 @@
                       Variant="Variant.Outlined"
                       Label="Krótki opis *"/>
 
-        <MudTextField @bind-Value="_model.Quantity"
-                      For="@(() => _model.Quantity)"
-                      Variant="Variant.Outlined"
-                      InputType="InputType.Number"
-                      Label="Ilość"/>
-        <div class="d-flex gap-2">
-            <MudNumericField @bind-Value="_model.PriceNet"
-                             For="@(() => _model.PriceNet)"
-                             Variant="Variant.Outlined"
-                             Format="N2"
-                             Adornment="Adornment.End"
-                             AdornmentText="zł"
-                             Label="Cena netto *"/>
+    <MudTextField @bind-Value="_model.Quantity"
+                  For="@(() => _model.Quantity)"
+                  Variant="Variant.Outlined"
+                  InputType="InputType.Number"
+                  Label="Ilość"/>
+    <div class="d-flex gap-2">
+        <MudNumericField @bind-Value="_model.PriceNet"
+                         For="@(() => _model.PriceNet)"
+                         Variant="Variant.Outlined"
+                         Format="N2"
+                         Adornment="Adornment.End"
+                         AdornmentText="zł"
+                         Label="Cena netto *"/>
 
-            <MudSelect T="TaxRateDto" Label="Stawka podatku *" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" @bind-Value="_model.TaxRate">
-                @foreach (var taxRate in _taxRates)
-                {
-                    <MudSelectItem T="TaxRateDto" Value="@taxRate">@taxRate.Description</MudSelectItem>
-                }
-            </MudSelect>
-            <MudNumericField
-                Variant="Variant.Outlined"
-                Format="N2"
-                ReadOnly="true"
-                Value="@PriceGross"
-                Adornment="Adornment.End"
-                AdornmentText="zł"
-                Label="Cena brutto (wyliczona)"/>
-        </div>
-        <MudSwitch @bind-Checked="_model.IsHidden"
-                   Color="Color.Secondary"
-                   For="@(() => _model.IsHidden)"
-                   Label="Ukrycie produktu"/>
+        <MudSelect T="TaxRateDto" Label="Stawka podatku *" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter"
+                   @bind-Value="_model.TaxRate">
+            @foreach (var taxRate in _taxRates)
+            {
+                <MudSelectItem T="TaxRateDto" Value="@taxRate">@taxRate.Description</MudSelectItem>
+            }
+        </MudSelect>
+        <MudNumericField
+            Variant="Variant.Outlined"
+            Format="N2"
+            ReadOnly="true"
+            Value="@PriceGross"
+            Adornment="Adornment.End"
+            AdornmentText="zł"
+            Label="Cena brutto (wyliczona)"/>
+    </div>
+    <MudSwitch @bind-Checked="_model.IsHidden"
+               Color="Color.Secondary"
+               For="@(() => _model.IsHidden)"
+               Label="Ukrycie produktu"/>
 
-        <MudGrid>
-            <MudItem xs="12" md="6">
-                <MudTextField @bind-Value="_model.Description"
-                              For="@(() => _model.Description)"
-                              Variant="Variant.Outlined"
-                              Immediate="true"
-                              Lines="10"
-                              Label="Opis szczegółowy *"/>
+    <MudGrid>
+        <MudItem xs="12" md="6">
+            <MudTextField @bind-Value="_model.Description"
+                          For="@(() => _model.Description)"
+                          Variant="Variant.Outlined"
+                          Immediate="true"
+                          Lines="10"
+                          Label="Opis szczegółowy *"/>
 
-            </MudItem>
+        </MudItem>
 
-            <MudItem xs="12" md="6">
+        <MudItem xs="12" md="6">
+            <div>
+                <strong>Podgląd:</strong>
                 <div>
-                    <strong>Podgląd:</strong>
-                    <div>
-                        @((MarkupString)_model.Description)
-                    </div>
+                    @((MarkupString)_model.Description)
                 </div>
-            </MudItem>
-        </MudGrid>
-        <MudFileUpload T="IReadOnlyList<IBrowserFile>" FilesChanged="@((files) => UploadFiles(files, ProductFileTypeDto.Image))" Accept=".png, .jpg">
-            <ButtonTemplate>
-                <MudButton HtmlTag="label"
-                           Variant="Variant.Filled"
-                           Color="Color.Secondary"
-                           StartIcon="@Icons.Material.Filled.Image"
-                           for="@context">
-                    Dodaj obrazy
+            </div>
+        </MudItem>
+    </MudGrid>
+    <MudFileUpload T="IReadOnlyList<IBrowserFile>"
+                   FilesChanged="@((files) => UploadFiles(files, ProductFileTypeDto.Image))" Accept=".png, .jpg">
+        <ActivatorContent>
+            <MudButton HtmlTag="label"
+                       Variant="Variant.Filled"
+                       Color="Color.Secondary"
+                       StartIcon="@Icons.Material.Filled.Image">
+                Dodaj obrazy
+            </MudButton>
+        </ActivatorContent>
+    </MudFileUpload>
+    <MudList T="string">
+        @foreach (var file in _model.ProductFiles.Where(x => x.ProductFileType == ProductFileTypeDto.Image))
+        {
+            <MudListItem T="string" Icon="@Icons.Material.Filled.Image">
+                @file.FileName
+                <MudButton OnClick="@(() => RemoveFile(file))" EndIcon="@Icons.Material.Filled.RemoveCircle"
+                           Variant="Variant.Outlined" Color="Color.Secondary">Usuń
                 </MudButton>
-            </ButtonTemplate>
-        </MudFileUpload>
-        <MudList>
+            </MudListItem>
+        }
+    </MudList>
+    @if (_model.ProductFiles.Any(x => x.ProductFileType == ProductFileTypeDto.Image))
+    {
+        <MudCarousel TData="object" AutoCycle="false" css Style="height: 300px">
             @foreach (var file in _model.ProductFiles.Where(x => x.ProductFileType == ProductFileTypeDto.Image))
             {
-                <MudListItem Icon="@Icons.Material.Filled.Image">
-                    @file.FileName
-                    <MudButton OnClick="@(() => RemoveFile(file))" EndIcon="@Icons.Material.Filled.RemoveCircle" Variant="Variant.Outlined" Color="Color.Secondary">Usuń</MudButton>
-                </MudListItem>
+                <MudCarouselItem>
+                    <MudImage ObjectFit="ObjectFit.Cover" Height="300" Src=@file.ImageSource Alt="gallery-item"
+                              Elevation="25" Class="rounded-lg d-block m-auto"/>
+                </MudCarouselItem>
             }
-        </MudList>
-        @if (_model.ProductFiles.Any(x => x.ProductFileType == ProductFileTypeDto.Image))
+        </MudCarousel>
+    }
+    <MudFileUpload T="IReadOnlyList<IBrowserFile>" Accept=".pdf"
+                   FilesChanged="@((files) => UploadFiles(files, ProductFileTypeDto.Other))">
+        <ButtonTemplate>
+            <MudButton HtmlTag="label"
+                       Variant="Variant.Filled"
+                       Color="Color.Secondary"
+                       StartIcon="@Icons.Material.Filled.Image">
+                Załącz pliki
+            </MudButton>
+        </ButtonTemplate>
+    </MudFileUpload>
+    <MudList T="string">
+        @foreach (var file in _model.ProductFiles.Where(x => x.ProductFileType == ProductFileTypeDto.Other))
         {
-            <MudCarousel TData="object" AutoCycle="false" css Style="height: 300px">
-                @foreach (var file in _model.ProductFiles.Where(x => x.ProductFileType == ProductFileTypeDto.Image))
-                {
-                    <MudCarouselItem>
-                        <MudImage ObjectFit="ObjectFit.Cover" Height="300" Src=@file.ImageSource Alt="gallery-item" Elevation="25" Class="rounded-lg d-block m-auto"/>
-                    </MudCarouselItem>
-                }
-            </MudCarousel>
+            <MudListItem T="string" Icon="@Icons.Material.Filled.AttachFile">
+                <div class="d-flex flex-column gap-2">
+                    <MudButton OnClick="@(() => RemoveFile(file))" EndIcon="@Icons.Material.Filled.RemoveCircle"
+                               Variant="Variant.Outlined" Color="Color.Secondary">Usuń
+                    </MudButton>
+                    <MudTextField @bind-Value="file.FileName"
+                                  Variant="Variant.Outlined"
+                                  Label="Nazwa *"/>
+                    <MudTextField @bind-Value="file.Description"
+                                  Variant="Variant.Outlined"
+                                  Label="Opis"/>
+                </div>
+            </MudListItem>
         }
-        <MudFileUpload T="IReadOnlyList<IBrowserFile>" Accept=".pdf" FilesChanged="@((files) => UploadFiles(files, ProductFileTypeDto.Other))">
-            <ButtonTemplate>
-                <MudButton HtmlTag="label"
-                           Variant="Variant.Filled"
-                           Color="Color.Secondary"
-                           StartIcon="@Icons.Material.Filled.Image"
-                           for="@context">
-                    Załącz pliki
-                </MudButton>
-            </ButtonTemplate>
-        </MudFileUpload>
-        <MudList>
-            @foreach (var file in _model.ProductFiles.Where(x => x.ProductFileType == ProductFileTypeDto.Other))
-            {
-                <MudListItem Icon="@Icons.Material.Filled.AttachFile">
-                    <div class="d-flex flex-column gap-2">
-                        <MudButton OnClick="@(() => RemoveFile(file))" EndIcon="@Icons.Material.Filled.RemoveCircle" Variant="Variant.Outlined" Color="Color.Secondary">Usuń</MudButton>
-                        <MudTextField @bind-Value="file.FileName"
-                                      Variant="Variant.Outlined"
-                                      Label="Nazwa *"/>
-                        <MudTextField @bind-Value="file.Description"
-                                      Variant="Variant.Outlined"
-                                      Label="Opis"/>
-                    </div>
-                </MudListItem>
-            }
-        </MudList>
-    </MudCardContent>
+    </MudList>
+</MudCardContent>
 
 
 @code {
 
-    [Parameter]
-    public ProductModel<TFile> _model { get; set; }
+    [Parameter] public ProductModel<TFile> _model { get; set; }
 
     private IReadOnlyCollection<TaxRateDto> _taxRates = new Collection<TaxRateDto>();
 
@@ -197,7 +198,7 @@
             File = file,
             ProductFileType = fileType,
         };
-        
+
         var buffer = new byte[file.Size];
         await file.OpenReadStream(maxAllowedSize).ReadAsync(buffer);
         var fileBase64 = Convert.ToBase64String(buffer);
@@ -210,6 +211,7 @@
             {
                 RemoveFile(currentThumbnail);
             }
+
             _model.ThumbnailImageSource = $"data:image/jpeg;base64,{fileBase64}";
             if (_model is CreateProductModel createModel)
             {
@@ -226,4 +228,5 @@
         _model.ProductFiles.Remove(file);
         StateHasChanged();
     }
+
 }

@@ -42,7 +42,7 @@
                         </MudCardHeader>
                         <MudCardMedia Image="@product.ThumbnailUri"/>
                         <MudCardContent>
-                            <MudText Typo="Typo.subtitle2">@(_showNetPrice ? product.PriceNet : product.PriceGross) zł</MudText>
+                            <MudText Typo="Typo.subtitle2">@(_showNetPrice ? product.PriceNet : product.PriceGross) zł @(_showNetPrice ? "Netto" : "Brutto")</MudText>
                             <MudText Typo="Typo.caption">Ilość: @product.Quantity</MudText>
                         </MudCardContent>
                         <MudCardActions>
