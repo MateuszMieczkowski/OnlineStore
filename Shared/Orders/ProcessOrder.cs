@@ -2,4 +2,14 @@
 
 namespace OnlineStore.Shared.Orders;
 
-public record ProcessOrder(int OrderId) : ICommand;
+public class ProcessOrder : ICommand
+{
+    public ProcessOrder(int orderId)
+    {
+        OrderId = orderId;
+    }
+
+    public ProcessOrder() { }
+    
+    public int OrderId { get; set; }
+}

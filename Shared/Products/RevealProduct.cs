@@ -2,4 +2,17 @@
 
 namespace OnlineStore.Shared.Products;
 
-public record RevealProduct(int Id) : ICommand;
+public class RevealProduct : ICommand
+{
+    public RevealProduct(int id)
+    {
+        Id = id;
+    }
+
+    public RevealProduct()
+    {
+        
+    }
+
+    public int Id { get; set; }
+}

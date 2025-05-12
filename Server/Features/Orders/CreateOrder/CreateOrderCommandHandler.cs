@@ -28,6 +28,12 @@ public class CreateOrderCommandHandler : ICommandHandler<Shared.Orders.CreateOrd
 	public async Task Handle(Shared.Orders.CreateOrder request, CancellationToken cancellationToken)
     {
         var userId = _loggedUserService.GetUserId();
+        var userRole = _loggedUserService.GetUserRole();
+        if (userRole != UserRole.User.ToString())
+        {
+            throw new Exception("Only users can order");
+        }
+        
         var client = await _dbContext.Clients
             .FirstAsync(x => x.Id == userId, cancellationToken);
 

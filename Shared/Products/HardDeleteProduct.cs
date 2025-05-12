@@ -2,4 +2,17 @@
 
 namespace OnlineStore.Shared.Products;
 
-public record HardDeleteProduct(int Id) : ICommand;
+public class HardDeleteProduct : ICommand
+{
+    public HardDeleteProduct(int id)
+    {
+        Id = id;
+    }
+
+    public HardDeleteProduct()
+    {
+        
+    }
+
+    public int Id { get; set; }
+}

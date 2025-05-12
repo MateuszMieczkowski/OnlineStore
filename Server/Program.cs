@@ -1,5 +1,3 @@
-using System.Reflection;
-using System.Text;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -25,10 +23,14 @@ using OnlineStore.Server.Middleware;
 using OnlineStore.Server.Options;
 using OnlineStore.Server.Services;
 using OnlineStore.Server.Services.Email;
+using OnlineStore.Server.SoapServices;
 using OnlineStore.Shared.Accounts;
 using OnlineStore.Shared.Clients;
 using OnlineStore.Shared.Orders;
 using OnlineStore.Shared.Products;
+using OnlineStore.Shared.SoapContracts;
+using SoapCore;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -80,7 +82,7 @@ builder.Services.AddScoped<IValidator<RegisterAdmin>, RegisterUserDtoValidator>(
 builder.Services.AddScoped<IValidator<CreateProductsBatch>, CreateProductsBatchValidator>();
 builder.Services.AddScoped<IValidator<UpdateProduct>, UpdateProductValidator>();
 builder.Services.AddScoped<IValidator<CreateOrder>, CreateOrderValidator>();
-builder.Services.AddScoped<IValidator<CreateOrder.CreateOrderItem>, CreateOrderItemValidator>();
+builder.Services.AddScoped<IValidator<CreateOrderItem>, CreateOrderItemValidator>();
 builder.Services.AddScoped<StoreSeeder>();
 builder.Services.AddScoped<IBlobStorage, AzureStorage>();
 builder.Services.AddSingleton<IClock, Clock>();
@@ -108,7 +110,6 @@ builder.Services.RegisterQuartzJobs();
 builder.Services.RegisterEmailServices();
 
 
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("FrontEndClient", p =>
@@ -119,6 +120,13 @@ builder.Services.AddCors(options =>
             //              builder.Configuration["ClientAddress"])
     );
 });
+
+builder.Services.AddSoapCore();
+builder.Services.AddScoped<IAccountSoapService, AccountSoapService>();
+builder.Services.AddScoped<IClientSoapService, ClientSoapService>();
+builder.Services.AddScoped<IOrderSoapService, OrderSoapService>();
+builder.Services.AddScoped<IProductSoapService, ProductSoapService>();
+builder.Services.AddScoped<IShoppingCardSoapService, ShoppingCardSoapService>();
 
 var app = builder.Build();
 
@@ -152,13 +160,23 @@ app.UseMiddleware<ErrorHandlingMiddleware>();
 app.UseAuthentication();
 
 app.UseHttpsRedirection();
-
 app.UseStaticFiles();
-
 app.UseRouting();
 
 app.UseAuthorization();
 
-app.MapControllers();
+// app.MapRazorPages();
+// app.MapControllers();
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.UseSoapEndpoint<IAccountSoapService>("/soap/account", new SoapEncoderOptions(), SoapSerializer.DataContractSerializer);
+    endpoints.UseSoapEndpoint<IClientSoapService>("/soap/client", new SoapEncoderOptions(), SoapSerializer.DataContractSerializer);
+    endpoints.UseSoapEndpoint<IOrderSoapService>("/soap/order", new SoapEncoderOptions(), SoapSerializer.DataContractSerializer);
+    endpoints.UseSoapEndpoint<IProductSoapService>("/soap/product", new SoapEncoderOptions(), SoapSerializer.DataContractSerializer);
+    endpoints.UseSoapEndpoint<IShoppingCardSoapService>("/soap/shopping-card", new SoapEncoderOptions(), SoapSerializer.DataContractSerializer);
+});
+
+app.MapFallbackToFile("index.html");
 
 app.Run();

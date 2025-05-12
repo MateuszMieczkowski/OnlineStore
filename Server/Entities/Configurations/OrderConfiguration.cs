@@ -22,8 +22,7 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
             .IsRequired();
 
         builder.HasOne(e => e.Address)
-            .WithMany()
-            .HasForeignKey(e => e.OrderAddressId)
+            .WithOne()
             .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
 

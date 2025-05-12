@@ -1,5 +1,4 @@
 using OnlineStore.Shared.Accounts;
-using OnlineStore.Shared.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace OnlineStore.Shared.Clients;

@@ -9,12 +9,12 @@ public static class OrderMapper
 	public static OrderListItemDto ToListItemDto(this Order order)
 	{
 		return new OrderListItemDto(
-			Id: order.Id,
-			TotalNet: order.TotalNet,
-			TotalGross: order.TotalGross,
-			ClientId: order.ClientId,
-			ClientEmail: order.Client.Email,
-			CreatedDate: order.CreatedDate)
+			id: order.Id,
+			totalNet: order.TotalNet,
+			totalGross: order.TotalGross,
+			clientId: order.ClientId,
+			clientEmail: order.Client.Email,
+			createdDate: order.CreatedDate)
 		{
 			ModifiedDate = order.ModifiedDate,
 			Status = (OrderStatusDto)order.Status

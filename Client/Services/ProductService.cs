@@ -38,24 +38,24 @@ public class ProductService : IProductService
         ProductFilterModel filter)
     {
         var query = new GetProductList(
-            PageNumber: pageNumber,
-            PageSize: pageSize,
-            DeletedOnly: filter.DeletedOnly,
-            HiddenOnly: filter.HiddenOnly,
-            SearchPhrase: filter.SearchPhrase,
-            Name: filter.Name,
-            ReferenceNumber: filter.ReferenceNumber,
-            ShortDescription: filter.ShortDescription,
-            FilterGrossPrice: filter.FilterGrossPrice,
-            PriceFrom: filter.MinPrice,
-            PriceTo: filter.MaxPrice);
+            pageNumber: pageNumber,
+            pageSize: pageSize,
+            deletedOnly: filter.DeletedOnly,
+            hiddenOnly: filter.HiddenOnly,
+            searchPhrase: filter.SearchPhrase,
+            name: filter.Name,
+            referenceNumber: filter.ReferenceNumber,
+            shortDescription: filter.ShortDescription,
+            filterGrossPrice: filter.FilterGrossPrice,
+            priceFrom: filter.MinPrice,
+            priceTo: filter.MaxPrice);
         
         return await _broker.GetProductsAsync(query);
     }
 
     public async Task<ProductDto> GetProductById(int id)
     {
-        var query = new GetProduct(Id: id);
+        var query = new GetProduct(id: id);
         return await _broker.GetProductByIdAsync(query);
     }
 
@@ -69,15 +69,15 @@ public class ProductService : IProductService
                             new CreateProductFile(y.FileName, y.FileBase64 ?? "", y.ProductFileType, y.Description))
                         .ToList();
                     return new CreateProductDto(
-                        Name: x.Name,
-                        ReferenceNumber: x.ReferenceNumber,
-                        ShortDescription: x.ShortDescription,
-                        Description: x.Description,
-                        Quantity: x.Quantity,
-                        PriceNet: x.PriceNet,
-                        IsHidden: x.IsHidden,
-                        TaxRateId: x.TaxRate!.TaxRateId,
-                        ProductFiles: files);
+                        name: x.Name,
+                        referenceNumber: x.ReferenceNumber,
+                        shortDescription: x.ShortDescription,
+                        description: x.Description,
+                        quantity: x.Quantity,
+                        priceNet: x.PriceNet,
+                        isHidden: x.IsHidden,
+                        taxRateId: x.TaxRate!.TaxRateId,
+                        productFiles: files);
                 })
             .ToList();
 

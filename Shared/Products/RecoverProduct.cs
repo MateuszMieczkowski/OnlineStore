@@ -2,4 +2,17 @@
 
 namespace OnlineStore.Shared.Products;
 
-public record RecoverProduct(int Id) : ICommand;
+public class RecoverProduct : ICommand
+{
+    public RecoverProduct(int Id)
+    {
+        this.Id = Id;
+    }
+
+    public RecoverProduct()
+    {
+        
+    }
+    
+    public int Id { get; set; }
+}

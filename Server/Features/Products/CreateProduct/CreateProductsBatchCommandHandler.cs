@@ -76,7 +76,7 @@ public class CreateProductsBatchCommandHandler : ICommandHandler<CreateProductsB
         var productFileTasks = productDto.ProductFiles
             .Select(createProductFile => UploadProductFile(product, createProductFile, cancellationToken))
             .ToList();
-
+        
         var productFiles = await Task.WhenAll(productFileTasks);
         foreach (var productFile in productFiles)
         {
@@ -97,8 +97,7 @@ public class CreateProductsBatchCommandHandler : ICommandHandler<CreateProductsB
             FileType = (ProductFileType)createProductFile.ProductFileType,
         };
 
-        productFile.BlobUri =
-            await _blobStorage.UploadAsync(new BlobFileName(productFile.BlobId, productFile.FileName), createProductFile.FileBase64, cancellationToken);
+        productFile.BlobUri = await _blobStorage.UploadAsync(new BlobFileName(productFile.BlobId, productFile.FileName), createProductFile.FileBase64, cancellationToken);
 
         if (productFile.FileType == ProductFileType.Thumbnail)
         {

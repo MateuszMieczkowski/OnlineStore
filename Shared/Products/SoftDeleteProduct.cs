@@ -2,4 +2,17 @@
 
 namespace OnlineStore.Shared.Products;
 
-public record SoftDeleteProduct(int Id) : ICommand;
+public class SoftDeleteProduct : ICommand
+{
+    public SoftDeleteProduct(int Id)
+    {
+        this.Id = Id;
+    }
+
+    public SoftDeleteProduct()
+    {
+        
+    }
+    
+    public int Id { get; set; }
+}

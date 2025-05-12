@@ -44,7 +44,7 @@ public class AuthenticateUserQueryHandler : IQueryHandler<Shared.Models.Authenti
         {
             Id = user.Id,
             Email = user.Email,
-            Preferences = await GetClientPreferences(user),
+            // Preferences = await GetClientPreferences(user),
             Token = _tokenGenerator.GenerateJwtToken(user)
         };
 

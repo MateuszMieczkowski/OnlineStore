@@ -9,6 +9,7 @@ using OnlineStore.Client.Brokers.API;
 using OnlineStore.Client.Configurations;
 using OnlineStore.Client.Providers;
 using OnlineStore.Client.Services;
+using OnlineStore.Client.SoapServices;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.Logging.SetMinimumLevel(LogLevel.Information);
@@ -26,11 +27,21 @@ builder.Services.AddScoped<AuthenticationStateProvider>(p =>
 
 builder.Services.AddScoped<IApiBroker, ApiBroker>();
 
-builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<IAccountService, AccountService>();
-builder.Services.AddScoped<IClientService, ClientService>();
-builder.Services.AddScoped<IShoppingCartService, ShoppingCartService>();
-builder.Services.AddScoped<IOrderService, OrderService>();
+// builder.Services.AddScoped<IProductService, ProductService>();
+// builder.Services.AddScoped<IAccountService, AccountService>();
+// builder.Services.AddScoped<IClientService, ClientService>();
+// builder.Services.AddScoped<IShoppingCartService, ShoppingCartService>();
+// builder.Services.AddScoped<IOrderService, OrderService>();
+
+builder.Services.AddScoped<IProductService, ProductSoapService>();
+builder.Services.AddScoped<IAccountService, AccountSoapService>();
+builder.Services.AddScoped<IClientService, ClientSoapService>();
+builder.Services.AddScoped<IShoppingCartService, ShoppingCardSoapService>();
+builder.Services.AddScoped<IOrderService, OrderSoapService>();
+builder.Services.AddScoped<ISoapClient, SoapClient>();
+
+// builder.Services.AddScoped<IAccountSoapService, AccountSoapServiceClient>();
+
 builder.Services.AddSession();
 builder.Services.AddMudServices(config =>
 {

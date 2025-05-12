@@ -37,9 +37,9 @@ public class UpdateProductValidator : AbstractValidator<Shared.Products.UpdatePr
             .NotEmpty()
             .SetValidator(new UpdateProductFileValidator());
         
-        RuleFor(x => x.ProductFiles)
-            .Must(x => x.Count(y => y.ProductFileType == ProductFileTypeDto.Thumbnail) == 1)
-            .WithMessage("Product must have one and only thumbnail.");
+        // RuleFor(x => x.ProductFiles)
+        //     .Must(x => x.Count(y => y.ProductFileType == ProductFileTypeDto.Thumbnail) == 1)
+        //     .WithMessage("Product must have one and only thumbnail.");
     }
 }
 

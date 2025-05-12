@@ -28,7 +28,7 @@ public class OrderService : IOrderService
     
     public async Task<int> CreateOrder(CartModel cartModel)
     {
-        var orderItems = cartModel.Items.Select(x => new CreateOrder.CreateOrderItem(x.ProductId, x.Count)).ToList();
+        var orderItems = cartModel.Items.Select(x => new CreateOrderItem(x.ProductId, x.Count)).ToList();
         var command = new CreateOrder(cartModel.AddressId, orderItems);
         return await _broker.CreateOrderAsync(command);
     }

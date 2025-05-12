@@ -2,4 +2,17 @@
 
 namespace OnlineStore.Shared.Accounts;
 
-public record GetUserList(int PageNumber, int PageSize) : IPagedQuery<UserDto>;
+public record GetUserList : IPagedQuery<UserDto>
+{
+    public GetUserList(int PageNumber, int PageSize)
+    {
+        this.PageNumber = PageNumber;
+        this.PageSize = PageSize;
+    }
+
+    public GetUserList() { }
+
+    public int PageNumber { get; set; }
+
+    public int PageSize { get; set; }
+}

@@ -15,7 +15,7 @@ public class CreateOrderValidator : AbstractValidator<Shared.Orders.CreateOrder>
     }
 }
 
-public class CreateOrderItemValidator : AbstractValidator<Shared.Orders.CreateOrder.CreateOrderItem>
+public class CreateOrderItemValidator : AbstractValidator<Shared.Orders.CreateOrderItem>
 {
     public CreateOrderItemValidator()
     {

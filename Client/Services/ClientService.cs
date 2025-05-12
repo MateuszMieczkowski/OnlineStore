@@ -1,6 +1,5 @@
 ﻿using Blazored.LocalStorage;
 using OnlineStore.Client.Brokers.API;
-using OnlineStore.Client.Models;
 using OnlineStore.Client.Models.Accounts;
 using OnlineStore.Client.Providers;
 using OnlineStore.Shared.Clients;
@@ -60,13 +59,13 @@ public class ClientService : IClientService
     public async Task UpsertOrderAddress(UpsertAddressModel model)
     {
         var command = new UpsertOrderAddress(
-            Id: model.Id,
-            Street: model.Street,
-            StreetNumber: model.StreetNumber,
-            City: model.City,
-            State: model.State,
-            PostalCode: model.PostalCode,
-            Country: model.Country);
+            id: model.Id,
+            street: model.Street,
+            streetNumber: model.StreetNumber,
+            city: model.City,
+            state: model.State,
+            postalCode: model.PostalCode,
+            country: model.Country);
 
         await _broker.UpsertOrderAddress(command);
     }
@@ -74,7 +73,6 @@ public class ClientService : IClientService
     public async Task<UpsertAddressModel?> GetOrderAddress()
     {
         var addressDto = await _broker.GetOrderAddress();
-        Console.WriteLine(addressDto);
         if (addressDto is null)
         {
             return null;

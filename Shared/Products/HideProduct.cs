@@ -2,4 +2,17 @@
 
 namespace OnlineStore.Shared.Products;
 
-public record HideProduct(int Id) : ICommand;
+public class HideProduct : ICommand
+{
+    public HideProduct(int id)
+    {
+        Id = id;
+    }
+
+    public HideProduct()
+    {
+        
+    }
+
+    public int Id { get; set; }
+}

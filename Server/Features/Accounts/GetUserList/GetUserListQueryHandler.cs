@@ -1,5 +1,4 @@
-﻿using OnlineStore.Server.Enums;
-using OnlineStore.Server.Infrastructure;
+﻿using OnlineStore.Server.Infrastructure;
 using OnlineStore.Shared.Accounts;
 using OnlineStore.Shared.Infrastructure;
 
@@ -9,12 +8,11 @@ public class GetUserListQueryHandler : IQueryHandler<Shared.Accounts.GetUserList
 {
     private readonly IResultPaginator _resultPaginator;
     private readonly OnlineStoreDbContext _dbContext;
-    
+
     public GetUserListQueryHandler(IResultPaginator resultPaginator, OnlineStoreDbContext dbContext)
     {
         _resultPaginator = resultPaginator ?? throw new ArgumentNullException(nameof(resultPaginator));
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
-
     }
 
     public async Task<PagedResult<UserDto>> Handle(Shared.Accounts.GetUserList query, CancellationToken cancellationToken)

@@ -12,5 +12,6 @@
 
   <ItemGroup>
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.1.0" />
+    <PackageReference Include="System.ServiceModel.Primitives" Version="8.1.1" />
   </ItemGroup>
 </Project>

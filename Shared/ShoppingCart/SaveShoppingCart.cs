@@ -2,4 +2,14 @@ using OnlineStore.Shared.Infrastructure;
 
 namespace OnlineStore.Shared.ShoppingCart;
 
-public record SaveShoppingCart(ShoppingCartDto ShoppingCart) : ICommand;
+public class SaveShoppingCart : ICommand
+{
+    public SaveShoppingCart(ShoppingCartDto shoppingCart)
+    {
+        ShoppingCart = shoppingCart;
+    }
+
+    public SaveShoppingCart() { }
+
+    public ShoppingCartDto ShoppingCart { get; set; }
+}

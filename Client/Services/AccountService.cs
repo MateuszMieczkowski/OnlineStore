@@ -53,7 +53,7 @@ public class AccountService : IAccountService
 
         await _localStorage.SetItemAsync("accessToken", response.Token);
         await _localStorage.SetItemAsync("email", response.Email);
-        await _localStorage.SetItemAsync("preferences", response.Preferences);
+        // await _localStorage.SetItemAsync("preferences", response.Preferences);
         await _shoppingCartService.LoadCartFromServer();
 
         await ((ApiAuthenticationStateProvider)_authenticationStateProvider).LoggedIn();
@@ -83,10 +83,10 @@ public class AccountService : IAccountService
         var authenticationState = await _authenticationStateProvider.GetAuthenticationStateAsync();
         var userId = int.Parse(authenticationState.User.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value);
         var command = new ChangeUserPassword(
-            Id: userId,
-            CurrentPassword: model.CurrentPassword,
-            NewPassword: model.NewPassword,
-            ConfirmNewPassword: model.ConfirmNewPassword);
+            id: userId,
+            currentPassword: model.CurrentPassword,
+            newPassword: model.NewPassword,
+            confirmNewPassword: model.ConfirmNewPassword);
 
         await _broker.ChangeUserPassword(command);
     }

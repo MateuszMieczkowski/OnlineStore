@@ -46,9 +46,9 @@ public class CreateProductDtoValidator : AbstractValidator<CreateProductDto>
             .NotEmpty()
             .SetValidator(new CreateProductFileValidator());
 
-        RuleFor(x => x.ProductFiles)
-            .Must(x => x.Count(y => y.ProductFileType == ProductFileTypeDto.Thumbnail) == 1)
-            .WithMessage("Product must have one and only thumbnail.");
+        // RuleFor(x => x.ProductFiles)
+        //     .Must(x => x.Count(y => y.ProductFileType == ProductFileTypeDto.Thumbnail) == 1)
+        //     .WithMessage("Product must have one and only thumbnail.");
     }
 }
 
