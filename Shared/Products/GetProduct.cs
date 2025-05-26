@@ -1,5 +1,6 @@
 ﻿using OnlineStore.Shared.Infrastructure;
 using System.Runtime.Serialization;
+using System.ServiceModel;
 using System.Xml.Serialization;
 
 namespace OnlineStore.Shared.Products;
@@ -41,7 +42,8 @@ public record ProductDto
         bool IsHidden,
         bool IsDeleted,
         TaxRateDto TaxRate,
-        IEnumerable<ProductFileDto> ProductFiles)
+        IEnumerable<ProductFileDto> ProductFiles,
+        string? Thumbnail)
     {
         this.Id = Id;
         this.Name = Name;
@@ -55,6 +57,7 @@ public record ProductDto
         this.IsHidden = IsHidden;
         this.IsDeleted = IsDeleted;
         this.TaxRate = TaxRate;
+        this.Thumbnail = Thumbnail;
         this.ProductFiles = ProductFiles.ToList();
     }
 
@@ -93,6 +96,9 @@ public record ProductDto
 
     [DataMember]
     public TaxRateDto TaxRate { get; set; }
+
+    [DataMember]
+    public string? Thumbnail { get; set; }
 
     [DataMember]
     public List<ProductFileDto> ProductFiles { get; set; }

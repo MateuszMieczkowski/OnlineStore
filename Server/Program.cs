@@ -24,6 +24,7 @@ using OnlineStore.Server.Options;
 using OnlineStore.Server.Services;
 using OnlineStore.Server.Services.Email;
 using OnlineStore.Server.SoapServices;
+using OnlineStore.Server.ThumbnailServiceImplService;
 using OnlineStore.Shared.Accounts;
 using OnlineStore.Shared.Clients;
 using OnlineStore.Shared.Orders;
@@ -127,9 +128,9 @@ builder.Services.AddScoped<IClientSoapService, ClientSoapService>();
 builder.Services.AddScoped<IOrderSoapService, OrderSoapService>();
 builder.Services.AddScoped<IProductSoapService, ProductSoapService>();
 builder.Services.AddScoped<IShoppingCardSoapService, ShoppingCardSoapService>();
+builder.Services.AddScoped<ThumbnailService, ThumbnailServiceClient>();
 
 var app = builder.Build();
-
 
 using (var scope = app.Services.CreateScope())
 {
