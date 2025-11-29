@@ -20,13 +20,13 @@ public class CompleteOrderCommandHandler : ICommandHandler<Shared.Orders.Complet
     public async Task Handle(Shared.Orders.CompleteOrder request, CancellationToken cancellationToken)
     {
         var order = await _orderRepository.GetByIdAsync(request.OrderId,
-                        includeUser: true,
                         includeOrderItems: false,
                         userId: null,
                         cancellationToken)
                     ?? throw new NotFoundException($"Nie znaleziono zamówienia o ID {request.OrderId}");
-
-        var orderContext = new OrderContext(order, new OrderCompletedState(_emailService));
+        var (client, address) = await _orderRepository.GetExtendedDataByIdAsync(order, cancellationToken);
+        
+        var orderContext = new OrderContext(order, address, client, new OrderCompletedState(_emailService));
         await orderContext.CompleteAsync();
 
         await _orderRepository.UpdateAsync(order, cancellationToken);

@@ -24,6 +24,6 @@ public class ChangeUserPasswordCommandHandler : ICommandHandler<Shared.Accounts.
 
         _accountService.AssertHashedPassword(user, command.CurrentPassword);
 
-        await _accountService.ChangePassword(user, command.CurrentPassword);
+        await _accountService.ChangePassword(user, command.NewPassword);
     }
 }

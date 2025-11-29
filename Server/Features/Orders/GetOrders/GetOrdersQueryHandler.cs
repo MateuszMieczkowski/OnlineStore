@@ -31,11 +31,7 @@ public class GetOrdersQueryHandler : IQueryHandler<Shared.Orders.GetOrders, Page
 			.Select(Enum.Parse<OrderStatus>);
 		orderStatuses ??= Enum.GetValues<OrderStatus>();
 
-		
-		var dbQuery = _dbContext.Orders
-			.AsNoTracking()
-			.Include(x => x.Client)
-			.Where(x => orderStatuses.Contains(x.Status));
+		var dbQuery = _dbContext.Orders.Where(x => orderStatuses.Contains(x.Status));
 
 		var isAdmin = Enum.Parse<UserRole>(_loggedUserService.GetUserRole()!) == UserRole.Admin;
 

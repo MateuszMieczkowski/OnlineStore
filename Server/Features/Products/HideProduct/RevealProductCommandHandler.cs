@@ -4,20 +4,19 @@ using OnlineStore.Shared.Products;
 
 namespace OnlineStore.Server.Features.Products.HideProduct;
 
-public class RevealProductCommandHandler : ICommandHandler<RevealProduct>
+public class RevealProductCommandHandler(OnlineStoreDbContext dbContext) : ICommandHandler<RevealProduct>
 {
-    private readonly OnlineStoreDbContext _dbContext;
-
-    public RevealProductCommandHandler(OnlineStoreDbContext dbContext)
+    public async Task Handle(RevealProduct request, CancellationToken token)
     {
-        _dbContext = dbContext;
-    }
+        var product = await dbContext.Products.FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken: token);
+        if (product is null)
+        {
+            return;
+        }
 
-    public async Task Handle(RevealProduct request, CancellationToken cancellationToken)
-    {
-        await _dbContext.Products
-            .Where(x => x.Id == request.Id)
-            .ExecuteUpdateAsync(setter => setter.SetProperty(x => x.IsHidden, false),
-                cancellationToken: cancellationToken);
+        product.IsHidden = false;
+
+        dbContext.Update(product);
+        await dbContext.SaveChangesAsync(token);
     }
 }

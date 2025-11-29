@@ -16,9 +16,9 @@ public class OnlineStoreDbContext : DbContext
 
     public DbSet<Product> Products { get; set; } = null!;
     public DbSet<ProductCategory> ProductCategories { get; set; } = null!;
-    public DbSet<ProductFile> ProductFiles { get; set; } = null!;
+    // public DbSet<ProductFile> ProductFiles { get; set; } = null!;
     public DbSet<Order> Orders { get; set; } = null!;
-    public DbSet<OrderItem> OrdersItems { get; set; } = null!;
+    // public DbSet<OrderItem> OrdersItems { get; set; } = null!;
     public DbSet<OrderAddress> OrdersAddresses { get; set; } = null!;
     public DbSet<Email> Emails { get; set; } = null!;
     public DbSet<EmailTemplate> EmailTemplates { get; set; } = null!;
@@ -26,7 +26,14 @@ public class OnlineStoreDbContext : DbContext
     public DbSet<TaxRate> TaxRates { get; set; } = null!;
     public DbSet<UserPreferences> UserPreferences { get; set; } = null!;
     public DbSet<User> Users { get; set; } = null!;
-    public DbSet<Entities.Client> Clients { get; set; } = null!;
+    public DbSet<Client> Clients { get; set; } = null!;
+    public DbSet<Counter> Counters { get; set; } = null!;
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        Database.AutoTransactionBehavior = AutoTransactionBehavior.Never;
+        base.OnConfiguring(optionsBuilder);
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

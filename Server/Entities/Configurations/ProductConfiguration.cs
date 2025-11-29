@@ -10,6 +10,7 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.HasKey(e => e.Id);
         builder.Property(e => e.Id)
             .ValueGeneratedOnAdd()
+            .HasValueGenerator<MongoIntIdValueGenerator>()
             .UseIdentityColumn();
 
         builder.Property(e => e.Name)
@@ -45,16 +46,29 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .HasMaxLength(500)
             .IsRequired();
 
-        builder.HasOne(e => e.TaxRate)
-            .WithMany()
-            .HasForeignKey(e => e.TaxRateId)
-            .IsRequired()
-            .OnDelete(DeleteBehavior.Cascade);
+        builder.OwnsMany(x => x.ProductFiles, b =>
+        {
+            b.HasKey(e => e.Id);
+            b.Property(e => e.Id)
+                .ValueGeneratedOnAdd()
+                .HasValueGenerator<MongoIntIdValueGenerator>()
+                .UseIdentityColumn();
 
-        builder.HasMany(e => e.ProductFiles)
-            .WithOne(pf => pf.Product)
-            .HasForeignKey(pf => pf.ProductId)
-            .IsRequired()
-            .OnDelete(DeleteBehavior.Cascade);
+            b.Property(e => e.FileName).IsRequired().HasMaxLength(255);
+            b.Property(e => e.FileType).IsRequired();
+            b.Property(x => x.Description).HasMaxLength(500);
+        });
+
+        // builder.HasOne(e => e.TaxRate)
+        //     .WithMany()
+        //     .HasForeignKey(e => e.TaxRateId)
+        //     .IsRequired()
+        //     .OnDelete(DeleteBehavior.Cascade);
+
+        // builder.HasMany(e => e.ProductFiles)
+        //     .WithOne(pf => pf.Product)
+        //     .HasForeignKey(pf => pf.ProductId)
+        //     .IsRequired()
+        //     .OnDelete(DeleteBehavior.Cascade);
     }
 }

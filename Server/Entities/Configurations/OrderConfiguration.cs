@@ -10,6 +10,7 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.HasKey(e => e.Id);
         builder.Property(e => e.Id)
             .ValueGeneratedOnAdd()
+            .HasValueGenerator<MongoIntIdValueGenerator>()
             .UseIdentityColumn();
 
         builder.Property(e => e.TotalNet)
@@ -18,19 +19,38 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.Property(e => e.TotalGross)
             .IsRequired();
 
-        builder.Property(e => e.Status)
+        builder.Property(e => e.Status).IsRequired();
+
+        builder.Property(e => e.ClientId)
             .IsRequired();
 
-        builder.HasOne(e => e.Address)
-            .WithMany()
-            .HasForeignKey(e => e.OrderAddressId)
+        builder.Property(e => e.OrderAddressId)
+            .IsRequired();
+        
+        builder.Property(e => e.ClientEmail)
             .IsRequired()
-            .OnDelete(DeleteBehavior.Cascade);
+            .HasMaxLength(255);
 
-        builder.HasMany(e => e.OrderItems)
-            .WithOne(item => item.Order)
-            .HasForeignKey(item => item.OrderId)
-            .IsRequired()
-            .OnDelete(DeleteBehavior.Cascade);
+        builder.OwnsMany(x => x.OrderItems, b =>
+        {
+            b.HasKey(e => e.Id);
+            b.Property(e => e.Id)
+                .ValueGeneratedOnAdd()
+                .HasValueGenerator<MongoIntIdValueGenerator>()
+                .UseIdentityColumn();
+            b.OwnsOne(e => e.Product, x => x.ToJson());
+        });
+
+        // builder.HasOne(e => e.Address)
+        //     .WithMany()
+        //     .HasForeignKey(e => e.OrderAddressId)
+        //     .IsRequired()
+        //     .OnDelete(DeleteBehavior.Cascade);
+        //
+        // builder.HasMany(e => e.OrderItems)
+        //     .WithOne(item => item.Order)
+        //     .HasForeignKey(item => item.OrderId)
+        //     .IsRequired()
+        //     .OnDelete(DeleteBehavior.Cascade);
     }
 }

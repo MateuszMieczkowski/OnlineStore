@@ -16,7 +16,6 @@ public class Order :
     public DateTime CreatedDate { get; private set; }
     public DateTime ModifiedDate { get; private set; }
 
-    public OrderAddress Address { get; set; } = default!;
-    public Client Client { get; set; } = default!;
-    public List<OrderItem> OrderItems { get; set; } = default!;
+    public string ClientEmail { get; set; } = string.Empty;
+    public ICollection<OrderItem> OrderItems { get; set; } = [];
 }

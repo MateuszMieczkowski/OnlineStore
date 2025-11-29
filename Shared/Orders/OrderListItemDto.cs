@@ -12,4 +12,6 @@ public record OrderListItemDto(
 {
     public DateTime ModifiedDate { get; set; }
     public OrderStatusDto Status { get; set; }
+
+    public string ClientEmail { get; set; } = ClientEmail;
 };

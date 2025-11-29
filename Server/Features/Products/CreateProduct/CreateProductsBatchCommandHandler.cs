@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using OnlineStore.Server.Entities;
+﻿using OnlineStore.Server.Entities;
 using OnlineStore.Server.Enums;
 using OnlineStore.Server.Features.Products.Repository;
 using OnlineStore.Server.Features.Products.Services;
@@ -66,7 +65,6 @@ public class CreateProductsBatchCommandHandler : ICommandHandler<CreateProductsB
             Quantity = productDto.Quantity,
             PriceGross = _taxService.ApplyTax(productDto.PriceNet, taxRate.Amount),
             PriceNet = productDto.PriceNet,
-            TaxRate = taxRate,
             IsHidden = productDto.IsHidden,
             IsDeleted = false,
             ShortDescription = productDto.ShortDescription,
@@ -93,7 +91,6 @@ public class CreateProductsBatchCommandHandler : ICommandHandler<CreateProductsB
             BlobId = Guid.NewGuid(),
             FileName = createProductFile.FileName,
             Description = createProductFile.Description,
-            Product = product,
             FileType = (ProductFileType)createProductFile.ProductFileType,
         };
 

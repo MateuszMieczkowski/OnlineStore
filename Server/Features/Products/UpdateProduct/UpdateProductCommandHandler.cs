@@ -61,14 +61,12 @@ public class UpdateProductCommandHandler : ICommandHandler<Shared.Products.Updat
     {
         var newProductFile = new ProductFile
         {
-            Product = product,
             FileName = productFileDto.FileName,
             Description = productFileDto.Description,
             FileType = (ProductFileType)productFileDto.ProductFileType,
             BlobId = Guid.NewGuid()
         };
-        newProductFile.BlobUri = await _blobStorage.UploadAsync(new BlobFileName(newProductFile.BlobId, newProductFile.FileName),
-            productFileDto.FileBase64, cancellationToken);
+        newProductFile.BlobUri = await _blobStorage.UploadAsync(new BlobFileName(newProductFile.BlobId, newProductFile.FileName), productFileDto.FileBase64!, cancellationToken);
         
         if (newProductFile.FileType == ProductFileType.Thumbnail)
         {

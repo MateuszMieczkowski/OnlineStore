@@ -5,11 +5,18 @@ namespace OnlineStore.Server.Features.Orders.UpdateOrderState;
 public class OrderContext
 {
     public Order Order { get; }
+
+    public OrderAddress OrderAddress { get; }
+
+    public User Client { get; }
+
     private IOrderState _state;
     
-    public OrderContext(Order order, IOrderState state)
+    public OrderContext(Order order, OrderAddress orderAddress, User client, IOrderState state)
     {
         Order = order;
+        OrderAddress = orderAddress;
+        Client = client;
         _state = state;
     }
 

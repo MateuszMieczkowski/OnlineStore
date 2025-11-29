@@ -14,8 +14,8 @@ public class EmailTemplateSeeder
 
     public async Task SeedAsync()
     {
-        await SeedTemplateAsync(new OrderCreatedSummaryEmail(null!, null!, null!, null!));
-        await SeedTemplateAsync(new OrderStatusChangedEmail(null!, null!, null!, null!));
+        await SeedTemplateAsync(new OrderCreatedSummaryEmail(null!, null!, null!, null!, null!));
+        await SeedTemplateAsync(new OrderStatusChangedEmail(null!, null!, null!, null!, null!));
         await SeedTemplateAsync(new ResetPasswordEmail(null!, null!, null!, null!));
     }
 

@@ -9,6 +9,11 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
     {
         builder.HasKey(e => e.Id);
         
+        builder.Property(e => e.Id)
+            .ValueGeneratedOnAdd()
+            .HasValueGenerator<MongoIntIdValueGenerator>()
+            .UseIdentityColumn();
+
         builder.Property(e => e.Email)
             .IsRequired()
             .HasMaxLength(255);

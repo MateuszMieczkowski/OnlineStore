@@ -18,35 +18,41 @@ public class GetProductQueryHandler : IQueryHandler<Shared.Products.GetProduct, 
         _loggedUserService = loggedUserService;
     }
 
-    public async Task<ProductDto> Handle(Shared.Products.GetProduct query, CancellationToken cancellationToken)
+    public async Task<ProductDto> Handle(Shared.Products.GetProduct query, CancellationToken token)
     {
-        var dbQuery = _dbContext.Products
-            .Where(x => x.Id == query.Id);
+        var dbQuery = _dbContext.Products.AsQueryable();
 
         if (_loggedUserService.GetUserRole() != UserRoles.Admin)
         {
            dbQuery = dbQuery.Where(x => !x.IsDeleted && !x.IsHidden);
         }
-        
-        var result = await dbQuery
-            .Select(x => new ProductDto(
-                x.Id,
-                x.Name,
-                x.ReferenceNumber,
-                x.ShortDescription,
-                x.Description ?? "",
-                x.ThumbnailBlobUri,
-                x.Quantity,
-                x.PriceNet,
-                x.PriceGross,
-                x.IsHidden,
-                x.IsDeleted,
-                new TaxRateDto(x.TaxRate.Id, x.TaxRate.Amount, x.TaxRate.Description),
-                x.ProductFiles.Select(y =>
-                    new ProductFileDto(y.Id, y.FileName, y.BlobUri, y.Description, (ProductFileTypeDto)y.FileType))))
-            .FirstOrDefaultAsync(cancellationToken) ??
-                throw new NotFoundException($"Nie znaleziono produktu o ID {query.Id}");
 
-        return result;
+        var x = await dbQuery.FirstOrDefaultAsync(x => x.Id == query.Id, cancellationToken: token);
+        if (x is null)
+        {
+            throw new NotFoundException($"Nie znaleziono produktu o ID {query.Id}");
+        }
+
+        // ReSharper disable once EntityFramework.NPlusOne.IncompleteDataUsage
+        var taxRate = await _dbContext.TaxRates.FirstOrDefaultAsync(tr => tr.Id == x.TaxRateId, cancellationToken: token);
+        // ReSharper disable once EntityFramework.NPlusOne.IncompleteDataUsage
+        var productFiles = x.ProductFiles
+            .Select(y => new ProductFileDto(y.Id, y.FileName, y.BlobUri, y.Description, (ProductFileTypeDto)y.FileType))
+            .ToList();
+        
+        return new ProductDto(
+            Id: x.Id,
+            Name: x.Name,
+            ReferenceNumber: x.ReferenceNumber,
+            ShortDescription: x.ShortDescription,
+            Description: x.Description ?? "",
+            ThumbnailUri: x.ThumbnailBlobUri,
+            Quantity: x.Quantity,
+            PriceNet: x.PriceNet,
+            PriceGross: x.PriceGross,
+            IsHidden: x.IsHidden,
+            IsDeleted: x.IsDeleted,
+            TaxRate: taxRate != null ? new TaxRateDto(taxRate.Id, taxRate.Amount, taxRate.Description) : null!,
+            ProductFiles: productFiles);
     }
 }

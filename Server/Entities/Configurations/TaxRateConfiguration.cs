@@ -8,8 +8,10 @@ public class TaxRateConfiguration : IEntityTypeConfiguration<TaxRate>
     public void Configure(EntityTypeBuilder<TaxRate> builder)
     {
         builder.HasKey(e => e.Id);
+
         builder.Property(e => e.Id)
             .ValueGeneratedOnAdd()
+            .HasValueGenerator<MongoIntIdValueGenerator>()
             .UseIdentityColumn();
 
         builder.Property(e => e.Description)

@@ -11,6 +11,7 @@ public class EmailConfiguration : IEntityTypeConfiguration<Email>
 
         builder.Property(e => e.Id)
             .ValueGeneratedOnAdd()
+            .HasValueGenerator<MongoIntIdValueGenerator>()
             .UseIdentityColumn();
 
         builder.Property(e => e.SenderEmail)

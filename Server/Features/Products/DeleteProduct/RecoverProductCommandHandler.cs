@@ -4,21 +4,20 @@ using OnlineStore.Shared.Products;
 
 namespace OnlineStore.Server.Features.Products.DeleteProduct;
 
-public class RecoverProductCommandHandler : ICommandHandler<RecoverProduct>
+public class RecoverProductCommandHandler(OnlineStoreDbContext dbContext) : ICommandHandler<RecoverProduct>
 {
-    private readonly OnlineStoreDbContext _dbContext;
-
-    public RecoverProductCommandHandler(OnlineStoreDbContext dbContext)
+    public async Task Handle(RecoverProduct request, CancellationToken token)
     {
-        _dbContext = dbContext;
-    }
+        var product = await dbContext.Products.FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken: token);
+        if (product is null)
+        {
+            return;
+        }
 
-    public async Task Handle(RecoverProduct request, CancellationToken cancellationToken)
-    {
-        await _dbContext.Products
-            .Where(x => x.Id == request.Id)
-            .ExecuteUpdateAsync(setter => setter.SetProperty(x => x.IsDeleted, false)
-                    .SetProperty(x => x.IsHidden, false),
-                cancellationToken: cancellationToken);
+        product.IsDeleted = false;
+        product.IsHidden = false;
+
+        dbContext.Update(product);
+        await dbContext.SaveChangesAsync(token);
     }
 }

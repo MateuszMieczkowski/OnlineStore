@@ -11,6 +11,7 @@ public class EmailTemplateConfiguration : IEntityTypeConfiguration<EmailTemplate
 
         builder.Property(e => e.Id)
             .ValueGeneratedOnAdd()
+            .HasValueGenerator<MongoIntIdValueGenerator>()
             .UseIdentityColumn();
 
         builder.Property(e => e.Name)

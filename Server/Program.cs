@@ -1,4 +1,3 @@
-using System.Reflection;
 using System.Text;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
@@ -63,7 +62,7 @@ builder.Services.AddAuthentication(option =>
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<OnlineStoreDbContext>(
-    options => options.UseSqlServer(builder.Configuration.GetConnectionString("OnlineStoreDbConnection")));
+    options => options.UseMongoDB(builder.Configuration.GetConnectionString("OnlineStoreDbConnection")!, databaseName: "OnlineStoreDb"));
 
 builder.Services.AddScoped<ErrorHandlingMiddleware>();
 
@@ -126,10 +125,7 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var dbSeeder = scope.ServiceProvider.GetRequiredService<StoreSeeder>();
-    dbSeeder.Seed();
-    
-    var templateSeeder = scope.ServiceProvider.GetRequiredService<EmailTemplateSeeder>();
-    await templateSeeder.SeedAsync();
+    await dbSeeder.SeedAsync();
 }
 
 // Configure the HTTP request pipeline.

@@ -21,10 +21,10 @@ public class ClientConfiguration : IEntityTypeConfiguration<Client>
             .IsRequired()
             .HasMaxLength(20);
         
-        builder.HasMany(e => e.Orders)
-            .WithOne(e => e.Client)
-            .HasForeignKey(e => e.ClientId)
-            .IsRequired()
-            .OnDelete(DeleteBehavior.Cascade);
+        // builder.HasMany(e => e.Orders)
+        //     .WithOne(e => e.Client)
+        //     .HasForeignKey(e => e.ClientId)
+        //     .IsRequired()
+        //     .OnDelete(DeleteBehavior.Cascade);
     }
 }

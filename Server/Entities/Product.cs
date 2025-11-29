@@ -15,7 +15,6 @@ public class Product
     public string ThumbnailBlobUri { get; set; } = string.Empty;
     public int TaxRateId { get; set; }
     public int? ProductCategoryId { get; set; }
-    public TaxRate TaxRate { get; set; } = default!;
     public ProductCategory? ProductCategory { get; set; }
-    public ICollection<ProductFile> ProductFiles { get; set; } = default!;
+    public ICollection<ProductFile> ProductFiles { get; set; } = [];
 }

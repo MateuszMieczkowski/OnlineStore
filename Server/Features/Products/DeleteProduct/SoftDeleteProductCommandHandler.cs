@@ -4,21 +4,20 @@ using OnlineStore.Shared.Products;
 
 namespace OnlineStore.Server.Features.Products.DeleteProduct;
 
-public class SoftDeleteProductCommandHandler : ICommandHandler<SoftDeleteProduct>
+public class SoftDeleteProductCommandHandler(OnlineStoreDbContext dbContext) : ICommandHandler<SoftDeleteProduct>
 {
-    private readonly OnlineStoreDbContext _dbContext;
-
-    public SoftDeleteProductCommandHandler(OnlineStoreDbContext dbContext)
+    public async Task Handle(SoftDeleteProduct request, CancellationToken token)
     {
-        _dbContext = dbContext;
-    }
+        var product = await dbContext.Products.FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken: token);
+        if (product is null)
+        {
+            return;
+        }
 
-    public async Task Handle(SoftDeleteProduct request, CancellationToken cancellationToken)
-    {
-        await _dbContext.Products
-            .Where(x => x.Id == request.Id)
-            .ExecuteUpdateAsync(setter => setter.SetProperty(x => x.IsDeleted, true)
-                    .SetProperty(x => x.IsHidden, false),
-                cancellationToken: cancellationToken);
+        product.IsHidden = false;
+        product.IsDeleted = true;
+
+        dbContext.Update(product);
+        await dbContext.SaveChangesAsync(token);
     }
 }

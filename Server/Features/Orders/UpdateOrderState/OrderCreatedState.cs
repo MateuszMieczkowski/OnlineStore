@@ -31,14 +31,15 @@ public class OrderCreatedState : IOrderState
 		{
 			return;
 		}
-		var client = order.Client;
+		var client = context.Client;
 
 		order.Status = OrderStatus.Created;
 
 		var orderCreatedEmail = new OrderCreatedSummaryEmail(
 			order: order,
-		recipientEmail: client.Email,
-		recipientName: client.FullName,
+			context,
+			recipientEmail: client.Email,
+			recipientName: client.FullName,
 			senderEmail: null);
 
 		await _emailService.SendEmailFromDefinitionAsync(orderCreatedEmail);

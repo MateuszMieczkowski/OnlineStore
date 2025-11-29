@@ -1,16 +1,19 @@
 ﻿using System.Text;
 using OnlineStore.Server.Entities;
+using OnlineStore.Server.Features.Orders.UpdateOrderState;
 
 namespace OnlineStore.Server.Emails.EmailDefinitions;
 
 public class OrderCreatedSummaryEmail : EmailDefinition
 {
     private readonly Order _order;
+    private readonly OrderContext _orderContext;
 
-    public OrderCreatedSummaryEmail(Order order, string recipientEmail, string? recipientName, string? senderEmail)
+    public OrderCreatedSummaryEmail(Order order, OrderContext orderContext, string recipientEmail, string? recipientName, string? senderEmail)
         : base(recipientEmail, recipientName, senderEmail)
     {
         _order = order;
+        _orderContext = orderContext;
     }
 
     public override string Subject => "Zamówienie zostało złożone";
@@ -22,13 +25,13 @@ public class OrderCreatedSummaryEmail : EmailDefinition
         {
             new("{{OrderId}}", _order.Id.ToString()),
             new("{{OrderCreatedDate}}", _order.CreatedDate.ToShortDateString()),
-            new("{{ClientName}}", $"{_order.Client.FullName}"),
-            new("{{ClientEmail}}", _order.Client.Email),
-            new("{{OrderAddressStreet}}", _order.Address.Street),
-            new("{{OrderAddressStreetNumber}}", _order.Address.StreetNumber),
-            new("{{OrderAddressPostalCode}}", _order.Address.PostalCode),
-            new("{{OrderAddressCity}}", _order.Address.City),
-            new("{{OrderAddressCountry}}", _order.Address.Country),
+            new("{{ClientName}}", $"{_orderContext.Client.FullName}"),
+            new("{{ClientEmail}}", _orderContext.Client.Email),
+            new("{{OrderAddressStreet}}", _orderContext.OrderAddress.Street),
+            new("{{OrderAddressStreetNumber}}", _orderContext.OrderAddress.StreetNumber),
+            new("{{OrderAddressPostalCode}}", _orderContext.OrderAddress.PostalCode),
+            new("{{OrderAddressCity}}", _orderContext.OrderAddress.City),
+            new("{{OrderAddressCountry}}", _orderContext.OrderAddress.Country),
             new("{{OrderItemsRows}}", GetOrderItemsHtmlRows()),
             new("{{OrderTotalGross}}", _order.TotalGross + "zł"),
             new("{{OrderTotalNet}}", _order.TotalNet + "zł")

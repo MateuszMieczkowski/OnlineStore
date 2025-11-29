@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using OnlineStore.Server.Authentication;
+﻿using OnlineStore.Server.Authentication;
 using OnlineStore.Server.Features.Accounts.Services;
 using OnlineStore.Server.Features.Orders.Repository;
 using OnlineStore.Server.Infrastructure;
@@ -9,42 +8,31 @@ using OnlineStore.Shared.Orders;
 
 namespace OnlineStore.Server.Features.Orders.GetOrder;
 
-public class GetOrderQueryHandler : IQueryHandler<Shared.Orders.GetOrder, OrderDto>
+public class GetOrderQueryHandler(ILoggedUserService loggedUserService, IOrderRepository orderRepository) : IQueryHandler<Shared.Orders.GetOrder, OrderDto>
 {
-	private readonly ILoggedUserService _loggedUserService;
-	private readonly IOrderRepository _orderRepository;
-
-	public GetOrderQueryHandler(ILoggedUserService loggedUserService, IOrderRepository orderRepository)
-	{
-		_loggedUserService = loggedUserService;
-		_orderRepository = orderRepository;
-	}
-
 	public async Task<OrderDto> Handle(Shared.Orders.GetOrder query, CancellationToken cancellationToken)
 	{
-		var isClient = _loggedUserService.GetUserRole() == UserRoles.User;
+		var isClient = loggedUserService.GetUserRole() == UserRoles.User;
 		int? userId = null;
 		if (isClient)
 		{
-			 userId = _loggedUserService.GetUserId();
+			 userId = loggedUserService.GetUserId();
 		}
 		
-		var order = await _orderRepository.GetByIdAsync(query.Id,
-			includeUser: true,
+		var order = await orderRepository.GetByIdAsync(query.Id,
 			includeOrderItems: true,
             userId: userId,
 			cancellationToken: cancellationToken)
 				?? throw new NotFoundException($"Nie znaleziono zamówienia o ID {query.Id}");
-		
-
+		var orderAddress = await orderRepository.GetOrderAddressAsync(order.OrderAddressId, cancellationToken); 
 		var addressDto = new OrderAddressDto(
 			Id: order.OrderAddressId,
-			Street: order.Address.Street,
-			StreetNumber: order.Address.StreetNumber,
-			City: order.Address.City,
-			State: order.Address.State,
-			PostalCode: order.Address.PostalCode,
-			Country: order.Address.Country);
+			Street: orderAddress.Street,
+			StreetNumber: orderAddress.StreetNumber,
+			City: orderAddress.City,
+			State: orderAddress.State,
+			PostalCode: orderAddress.PostalCode,
+			Country: orderAddress.Country);
 
 		var orderItems = order.OrderItems
 			.Select(x => new OrderItemDto(

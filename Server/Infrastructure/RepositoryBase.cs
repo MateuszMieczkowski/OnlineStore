@@ -7,9 +7,9 @@ using Microsoft.EntityFrameworkCore;
 
 public abstract class RepositoryBase<T> : IRepository<T> where T : class
 {
-    protected readonly DbContext _dbContext;
+    protected readonly OnlineStoreDbContext _dbContext;
 
-    protected RepositoryBase(DbContext dbContext)
+    protected RepositoryBase(OnlineStoreDbContext dbContext)
     {
         _dbContext = dbContext;
     }

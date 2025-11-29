@@ -9,8 +9,5 @@ public class OrderAddress
     public string? State { get; set; }
     public string PostalCode { get; set; } = string.Empty;
     public string Country { get; set; } = string.Empty;
-
     public int? UserId { get; set; }
-    
-    public User? User { get; set; }
 }

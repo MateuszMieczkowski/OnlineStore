@@ -10,6 +10,7 @@ public class OrderAddressConfiguration : IEntityTypeConfiguration<OrderAddress>
         builder.HasKey(e => e.Id);
         builder.Property(e => e.Id)
             .ValueGeneratedOnAdd()
+            .HasValueGenerator<MongoIntIdValueGenerator>()
             .UseIdentityColumn();
 
         builder.Property(e => e.Street)
@@ -35,6 +36,6 @@ public class OrderAddressConfiguration : IEntityTypeConfiguration<OrderAddress>
             .IsRequired()
             .HasMaxLength(100);
 
-        builder.HasOne(e => e.User).WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.SetNull);
+        // builder.HasOne(e => e.User).WithMany().HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.SetNull);
     }
 }
