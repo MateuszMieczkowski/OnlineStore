@@ -16,7 +16,6 @@ public class ChangeUserPasswordCommandHandler : ICommandHandler<Shared.Accounts.
         _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
     }
 
-
     public async Task Handle(Shared.Accounts.ChangeUserPassword command, CancellationToken cancellationToken)
     {
         var user = await _userRepository.GetByIdAsync(command.Id)
@@ -24,6 +23,6 @@ public class ChangeUserPasswordCommandHandler : ICommandHandler<Shared.Accounts.
 
         _accountService.AssertHashedPassword(user, command.CurrentPassword);
 
-        await _accountService.ChangePassword(user, command.CurrentPassword);
+        await _accountService.ChangePassword(user, command.NewPassword);
     }
 }

@@ -1,11 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace OnlineStore.Server.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -16,12 +17,14 @@ namespace OnlineStore.Server.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    SenderEmail = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    SenderEmail = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
                     RecipientEmail = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     RecipientName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    HtmlContent = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: false),
+                    HtmlContent = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    AttemptCount = table.Column<int>(type: "int", nullable: false, defaultValue: 0)
+                    AttemptCount = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
+                    Subject = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SentDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -35,29 +38,11 @@ namespace OnlineStore.Server.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    HtmlContent = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: false)
+                    HtmlContent = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_EmailTemplates", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "OrdersAddresses",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Street = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    StreetNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    City = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    State = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    PostalCode = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    Country = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_OrdersAddresses", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -96,7 +81,14 @@ namespace OnlineStore.Server.Migrations
                     Email = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     PasswordHash = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     UserRole = table.Column<int>(type: "int", nullable: false),
-                    Discriminator = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Preferences_UITheme = table.Column<int>(type: "int", nullable: true),
+                    Preferences_DisplayedPrice = table.Column<int>(type: "int", nullable: true),
+                    Preferences_IsSubscribedToNewsLetter = table.Column<bool>(type: "bit", nullable: true),
+                    Preferences_PageSize = table.Column<int>(type: "int", nullable: true, defaultValue: 20),
+                    Discriminator = table.Column<string>(type: "nvarchar(8)", maxLength: 8, nullable: false),
+                    FirstName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    LastName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -114,11 +106,14 @@ namespace OnlineStore.Server.Migrations
                     ShortDescription = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     Description = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
                     PriceNet = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    PriceGross = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     IsHidden = table.Column<bool>(type: "bit", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
+                    ThumbnailBlobUri = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     TaxRateId = table.Column<int>(type: "int", nullable: false),
-                    ProductCategoryId = table.Column<int>(type: "int", nullable: true)
+                    ProductCategoryId = table.Column<int>(type: "int", nullable: true),
+                    ProductFiles = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -138,6 +133,53 @@ namespace OnlineStore.Server.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "OrdersAddresses",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Street = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    StreetNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    City = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    State = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    PostalCode = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Country = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrdersAddresses", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_OrdersAddresses_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RemindPasswordRequests",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Token = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    CreatedTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    IsUsed = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RemindPasswordRequests", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RemindPasswordRequests_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Orders",
                 columns: table => new
                 {
@@ -147,7 +189,10 @@ namespace OnlineStore.Server.Migrations
                     TotalGross = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     ClientId = table.Column<int>(type: "int", nullable: false),
-                    OrderAddressId = table.Column<int>(type: "int", nullable: false)
+                    OrderAddressId = table.Column<int>(type: "int", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    OrderItems = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -166,97 +211,6 @@ namespace OnlineStore.Server.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "RemindPasswordRequests",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Token = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_RemindPasswordRequests", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_RemindPasswordRequests_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "UserPreferences",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UITheme = table.Column<int>(type: "int", nullable: false),
-                    DisplayedPrice = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserPreferences", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_UserPreferences_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ProductFiles",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    FileName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    BlobUri = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    ProductId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ProductFiles", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ProductFiles_Products_ProductId",
-                        column: x => x.ProductId,
-                        principalTable: "Products",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "OrdersItems",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    OrderId = table.Column<int>(type: "int", nullable: false),
-                    PriceNet = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    PriceGross = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    ProductId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_OrdersItems", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_OrdersItems_Orders_OrderId",
-                        column: x => x.OrderId,
-                        principalTable: "Orders",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_OrdersItems_Products_ProductId",
-                        column: x => x.ProductId,
-                        principalTable: "Products",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_Orders_ClientId",
                 table: "Orders",
@@ -268,19 +222,9 @@ namespace OnlineStore.Server.Migrations
                 column: "OrderAddressId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrdersItems_OrderId",
-                table: "OrdersItems",
-                column: "OrderId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_OrdersItems_ProductId",
-                table: "OrdersItems",
-                column: "ProductId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ProductFiles_ProductId",
-                table: "ProductFiles",
-                column: "ProductId");
+                name: "IX_OrdersAddresses_UserId",
+                table: "OrdersAddresses",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Products_ProductCategoryId",
@@ -296,12 +240,6 @@ namespace OnlineStore.Server.Migrations
                 name: "IX_RemindPasswordRequests_UserId",
                 table: "RemindPasswordRequests",
                 column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserPreferences_UserId",
-                table: "UserPreferences",
-                column: "UserId",
-                unique: true);
         }
 
         /// <inheritdoc />
@@ -314,34 +252,25 @@ namespace OnlineStore.Server.Migrations
                 name: "EmailTemplates");
 
             migrationBuilder.DropTable(
-                name: "OrdersItems");
-
-            migrationBuilder.DropTable(
-                name: "ProductFiles");
-
-            migrationBuilder.DropTable(
-                name: "RemindPasswordRequests");
-
-            migrationBuilder.DropTable(
-                name: "UserPreferences");
-
-            migrationBuilder.DropTable(
                 name: "Orders");
 
             migrationBuilder.DropTable(
                 name: "Products");
 
             migrationBuilder.DropTable(
-                name: "OrdersAddresses");
+                name: "RemindPasswordRequests");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "OrdersAddresses");
 
             migrationBuilder.DropTable(
                 name: "ProductCategories");
 
             migrationBuilder.DropTable(
                 name: "TaxRates");
+
+            migrationBuilder.DropTable(
+                name: "Users");
         }
     }
 }

@@ -20,11 +20,5 @@ public class ClientConfiguration : IEntityTypeConfiguration<Client>
         builder.Property(e => e.PhoneNumber)
             .IsRequired()
             .HasMaxLength(20);
-        
-        builder.HasMany(e => e.Orders)
-            .WithOne(e => e.Client)
-            .HasForeignKey(e => e.ClientId)
-            .IsRequired()
-            .OnDelete(DeleteBehavior.Cascade);
     }
 }

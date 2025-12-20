@@ -18,28 +18,15 @@ public class ChangeUserPreferencesCommandHandler : ICommandHandler<Shared.Client
     public async Task Handle(Shared.Clients.ChangeUserPreferences command, CancellationToken cancellationToken)
     {
         var userId = command.UserId;
-        var userPreferences =
-            await _dbContext.UserPreferences.FirstOrDefaultAsync(x => x.UserId == userId, cancellationToken);
-        var shouldCreatePreferences = userPreferences is null;
+        var user = await _dbContext.Users.SingleAsync(x => x.Id == userId, cancellationToken);
+        user.Preferences ??= new UserPreferences { UserId = userId };
 
-        if (shouldCreatePreferences)
-        {
-            userPreferences = new UserPreferences { UserId = userId };
-        }
+        user.Preferences.UITheme = (UITheme)command.UiThemeDto;
+        user.Preferences.DisplayedPrice = (DisplayedPrice)command.DisplayedPriceDto;
+        user.Preferences.IsSubscribedToNewsLetter = command.IsSubscribedToNewsletter;
+        user.Preferences.PageSize = command.PageSize;
 
-        userPreferences!.UITheme = (UITheme)command.UiThemeDto;
-        userPreferences.DisplayedPrice = (DisplayedPrice)command.DisplayedPriceDto;
-        userPreferences.IsSubscribedToNewsLetter = command.IsSubscribedToNewsletter;
-        userPreferences.PageSize = command.PageSize;
-
-        if (shouldCreatePreferences)
-        {
-            _dbContext.UserPreferences.Add(userPreferences);
-        }
-        else
-        {
-            _dbContext.UserPreferences.Update(userPreferences);
-        }
+        _dbContext.Users.Update(user);
 
         await _dbContext.SaveChangesAsync(cancellationToken);
     }

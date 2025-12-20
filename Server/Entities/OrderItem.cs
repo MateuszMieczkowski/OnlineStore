@@ -9,5 +9,4 @@ public class OrderItem
     public int Quantity { get; set; }
 
     public OrderItemProduct Product { get; set; } = default!;
-    public Order Order { get; set; } = default!;
 }

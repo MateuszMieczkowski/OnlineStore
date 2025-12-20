@@ -21,6 +21,7 @@ public class GetProductQueryHandler : IQueryHandler<Shared.Products.GetProduct, 
     public async Task<ProductDto> Handle(Shared.Products.GetProduct query, CancellationToken cancellationToken)
     {
         var dbQuery = _dbContext.Products
+            .Include(x => x.TaxRate)
             .Where(x => x.Id == query.Id);
 
         if (_loggedUserService.GetUserRole() != UserRoles.Admin)
@@ -28,25 +29,21 @@ public class GetProductQueryHandler : IQueryHandler<Shared.Products.GetProduct, 
            dbQuery = dbQuery.Where(x => !x.IsDeleted && !x.IsHidden);
         }
         
-        var result = await dbQuery
-            .Select(x => new ProductDto(
-                x.Id,
-                x.Name,
-                x.ReferenceNumber,
-                x.ShortDescription,
-                x.Description ?? "",
-                x.ThumbnailBlobUri,
-                x.Quantity,
-                x.PriceNet,
-                x.PriceGross,
-                x.IsHidden,
-                x.IsDeleted,
-                new TaxRateDto(x.TaxRate.Id, x.TaxRate.Amount, x.TaxRate.Description),
-                x.ProductFiles.Select(y =>
-                    new ProductFileDto(y.Id, y.FileName, y.BlobUri, y.Description, (ProductFileTypeDto)y.FileType))))
-            .FirstOrDefaultAsync(cancellationToken) ??
-                throw new NotFoundException($"Nie znaleziono produktu o ID {query.Id}");
+        var product = await dbQuery.FirstOrDefaultAsync(cancellationToken) ?? throw new NotFoundException($"Nie znaleziono produktu o ID {query.Id}");
 
-        return result;
+        return new ProductDto(
+            Id: product.Id,
+            Name: product.Name,
+            ReferenceNumber: product.ReferenceNumber,
+            ShortDescription: product.ShortDescription,
+            Description: product.Description ?? "",
+            ThumbnailUri: product.ThumbnailBlobUri,
+            Quantity: product.Quantity,
+            PriceNet: product.PriceNet,
+            PriceGross: product.PriceGross,
+            IsHidden: product.IsHidden,
+            IsDeleted: product.IsDeleted,
+            TaxRate: new TaxRateDto(product.TaxRate.Id, product.TaxRate.Amount, product.TaxRate.Description),
+            ProductFiles: product.ProductFiles.Select(p => new ProductFileDto(p.Id, p.FileName, p.BlobUri, p.Description, (ProductFileTypeDto)p.FileType)));
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.Text.Json;
 
 namespace OnlineStore.Server.Entities.Configurations;
 
@@ -51,10 +52,11 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasMany(e => e.ProductFiles)
-            .WithOne(pf => pf.Product)
-            .HasForeignKey(pf => pf.ProductId)
-            .IsRequired()
-            .OnDelete(DeleteBehavior.Cascade);
+        builder.Property(e => e.ProductFiles)
+            .HasConversion(
+                v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
+                v => JsonSerializer.Deserialize<List<ProductFile>>(v, (JsonSerializerOptions?)null) ?? new List<ProductFile>()
+            )
+            .HasColumnType("nvarchar(max)");
     }
 }

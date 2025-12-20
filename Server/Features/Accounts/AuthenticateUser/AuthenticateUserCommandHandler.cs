@@ -44,16 +44,16 @@ public class AuthenticateUserQueryHandler : IQueryHandler<Shared.Models.Authenti
         {
             Id = user.Id,
             Email = user.Email,
-            Preferences = await GetClientPreferences(user),
+            Preferences = GetClientPreferences(user),
             Token = _tokenGenerator.GenerateJwtToken(user)
         };
 
         return authResponse;
     }
 
-    private async Task<UserPreferencesDto> GetClientPreferences(User user)
+    private UserPreferencesDto GetClientPreferences(User user)
     {
-        var preferences = await _context.UserPreferences.FirstOrDefaultAsync(x => x.UserId == user.Id);
+        var preferences = user.Preferences;
         
         var defaultUiTheme = UITheme.Light;
         var defaultDisplayPrice = DisplayedPrice.Gross;

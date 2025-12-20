@@ -12,6 +12,10 @@ public class User
 
     public virtual string FullName => Email;
 
+    public ICollection<Order> Orders { get; set; } = default!;
+
+    public UserPreferences? Preferences { get; set; }
+
     public void UpdatePassword(string passwordHash)
     {
         PasswordHash = passwordHash;

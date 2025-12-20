@@ -93,7 +93,6 @@ public class CreateProductsBatchCommandHandler : ICommandHandler<CreateProductsB
             BlobId = Guid.NewGuid(),
             FileName = createProductFile.FileName,
             Description = createProductFile.Description,
-            Product = product,
             FileType = (ProductFileType)createProductFile.ProductFileType,
         };
 

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.Text.Json;
 
 namespace OnlineStore.Server.Entities.Configurations;
 
@@ -27,10 +28,11 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
             .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasMany(e => e.OrderItems)
-            .WithOne(item => item.Order)
-            .HasForeignKey(item => item.OrderId)
-            .IsRequired()
-            .OnDelete(DeleteBehavior.Cascade);
+        builder.Property(e => e.OrderItems)
+            .HasConversion(
+                v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
+                v => JsonSerializer.Deserialize<List<OrderItem>>(v, (JsonSerializerOptions?)null) ?? new List<OrderItem>()
+            )
+            .HasColumnType("nvarchar(max)");
     }
 }

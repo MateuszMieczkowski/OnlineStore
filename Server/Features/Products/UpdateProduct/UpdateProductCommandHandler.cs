@@ -61,7 +61,6 @@ public class UpdateProductCommandHandler : ICommandHandler<Shared.Products.Updat
     {
         var newProductFile = new ProductFile
         {
-            Product = product,
             FileName = productFileDto.FileName,
             Description = productFileDto.Description,
             FileType = (ProductFileType)productFileDto.ProductFileType,

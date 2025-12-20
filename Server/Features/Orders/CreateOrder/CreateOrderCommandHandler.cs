@@ -28,7 +28,7 @@ public class CreateOrderCommandHandler : ICommandHandler<Shared.Orders.CreateOrd
 	public async Task Handle(Shared.Orders.CreateOrder request, CancellationToken cancellationToken)
     {
         var userId = _loggedUserService.GetUserId();
-        var client = await _dbContext.Clients
+        var client = await _dbContext.Users
             .FirstAsync(x => x.Id == userId, cancellationToken);
 
         var requestProductIds = request.Items.Select(x => x.ProductId);

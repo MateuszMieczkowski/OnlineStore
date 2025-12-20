@@ -12,15 +12,15 @@ using OnlineStore.Server;
 namespace OnlineStore.Server.Migrations
 {
     [DbContext(typeof(OnlineStoreDbContext))]
-    [Migration("20231121211009_AddThumbnailUriToProduct")]
-    partial class AddThumbnailUriToProduct
+    [Migration("20251220124447_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.13")
+                .HasAnnotation("ProductVersion", "9.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -102,8 +102,18 @@ namespace OnlineStore.Server.Migrations
                     b.Property<int>("ClientId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("OrderAddressId")
                         .HasColumnType("int");
+
+                    b.Property<string>("OrderItems")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -160,41 +170,14 @@ namespace OnlineStore.Server.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("OrdersAddresses");
-                });
-
-            modelBuilder.Entity("OnlineStore.Server.Entities.OrderItem", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("OrderId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("PriceGross")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("PriceNet")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OrderId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("OrdersItems");
                 });
 
             modelBuilder.Entity("OnlineStore.Server.Entities.Product", b =>
@@ -228,6 +211,10 @@ namespace OnlineStore.Server.Migrations
 
                     b.Property<int?>("ProductCategoryId")
                         .HasColumnType("int");
+
+                    b.Property<string>("ProductFiles")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
@@ -274,44 +261,6 @@ namespace OnlineStore.Server.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ProductCategories");
-                });
-
-            modelBuilder.Entity("OnlineStore.Server.Entities.ProductFile", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<Guid>("BlobId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("BlobUri")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("FileName")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<int>("FileType")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("ProductFiles");
                 });
 
             modelBuilder.Entity("OnlineStore.Server.Entities.RemindPasswordRequest", b =>
@@ -373,7 +322,8 @@ namespace OnlineStore.Server.Migrations
 
                     b.Property<string>("Discriminator")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(8)
+                        .HasColumnType("nvarchar(8)");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -392,34 +342,9 @@ namespace OnlineStore.Server.Migrations
 
                     b.ToTable("Users");
 
-                    b.HasDiscriminator<string>("Discriminator").HasValue("User");
+                    b.HasDiscriminator().HasValue("User");
 
                     b.UseTphMappingStrategy();
-                });
-
-            modelBuilder.Entity("OnlineStore.Server.Entities.UserPreferences", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("DisplayedPrice")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UITheme")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
-
-                    b.ToTable("UserPreferences");
                 });
 
             modelBuilder.Entity("OnlineStore.Server.Entities.Client", b =>
@@ -430,9 +355,6 @@ namespace OnlineStore.Server.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
-
-                    b.Property<bool>("IsSubscribedToNewsletter")
-                        .HasColumnType("bit");
 
                     b.Property<string>("LastName")
                         .IsRequired()
@@ -466,23 +388,14 @@ namespace OnlineStore.Server.Migrations
                     b.Navigation("Client");
                 });
 
-            modelBuilder.Entity("OnlineStore.Server.Entities.OrderItem", b =>
+            modelBuilder.Entity("OnlineStore.Server.Entities.OrderAddress", b =>
                 {
-                    b.HasOne("OnlineStore.Server.Entities.Order", "Order")
-                        .WithMany("OrderItems")
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("OnlineStore.Server.Entities.Product", "Product")
+                    b.HasOne("OnlineStore.Server.Entities.User", "User")
                         .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
-                    b.Navigation("Order");
-
-                    b.Navigation("Product");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("OnlineStore.Server.Entities.Product", b =>
@@ -503,17 +416,6 @@ namespace OnlineStore.Server.Migrations
                     b.Navigation("TaxRate");
                 });
 
-            modelBuilder.Entity("OnlineStore.Server.Entities.ProductFile", b =>
-                {
-                    b.HasOne("OnlineStore.Server.Entities.Product", "Product")
-                        .WithMany("ProductFiles")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-                });
-
             modelBuilder.Entity("OnlineStore.Server.Entities.RemindPasswordRequest", b =>
                 {
                     b.HasOne("OnlineStore.Server.Entities.User", "User")
@@ -525,25 +427,38 @@ namespace OnlineStore.Server.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("OnlineStore.Server.Entities.UserPreferences", b =>
+            modelBuilder.Entity("OnlineStore.Server.Entities.User", b =>
                 {
-                    b.HasOne("OnlineStore.Server.Entities.User", "User")
-                        .WithOne()
-                        .HasForeignKey("OnlineStore.Server.Entities.UserPreferences", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.OwnsOne("OnlineStore.Server.Entities.UserPreferences", "Preferences", b1 =>
+                        {
+                            b1.Property<int>("UserId")
+                                .HasColumnType("int");
 
-                    b.Navigation("User");
-                });
+                            b1.Property<int>("DisplayedPrice")
+                                .HasColumnType("int");
 
-            modelBuilder.Entity("OnlineStore.Server.Entities.Order", b =>
-                {
-                    b.Navigation("OrderItems");
-                });
+                            b1.Property<bool>("IsSubscribedToNewsLetter")
+                                .HasColumnType("bit");
 
-            modelBuilder.Entity("OnlineStore.Server.Entities.Product", b =>
-                {
-                    b.Navigation("ProductFiles");
+                            b1.Property<int>("PageSize")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("int")
+                                .HasDefaultValue(20);
+
+                            b1.Property<int>("UITheme")
+                                .HasColumnType("int");
+
+                            b1.HasKey("UserId");
+
+                            b1.ToTable("Users");
+
+                            b1.WithOwner("User")
+                                .HasForeignKey("UserId");
+
+                            b1.Navigation("User");
+                        });
+
+                    b.Navigation("Preferences");
                 });
 
             modelBuilder.Entity("OnlineStore.Server.Entities.ProductCategory", b =>

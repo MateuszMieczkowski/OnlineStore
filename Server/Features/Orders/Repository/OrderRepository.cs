@@ -25,11 +25,6 @@ public class OrderRepository : RepositoryBase<Order>, IOrderRepository
             query = query.Include(x => x.Client);
         }
 
-        if (includeOrderItems)
-        {
-            query = query.Include(x => x.OrderItems);
-        }
-
         if (userId is not null)
         {
             query = query.Where(x => x.ClientId == userId);

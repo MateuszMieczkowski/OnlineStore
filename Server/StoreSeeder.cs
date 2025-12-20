@@ -6,43 +6,51 @@ using OnlineStore.Server.Enums;
 
 namespace OnlineStore.Server;
 
-public class StoreSeeder
+public class StoreSeeder(OnlineStoreDbContext dbContext, IPasswordHasher<User> passwordHasher)
 {
-    private readonly OnlineStoreDbContext _dbContext;
-    private readonly IPasswordHasher<User> _passwordHasher;
-
-    public StoreSeeder(OnlineStoreDbContext dbContext, IPasswordHasher<User> passwordHasher)
-    {
-        _dbContext = dbContext;
-        _passwordHasher = passwordHasher;
-    }
-
     public void Seed()
     {
-        if (!_dbContext.Database.CanConnect()) return;
+        if (!dbContext.Database.CanConnect()) return;
 
-        var pendingMigrations = _dbContext.Database.GetPendingMigrations();
-        if (pendingMigrations.Any()) _dbContext.Database.Migrate();
+        var pendingMigrations = dbContext.Database.GetPendingMigrations();
+        if (pendingMigrations.Any()) dbContext.Database.Migrate();
 
-        if (!_dbContext.TaxRates.Any())
-        {
-            var taxRates = GetTaxRates();
-            _dbContext.TaxRates.AddRange(taxRates);
-            _dbContext.SaveChanges();
-        }
-
-
-        if (!_dbContext.Users.Any(x => x.UserRole == UserRole.Admin))
+        SeedTaxRates();
+        SeedUsers();
+        SeedProducts();
+    }
+    private void SeedUsers()
+    {
+        if (!dbContext.Users.Any(x => x.UserRole == UserRole.Admin))
         {
             var admin = new User()
             {
                 Email = "admin@onlinestore.pl",
                 UserRole = UserRole.Admin
             };
-            var password = _passwordHasher.HashPassword(admin, "admin123");
+            var password = passwordHasher.HashPassword(admin, "admin123");
             admin.PasswordHash = password;
-            _dbContext.Add(admin);
-            _dbContext.SaveChanges();
+            dbContext.Add(admin);
+            dbContext.SaveChanges();
+        }
+    }
+    private void SeedTaxRates()
+    {
+        if (!dbContext.TaxRates.Any())
+        {
+            var taxRates = GetTaxRates();
+            dbContext.TaxRates.AddRange(taxRates);
+            dbContext.SaveChanges();
+        }
+    }
+
+    private void SeedProducts()
+    {
+        if (!dbContext.Products.Any())
+        {
+            var products = GetProducts();
+            dbContext.Products.AddRange(products);
+            dbContext.SaveChanges();
         }
     }
 
@@ -78,5 +86,50 @@ public class StoreSeeder
                 Description = "NP"
             }
         };
+    }
+    
+    private IEnumerable<Product> GetProducts()
+    {
+        return
+        [
+            new Product
+            {
+                Name = "Sample Product 1",
+                ShortDescription = "Sample Product Short Description 1",
+                Description = "Sample Product Description 1",
+                ReferenceNumber = "SP001",
+                Quantity = 150,
+                PriceGross = 100,
+                PriceNet = 77,
+                ProductFiles = [],
+                TaxRate = new TaxRate { Amount = 23, Description = "23%" },
+                TaxRateId = 1 // 23%
+            },
+            new Product
+            {
+                Name = "Sample Product 2",
+                ShortDescription = "Sample Product Short Description 2",
+                Description = "Sample Product Description 2",
+                ReferenceNumber = "SP002",
+                Quantity = 250,
+                PriceGross = 200,
+                PriceNet = 184,
+                ProductFiles = [],
+                TaxRate = new TaxRate { Amount = 8, Description = "8%" },
+                TaxRateId = 2 // 8%
+            },
+            new Product
+            {
+                Name = "Sample Product 3",
+                ShortDescription = "Sample Product Short Description 3",
+                Description = "Sample Product 3",
+                ReferenceNumber = "SP003",
+                Quantity = 350,
+                PriceGross = 300,
+                PriceNet = 285,
+                TaxRate = new TaxRate { Amount = 5, Description = "5%" },
+                ProductFiles = [] // 5%
+            }
+        ];
     }
 }
