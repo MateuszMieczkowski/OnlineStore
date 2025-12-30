@@ -25,22 +25,22 @@ public class AzureStorage : IBlobStorage
 		_logger = logger;
 	}
 
-	public async Task<string> UploadAsync(BlobFileName blobFileName, string fileBase64,
+	public Task<string> UploadAsync(BlobFileName blobFileName, string fileBase64,
 		CancellationToken cancellationToken = default)
 	{
-		var container = await GetContainerAsync(cancellationToken);
-		var blob = container.GetBlobClient(blobFileName.ToString());
-
-		await blob.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots, cancellationToken: cancellationToken);
-
-		var fileBinary = Convert.FromBase64String(fileBase64);
-		await using (var fileStream = await new StreamContent(new MemoryStream(fileBinary)).ReadAsStreamAsync(cancellationToken))
-		{
-			new FileExtensionContentTypeProvider().TryGetContentType(blobFileName.ToString(), out var contentType);
-			await blob.UploadAsync(fileStream, new BlobHttpHeaders { ContentType = contentType }, cancellationToken: cancellationToken);
-		}
-
-		return blob.Uri.ToString();
+		// var container = await GetContainerAsync(cancellationToken);
+		// var blob = container.GetBlobClient(blobFileName.ToString());
+		//
+		// await blob.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots, cancellationToken: cancellationToken);
+		//
+		// var fileBinary = Convert.FromBase64String(fileBase64);
+		// await using (var fileStream = await new StreamContent(new MemoryStream(fileBinary)).ReadAsStreamAsync(cancellationToken))
+		// {
+		// 	new FileExtensionContentTypeProvider().TryGetContentType(blobFileName.ToString(), out var contentType);
+		// 	await blob.UploadAsync(fileStream, new BlobHttpHeaders { ContentType = contentType }, cancellationToken: cancellationToken);
+		// }
+		// return blob.Uri.ToString();
+		return Task.FromResult($"https://onlinestorestorage.blob.core.windows.net/productfiles/{blobFileName}");
 	}
 
 	public async Task<bool> RemoveAsync(BlobFileName blobFileName, CancellationToken cancellationToken = default)

@@ -78,7 +78,7 @@ public partial class ApiBroker : IApiBroker
 
         return await Validate(response);
     }
-
+    
     private async Task<bool> Validate(HttpResponseMessage? response)
     {
         if (!response.IsSuccessStatusCode)

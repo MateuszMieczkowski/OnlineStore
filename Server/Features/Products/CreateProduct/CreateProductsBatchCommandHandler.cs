@@ -76,7 +76,7 @@ public class CreateProductsBatchCommandHandler : ICommandHandler<CreateProductsB
         var productFileTasks = productDto.ProductFiles
             .Select(createProductFile => UploadProductFile(product, createProductFile, cancellationToken))
             .ToList();
-
+        
         var productFiles = await Task.WhenAll(productFileTasks);
         foreach (var productFile in productFiles)
         {

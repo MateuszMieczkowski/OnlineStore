@@ -31,7 +31,6 @@ public class StoreSeeder
             _dbContext.SaveChanges();
         }
 
-
         if (!_dbContext.Users.Any(x => x.UserRole == UserRole.Admin))
         {
             var admin = new User()

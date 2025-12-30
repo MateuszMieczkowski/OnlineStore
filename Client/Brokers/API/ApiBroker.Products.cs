@@ -34,7 +34,7 @@ public partial class ApiBroker
 
     public async Task PostProductsAsync(CreateProductsBatch command)
     {
-        await PostAsync($"{ProductRelativeUrl}/create-batch", command);
+        await PostAsync($"{ProductRelativeUrl}/create-batch?n={command.Products.Count}", command);
     }
 
     public async Task UpdateProductAsync(int id, UpdateProductDto dto)
@@ -66,6 +66,11 @@ public partial class ApiBroker
     public async Task HardDeleteProductAsync(int id)
     {
         await DeleteAsync($"{ProductRelativeUrl}/{id}/hard-delete");
+    }
+
+    public async Task HardDeleteProductsAsync(HardDeleteProducts command)
+    {
+        await PostAsync($"{ProductRelativeUrl}/hard-delete/batch", command);
     }
 
     public async Task EmptyProductsBinAsync(IEnumerable<int> ids)

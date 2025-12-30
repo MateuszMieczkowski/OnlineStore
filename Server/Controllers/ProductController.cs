@@ -73,6 +73,15 @@ public class ProductController : ControllerBase
         return Ok();
     }
     
+    [HttpPost("hard-delete/batch")]
+    [Authorize(Roles = UserRoles.Admin)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<ActionResult> HardDeleteProduct([FromBody] HardDeleteProducts command)
+    {
+        await _mediator.Send(command);
+        return Ok();
+    }
+    
     [HttpPut("{id:int}/recover")]
     [Authorize(Roles = UserRoles.Admin)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]

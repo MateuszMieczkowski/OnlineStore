@@ -60,8 +60,8 @@ public class CreateProductFileValidator : AbstractValidator<CreateProductFile>
             .NotEmpty()
             .MaximumLength(255);
         
-        RuleFor(x => x.FileBase64)
-            .NotEmpty();
+        // RuleFor(x => x.FileBase64)
+            // .NotEmpty();
         
         RuleFor(x => x.ProductFileType)
             .IsInEnum();
