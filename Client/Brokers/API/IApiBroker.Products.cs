@@ -16,6 +16,7 @@ public partial interface IApiBroker
     Task SoftDeleteProductAsync(int id);
     Task RecoverProductAsync(int id);
     Task HardDeleteProductAsync(int id);
+    Task HardDeleteProductsAsync(HardDeleteProducts command);
     Task EmptyProductsBinAsync(IEnumerable<int> ids);
 
     Task<IReadOnlyCollection<TaxRateDto>> GetTaxRates();

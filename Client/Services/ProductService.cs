@@ -18,6 +18,7 @@ public interface IProductService
     Task Reveal(int id);
     Task Recover(int id);
     Task HardDelete(int id);
+    Task HardDeleteBatch(int[] ids);
     Task EmptyBin(IEnumerable<int> ids);
 
     Task<IReadOnlyCollection<TaxRateDto>> GetTaxRates();
@@ -119,6 +120,9 @@ public class ProductService : IProductService
     public async Task HardDelete(int id)
         => await _broker.HardDeleteProductAsync(id);
 
+    public async Task HardDeleteBatch(int[] ids)
+        => await _broker.HardDeleteProductsAsync(new HardDeleteProducts(ids, DeleteAll: true));
+    
     public async Task EmptyBin(IEnumerable<int> ids) => await _broker.EmptyProductsBinAsync(ids);
 
     public async Task<IReadOnlyCollection<TaxRateDto>> GetTaxRates()
