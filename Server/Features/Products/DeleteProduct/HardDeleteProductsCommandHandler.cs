@@ -15,12 +15,13 @@ public class HardDeleteProductsCommandHandler : ICommandHandler<HardDeleteProduc
 
     public async Task Handle(HardDeleteProducts request, CancellationToken cancellationToken)
     {
-        await _dbContext.Products
+        var products = await _dbContext.Products
             .Where(x => request.Ids.Contains(x.Id) || request.DeleteAll)
-            .ExecuteDeleteAsync(cancellationToken);
-        
-        await _dbContext.ProductFiles
-            .Where(x => request.Ids.Contains(x.ProductId) || request.DeleteAll)
-            .ExecuteDeleteAsync(cancellationToken);
+            .ToListAsync(cancellationToken);
+
+        _dbContext.Products.RemoveRange(products);
+        // await _dbContext.ProductFiles
+        //     .Where(x => request.Ids.Contains(x.ProductId) || request.DeleteAll)
+        //     .ExecuteDeleteAsync(cancellationToken);
     }
 }
