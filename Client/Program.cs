@@ -31,6 +31,7 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddScoped<IShoppingCartService, ShoppingCartService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddSession();
 builder.Services.AddMudServices(config =>
 {

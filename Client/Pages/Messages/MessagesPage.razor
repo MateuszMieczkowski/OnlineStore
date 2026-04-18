@@ -1,0 +1,162 @@
+@page "/messages"
+@attribute [Authorize]
+@using OnlineStore.Client.Services
+@using OnlineStore.Shared.Messages
+@inject IMessageService MessageService
+@inject ISnackbar Snackbar
+@inject NavigationManager NavigationManager
+
+<PageTitle>Wiadomości</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large">
+    <MudStack Spacing="4">
+        @if (_selectedMessage == null)
+        {
+            <MudStack>
+                <MudText Typo="Typo.h5">Moje wiadomości</MudText>
+                
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="() => _showCreateForm = !_showCreateForm">
+                    <MudIcon Icon="@Icons.Material.Filled.Add" Class="mr-2"/>
+                    @(_showCreateForm ? "Anuluj" : "Nowa wiadomość")
+                </MudButton>
+
+                @if (_showCreateForm)
+                {
+                    <CreateMessageForm OnSuccess="OnMessageCreated"/>
+                }
+
+                @if (_isLoading)
+                {
+                    <MudProgressLinear Indeterminate="true"/>
+                }
+                else if (_messages == null || !_messages.Any())
+                {
+                    <MudAlert Severity="Severity.Info">Brak wiadomości</MudAlert>
+                }
+                else
+                {
+                    <MudTable Items="@_messages" Hover="true" Loading="@_isLoading" Striped="true">
+                        <HeaderContent>
+                            <MudTh>ID</MudTh>
+                            <MudTh>Treść</MudTh>
+                            <MudTh>Utworzono</MudTh>
+                            <MudTh>Zaktualizowano</MudTh>
+                            <MudTh>Akcje</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd>@context.Id.ToString().Substring(0, 8)...</MudTd>
+                            <MudTd>@(context.Content.Length > 50 ? context.Content.Substring(0, 50) + "..." : context.Content)</MudTd>
+                            <MudTd>@context.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</MudTd>
+                            <MudTd>@context.UpdatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</MudTd>
+                            <MudTd>
+                                <MudStack Row="true" Spacing="1">
+                                    <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Info" OnClick="@(() => SelectMessage(context, true))"/>
+                                    <MudIconButton Icon="@Icons.Material.Filled.Security" Size="Size.Small" Color="Color.Warning" OnClick="@(() => SelectMessage(context, false))"/>
+                                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" OnClick="@(() => DeleteMessage(context))"/>
+                                </MudStack>
+                            </MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                }
+            </MudStack>
+        }
+        
+        @if (_shopPermissionsForm)
+        {
+            <ManagePermissionsForm Message="@_selectedMessage" OnSuccess="OnPermissionsUpdated" OnCancel="OnMessageCanceled"/>
+        }
+
+        @if(_shopUpdateForm)
+        {
+            <EditMessageForm Message="@_selectedMessage" OnSuccess="OnMessageUpdated" OnCancel="OnMessageCanceled"/>
+        }
+    </MudStack>
+</MudContainer>
+
+@code {
+    private List<MessageDto>? _messages;
+    private MessageDto? _selectedMessage;
+    private bool _showCreateForm;
+    private bool _isLoading = true;
+    private bool _shopUpdateForm = false;
+    private bool _shopPermissionsForm = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadMessages();
+    }
+
+    private async Task LoadMessages()
+    {
+        try
+        {
+            _isLoading = true;
+            var result = await MessageService.GetAllMessagesAsync();
+            _messages = result.ToList();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private void SelectMessage(MessageDto message, bool isEdit)
+    {
+        _selectedMessage = message;
+        _showCreateForm = false;
+        _shopUpdateForm = isEdit;
+        _shopPermissionsForm = !isEdit;
+        StateHasChanged();
+    }
+    //
+    // private void SelectMessageForPermissions(MessageDto message)
+    // {
+    //     _selectedMessage = message;
+    //     _showCreateForm = false;
+    //     StateHasChanged();
+    // }
+
+    private async Task DeleteMessage(MessageDto message)
+    {
+        try
+        {
+            await MessageService.DeleteMessageAsync(message.Id);
+            Snackbar.Add("Wiadomość usunięta", Severity.Success);
+            await LoadMessages();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+    }
+
+    private void OnMessageCanceled()
+    {
+        _selectedMessage = null;
+        _shopUpdateForm = false;
+        _shopPermissionsForm = false;
+    }
+    
+    private async Task OnMessageCreated()
+    {
+        _showCreateForm = false;
+        await LoadMessages();
+    }
+
+    private async Task OnMessageUpdated()
+    {
+        _selectedMessage = null;
+        await LoadMessages();
+    }
+
+    private async Task OnPermissionsUpdated()
+    {
+        _selectedMessage = null;
+        await LoadMessages();
+    }
+}
+

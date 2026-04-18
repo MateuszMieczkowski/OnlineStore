@@ -1,4 +1,4 @@
-﻿using OnlineStore.Shared.Accounts;
+﻿﻿using OnlineStore.Shared.Accounts;
 using OnlineStore.Shared.Infrastructure;
 using OnlineStore.Shared.Models;
 
@@ -38,5 +38,16 @@ public partial class ApiBroker
     public async Task ResetUserPassword(ResetPassword command)
     {
         await PostAsync($"{AccountRelativeUrl}/reset-password", command);
+    }
+
+    public async Task<LoginEventDto> GetLoginSummary()
+    {
+        return await GetAsync<LoginEventDto>($"{AccountRelativeUrl}/login-summary");
+    }
+
+    public async Task<LoginEventDetailsDto> GetLoginHistory(int limit = 10)
+    {
+        var requestUrl = $"{AccountRelativeUrl}/login-events?limit={limit}";
+        return await GetAsync<LoginEventDetailsDto>(requestUrl);
     }
 }

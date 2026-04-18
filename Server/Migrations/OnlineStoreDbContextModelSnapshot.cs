@@ -88,6 +88,95 @@ namespace OnlineStore.Server.Migrations
                     b.ToTable("EmailTemplates");
                 });
 
+            modelBuilder.Entity("OnlineStore.Server.Entities.LoginEvent", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FailureReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("IpAddress")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<bool>("IsSuccessful")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserAgent")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedDate");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("UserId", "CreatedDate");
+
+                    b.ToTable("LoginEvents");
+                });
+
+            modelBuilder.Entity("OnlineStore.Server.Entities.Message", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("AuthorId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ModifiedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorId");
+
+                    b.ToTable("Messages");
+                });
+
+            modelBuilder.Entity("OnlineStore.Server.Entities.MessagePermission", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("MessageId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("MessageId", "UserId")
+                        .IsUnique();
+
+                    b.ToTable("MessagePermissions");
+                });
+
             modelBuilder.Entity("OnlineStore.Server.Entities.Order", b =>
                 {
                     b.Property<int>("Id")
@@ -327,6 +416,15 @@ namespace OnlineStore.Server.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
+                    b.Property<int>("FailedLoginAttemptsSinceLastSuccess")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("LastFailedLoginAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("LastSuccessfulLoginAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -366,9 +464,50 @@ namespace OnlineStore.Server.Migrations
                     b.HasDiscriminator().HasValue("Client");
                 });
 
+            modelBuilder.Entity("OnlineStore.Server.Entities.LoginEvent", b =>
+                {
+                    b.HasOne("OnlineStore.Server.Entities.User", "User")
+                        .WithMany("LoginEvents")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("OnlineStore.Server.Entities.Message", b =>
+                {
+                    b.HasOne("OnlineStore.Server.Entities.User", "Author")
+                        .WithMany()
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Author");
+                });
+
+            modelBuilder.Entity("OnlineStore.Server.Entities.MessagePermission", b =>
+                {
+                    b.HasOne("OnlineStore.Server.Entities.Message", "Message")
+                        .WithMany("AllowedEditors")
+                        .HasForeignKey("MessageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("OnlineStore.Server.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Message");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("OnlineStore.Server.Entities.Order", b =>
                 {
-                    b.HasOne("OnlineStore.Server.Entities.Client", "Client")
+                    b.HasOne("OnlineStore.Server.Entities.User", "Client")
                         .WithMany("Orders")
                         .HasForeignKey("ClientId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -434,6 +573,9 @@ namespace OnlineStore.Server.Migrations
                             b1.Property<int>("DisplayedPrice")
                                 .HasColumnType("int");
 
+                            b1.Property<bool>("IsPasswordManagerEnabled")
+                                .HasColumnType("bit");
+
                             b1.Property<bool>("IsSubscribedToNewsLetter")
                                 .HasColumnType("bit");
 
@@ -458,13 +600,20 @@ namespace OnlineStore.Server.Migrations
                     b.Navigation("Preferences");
                 });
 
+            modelBuilder.Entity("OnlineStore.Server.Entities.Message", b =>
+                {
+                    b.Navigation("AllowedEditors");
+                });
+
             modelBuilder.Entity("OnlineStore.Server.Entities.ProductCategory", b =>
                 {
                     b.Navigation("Products");
                 });
 
-            modelBuilder.Entity("OnlineStore.Server.Entities.Client", b =>
+            modelBuilder.Entity("OnlineStore.Server.Entities.User", b =>
                 {
+                    b.Navigation("LoginEvents");
+
                     b.Navigation("Orders");
                 });
 #pragma warning restore 612, 618

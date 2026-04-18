@@ -25,6 +25,7 @@ public class ChangeUserPreferencesCommandHandler : ICommandHandler<Shared.Client
         user.Preferences.DisplayedPrice = (DisplayedPrice)command.DisplayedPriceDto;
         user.Preferences.IsSubscribedToNewsLetter = command.IsSubscribedToNewsletter;
         user.Preferences.PageSize = command.PageSize;
+        user.Preferences.IsPasswordManagerEnabled = command.IsPasswordManagerEnabled;
 
         _dbContext.Users.Update(user);
 

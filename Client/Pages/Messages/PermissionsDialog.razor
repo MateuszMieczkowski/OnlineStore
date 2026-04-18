@@ -1,0 +1,121 @@
+@using OnlineStore.Client.Services
+@using OnlineStore.Shared.Messages
+@inject IMessageService MessageService
+@inject ISnackbar Snackbar
+
+<MudPaper Class="p-5" Elevation="5">
+    <MudStack Spacing="3">
+        <MudText Typo="Typo.h6">Zarządzaj uprawnieniami edycji</MudText>
+        
+        <MudStack Spacing="2">
+            <MudText Typo="Typo.subtitle2">Udziel uprawnienia nowemu użytkownikowi</MudText>
+            <MudStack Row="true" Spacing="2">
+                <MudTextField @bind-Value="@_newUserIdStr" 
+                              Label="E-mail użytkownika" 
+                              Variant="Variant.Outlined"
+                              Style="flex: 1;"/>
+                <MudButton Color="Color.Success" Variant="Variant.Filled" OnClick="GrantPermission">
+                    Udziel
+                </MudButton>
+            </MudStack>
+        </MudStack>
+
+        <MudDivider/>
+
+        <MudText Typo="Typo.subtitle2">Bieżące uprawnienia</MudText>
+        @if (_permissions == null || !_permissions.Any())
+        {
+            <MudAlert Severity="Severity.Info">Brak przydzielonych uprawnień</MudAlert>
+        }
+        else
+        {
+            <MudList T="string" Dense="true">
+                @foreach (var permission in _permissions)
+                {
+                    <MudListItem>
+                        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Style="width: 100%;">
+                            <MudText>@permission.UserEmail</MudText>
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete" 
+                                           Size="Size.Small" 
+                                           Color="Color.Error"
+                                           OnClick="@(() => RevokePermission(permission))"/>
+                        </MudStack>
+                    </MudListItem>
+                }
+            </MudList>
+        }
+
+        <MudStack Row="true" Spacing="2" Class="mt-4">
+            <MudButton OnClick="OnCancel" Variant="Variant.Outlined">Zamknij</MudButton>
+        </MudStack>
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Parameter] public MessageDto Message { get; set; } = null!;
+    [Parameter] public EventCallback OnSuccess { get; set; }
+    [Parameter] public EventCallback OnCancel { get; set; }
+
+    private string _newUserIdStr = "";
+    private List<PermissionDto> _permissions = new();
+
+    protected override void OnInitialized()
+    {
+        _permissions = new List<PermissionDto>();
+    }
+
+    private async Task GrantPermission()
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(_newUserIdStr))
+            {
+                Snackbar.Add("Wprowadź E-mail użytkownika użytkownika", Severity.Warning);
+                return;
+            }
+
+            var request = new PermissionRequest { UserEmail = _newUserIdStr };
+            await MessageService.GrantPermissionAsync(Message.Id, request);
+
+            _permissions.Add(new PermissionDto { UserEmail = _newUserIdStr });
+            _newUserIdStr = "";
+
+            Snackbar.Add("Uprawnienie przydzielone", Severity.Success);
+            await OnSuccess.InvokeAsync();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+    }
+
+    private async Task RevokePermission(PermissionDto permission)
+    {
+        try
+        {
+            var request = new PermissionRequest { UserEmail = permission.UserEmail };
+            await MessageService.RevokePermissionAsync(Message.Id, request);
+
+            _permissions.Remove(permission);
+
+            Snackbar.Add("Uprawnienie cofnięte", Severity.Success);
+            await OnSuccess.InvokeAsync();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+    }
+
+    private async Task OnCancelClick()
+    {
+        await OnCancel.InvokeAsync();
+    }
+
+    private class PermissionDto
+    {
+        public string UserEmail { get; set; }
+    }
+}
+
+

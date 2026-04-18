@@ -1,4 +1,4 @@
-﻿using Blazored.LocalStorage;
+﻿﻿using Blazored.LocalStorage;
 using OnlineStore.Client.Brokers.API;
 using OnlineStore.Client.Models;
 using OnlineStore.Client.Models.Accounts;
@@ -45,7 +45,8 @@ public class ClientService : IClientService
             UiThemeDto: model.UiTheme,
             DisplayedPriceDto: model.DisplayedPrice,
             IsSubscribedToNewsletter: model.IsSubscribedToNewsLetter,
-            PageSize: model.PageSize);
+            PageSize: model.PageSize,
+            IsPasswordManagerEnabled: model.IsPasswordManagerEnabled);
 
         await _broker.ChangeClientPreferences(command);
 
@@ -54,7 +55,8 @@ public class ClientService : IClientService
                 model.UiTheme,
                 model.DisplayedPrice,
                 model.IsSubscribedToNewsLetter,
-                model.PageSize));
+                model.PageSize,
+                model.IsPasswordManagerEnabled));
     }
 
     public async Task UpsertOrderAddress(UpsertAddressModel model)

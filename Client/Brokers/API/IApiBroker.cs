@@ -15,4 +15,6 @@ public partial interface IApiBroker
     Task<TDto> PutAsync<TPutDto, TDto>(string relativeUrl, TPutDto content);
 
     Task<bool> DeleteAsync(string relativeUrl);
+
+    Task<TDto> PatchAsync<TPatchDto, TDto>(string relativeUrl, TPatchDto content);
 }

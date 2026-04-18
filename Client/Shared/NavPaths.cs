@@ -25,4 +25,10 @@ public static class NavPaths
     public const string OrderCheckout = "/orders/checkout";
  
     #endregion
+
+    #region Messages
+    
+    public const string Messages = "/messages";
+    
+    #endregion
 }

@@ -1,4 +1,4 @@
-﻿using Blazored.LocalStorage;
+﻿﻿using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using OnlineStore.Client.Brokers.API;
 using OnlineStore.Client.Models;
@@ -26,6 +26,10 @@ public interface IAccountService
     Task ForgotPassword(string email);
 
     Task ResetUserPassword(string token, ResetPasswordModel model);
+
+    Task<LoginEventDto> GetLoginSummary();
+
+    Task<LoginEventDetailsDto> GetLoginHistory(int limit = 10);
 }
 
 public class AccountService : IAccountService
@@ -101,5 +105,15 @@ public class AccountService : IAccountService
     {
         var command = new ResetPassword(token, model.NewPassword);
         await _broker.ResetUserPassword(command);
+    }
+
+    public async Task<LoginEventDto> GetLoginSummary()
+    {
+        return await _broker.GetLoginSummary();
+    }
+
+    public async Task<LoginEventDetailsDto> GetLoginHistory(int limit = 10)
+    {
+        return await _broker.GetLoginHistory(limit);
     }
 }

@@ -1,4 +1,4 @@
-﻿@using Blazored.LocalStorage
+﻿﻿@using Blazored.LocalStorage
 @using System.Security.Claims
 @inject AuthenticationStateProvider AuthenticationStateProvider 
 @inject NavigationManager NavigationManager
@@ -24,6 +24,7 @@
                 <Authorized>
                     <MudButton Href="@NavPaths.OrderCheckout" StartIcon="@Icons.Material.Filled.ShoppingCart">Koszyk</MudButton>
                     <MudButton StartIcon="@Icons.Material.Filled.ShoppingBag" Href="@NavPaths.OrderManage">Zamówienia</MudButton>
+                    <MudButton StartIcon="@Icons.Material.Filled.Message" Href="@NavPaths.Messages">Wiadomości</MudButton>
                     <MudButton StartIcon="@Icons.Material.Filled.Settings" Href="@NavPaths.UsersSettings">Ustawienia</MudButton>
                 </Authorized>
             </AuthorizeView>

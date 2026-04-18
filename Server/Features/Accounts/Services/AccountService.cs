@@ -67,10 +67,9 @@ public class AccountService : IAccountService
     public void AssertHashedPassword(User user, string currentPassword)
     {
         var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash!, currentPassword);
-
-        if (result == PasswordVerificationResult.Failed)
+        if (result != PasswordVerificationResult.Success)
         {
-            throw new InvalidCurrentPasswordException();
+            throw new InvalidCredentialsException();
         }
     }
 

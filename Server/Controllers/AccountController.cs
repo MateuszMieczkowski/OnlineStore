@@ -1,9 +1,12 @@
-﻿using MediatR;
+﻿﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OnlineStore.Server.Features.Accounts.Services;
 using OnlineStore.Shared.Accounts;
 using OnlineStore.Shared.Infrastructure;
 using OnlineStore.Shared.Models;
+using System.Security.Claims;
+using LoginEventDto = OnlineStore.Shared.Accounts.LoginEventDto;
 
 namespace OnlineStore.Server.Controllers;
 
@@ -13,10 +16,12 @@ namespace OnlineStore.Server.Controllers;
 public class AccountController : ControllerBase
 {
     private readonly IMediator _mediator;
+    private readonly ILoginEventService _loginEventService;
 
-    public AccountController(IMediator mediator)
+    public AccountController(IMediator mediator, ILoginEventService loginEventService)
     {
         _mediator = mediator;
+        _loginEventService = loginEventService ?? throw new ArgumentNullException(nameof(loginEventService));
     }
 
     [HttpGet]
@@ -69,5 +74,51 @@ public class AccountController : ControllerBase
     {
         await _mediator.Send(command);
         return NoContent();
+    }
+
+    // [HttpGet("login-events")]
+    // [ProducesResponseType(StatusCodes.Status200OK)]
+    // [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    // public async Task<ActionResult<LoginEventDetailsDto>> GetLoginEvents(int? limit = null)
+    // {
+    //     var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    //     if (!int.TryParse(userIdClaim, out var userId))
+    //     {
+    //         return Unauthorized();
+    //     }
+    //
+    //     var history = await _loginEventService.GetLoginHistoryAsync(userId, limit ?? 10);
+    //     var dto = new LoginEventDetailsDto(
+    //         LoginEvents: history,
+    //         LastSuccessfulLoginAt: history.FirstOrDefault(x => x.IsSuccessful)?.EventDate,
+    //         LastFailedLoginAt: history.FirstOrDefault(x => !x.IsSuccessful)?.EventDate
+    //     );
+    //
+    //     return Ok(dto);
+    // }
+
+    [HttpGet("login-summary")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<LoginEventDto>> GetLoginSummary()
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (!int.TryParse(userIdClaim, out var userId))
+        {
+            return Unauthorized();
+        }
+    
+        var lastSuccess = await _loginEventService.GetLastSuccessfulLoginAsync(userId);
+        var lastFailure = await _loginEventService.GetLastFailedLoginAsync(userId);
+        var failedCount = await _loginEventService.GetFailedLoginCountSinceLastSuccessAsync(userId);
+    
+        var summary = new LoginEventDto
+        {
+            LastSuccessfulLoginAt = lastSuccess?.EventDate,
+            LastFailedLoginAt = lastFailure?.EventDate,
+            FailedLoginAttemptsSinceLastSuccess = failedCount
+        };
+    
+        return Ok(summary);
     }
 }

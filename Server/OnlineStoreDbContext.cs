@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+﻿﻿using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using OnlineStore.Server.Entities;
 using OnlineStore.Server.Entities.Abstractions;
@@ -27,6 +27,9 @@ public class OnlineStoreDbContext : DbContext
     // public DbSet<UserPreferences> UserPreferences { get; set; } = null!;
     public DbSet<User> Users { get; set; } = null!;
     public DbSet<Entities.Client> Clients { get; set; } = null!;
+    public DbSet<Message> Messages { get; set; } = null!;
+    public DbSet<MessagePermission> MessagePermissions { get; set; } = null!;
+    public DbSet<LoginEvent> LoginEvents { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

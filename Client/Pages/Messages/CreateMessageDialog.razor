@@ -1,0 +1,69 @@
+@using OnlineStore.Client.Services
+@using OnlineStore.Shared.Messages
+@inject IMessageService MessageService
+@inject ISnackbar Snackbar
+
+<MudPaper Class="p-5" Elevation="5">
+    <MudText Typo="Typo.h6" Class="mb-4">Nowa wiadomość</MudText>
+    
+    <EditForm Model="@_request" OnValidSubmit="OnSubmit">
+        <DataAnnotationsValidator/>
+        
+        <div class="form-group">
+            <MudTextField @bind-Value="@_request.Content" 
+                          Label="Treść wiadomości" 
+                          Variant="Variant.Outlined" 
+                          Lines="5"
+                          MaxLength="2000"
+                          HelperText="Maksymalnie 2000 znaków"
+                          HelperTextOnFocus="true"
+                          Counter="2000"
+                          Class="mb-4"
+                          For="@(() => _request.Content)"/>
+        </div>
+
+        <MudStack Row="true" Spacing="2">
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Utwórz</MudButton>
+            <MudButton OnClick="Cancel" Variant="Variant.Outlined">Anuluj</MudButton>
+        </MudStack>
+    </EditForm>
+</MudPaper>
+
+@code {
+    [Parameter] public EventCallback OnSuccess { get; set; }
+
+    private CreateMessageRequest _request = new();
+
+    private async Task OnSubmit()
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(_request.Content))
+            {
+                Snackbar.Add("Treść wiadomości nie może być pusta", Severity.Warning);
+                return;
+            }
+
+            if (_request.Content.Length > 2000)
+            {
+                Snackbar.Add("Treść wiadomości nie może być dłuższa niż 2000 znaków", Severity.Warning);
+                return;
+            }
+
+            await MessageService.CreateMessageAsync(_request);
+            Snackbar.Add("Wiadomość utworzona", Severity.Success);
+            await OnSuccess.InvokeAsync();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+    }
+
+    private void Cancel()
+    {
+        _request = new();
+    }
+}
+
+

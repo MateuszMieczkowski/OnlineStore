@@ -1,0 +1,266 @@
+@using OnlineStore.Shared.Accounts
+@using Blazored.LocalStorage
+@inject IAccountService AccountService
+@inject ISnackbar Snackbar
+@inject ILocalStorageService LocalStorageService
+
+<AuthorizeView>
+    <Authorized>
+        <MudCard>
+            <MudCardHeader>
+                <MudText Typo="Typo.h6">Historia logowania</MudText>
+            </MudCardHeader>
+            <MudCardContent>
+                @if (_isLoading)
+                {
+                    <MudProgressLinear Indeterminate="true" Class="mb-4"/>
+                    <MudText>Ładowanie danych...</MudText>
+                }
+                else if (_loginEventSummary != null)
+                {
+                    <div class="login-event-summary">
+                        <MudGrid>
+                            <MudItem xs="12" sm="6" md="4">
+                                <MudCard Elevation="1">
+                                    <MudCardContent>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">Ostatnie pomyślne logowanie</MudText>
+                                        <MudText Typo="Typo.h6" Color="Color.Success">
+                                            @if (_loginEventSummary.LastSuccessfulLoginAt.HasValue)
+                                            {
+                                                <span>@_loginEventSummary.LastSuccessfulLoginAt.Value.ToString("yyyy-MM-dd HH:mm:ss")</span>
+                                            }
+                                            else
+                                            {
+                                                <span>Brak danych</span>
+                                            }
+                                        </MudText>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                            @if (_loginEventSummary.LastSuccessfulLoginAt.HasValue)
+                                            {
+                                                <span>@GetRelativeTime(_loginEventSummary.LastSuccessfulLoginAt.Value)</span>
+                                            }
+                                        </MudText>
+                                    </MudCardContent>
+                                </MudCard>
+                            </MudItem>
+
+                            <MudItem xs="12" sm="6" md="4">
+                                <MudCard Elevation="1">
+                                    <MudCardContent>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">Ostatnia nieudana próba</MudText>
+                                        <MudText Typo="Typo.h6" Color="Color.Warning">
+                                            @if (_loginEventSummary.LastFailedLoginAt.HasValue)
+                                            {
+                                                <span>@_loginEventSummary.LastFailedLoginAt.Value.ToString("yyyy-MM-dd HH:mm:ss")</span>
+                                            }
+                                            else
+                                            {
+                                                <span>Brak danych</span>
+                                            }
+                                        </MudText>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                            @if (_loginEventSummary.LastFailedLoginAt.HasValue)
+                                            {
+                                                <span>@GetRelativeTime(_loginEventSummary.LastFailedLoginAt.Value)</span>
+                                            }
+                                        </MudText>
+                                    </MudCardContent>
+                                </MudCard>
+                            </MudItem>
+
+                            <MudItem xs="12" sm="6" md="4">
+                                <MudCard Elevation="1">
+                                    <MudCardContent>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">Nieudane próby od ostatniego logowania</MudText>
+                                        <MudText Typo="Typo.h6" Color="@(_loginEventSummary.FailedLoginAttemptsSinceLastSuccess > 0 ? Color.Error : Color.Success)">
+                                            @_loginEventSummary.FailedLoginAttemptsSinceLastSuccess
+                                        </MudText>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                            @if (_loginEventSummary.FailedLoginAttemptsSinceLastSuccess > 0)
+                                            {
+                                                <span>⚠️ @_loginEventSummary.FailedLoginAttemptsSinceLastSuccess @(_loginEventSummary.FailedLoginAttemptsSinceLastSuccess == 1 ? "próba" : "próby")</span>
+                                            }
+                                            else
+                                            {
+                                                <span>✓ Brak nieudanych prób</span>
+                                            }
+                                        </MudText>
+                                    </MudCardContent>
+                                </MudCard>
+                            </MudItem>
+                        </MudGrid>
+
+                        <div class="mt-4">
+                            <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" Color="Color.Primary" OnClick="RefreshData">
+                                <MudIcon Icon="@Icons.Material.Filled.Refresh" Class="mr-2"/>
+                                Odśwież
+                            </MudButton>
+
+                            <MudButton ButtonType="ButtonType.Button" Variant="Variant.Text" Color="Color.Default" OnClick="ToggleHistory" Class="ml-2">
+                                <MudIcon Icon="@Icons.Material.Filled.History" Class="mr-2"/>
+                                @(_showHistory ? "Ukryj" : "Pokaż") pełną historię
+                            </MudButton>
+                        </div>
+
+                        @if (_showHistory)
+                        {
+                            <MudDivider Class="my-4"/>
+                            
+                            <MudText Typo="Typo.h6" Class="mb-3">Ostatnie logowania</MudText>
+
+                            @if (_loginEventDetails?.LoginEvents != null && _loginEventDetails.LoginEvents.Count > 0)
+                            {
+                                <MudTable Items="@_loginEventDetails.LoginEvents" Hover="true" Striped="true" Dense="true">
+                                    <HeaderContent>
+                                        <MudTh>Data i godzina</MudTh>
+                                        <MudTh>Status</MudTh>
+                                        <MudTh>Adres IP</MudTh>
+                                        <MudTh>Urządzenie</MudTh>
+                                    </HeaderContent>
+                                    <RowTemplate Context="loginEvent">
+                                        <MudTd>
+                                            <MudText Typo="Typo.body2">
+                                                @loginEvent.EventDate.ToString("yyyy-MM-dd HH:mm:ss")
+                                            </MudText>
+                                        </MudTd>
+                                        <MudTd>
+                                            @if (loginEvent.IsSuccessful)
+                                            {
+                                                @* <MudChip Color="Color.Success" Size="Size.Small" Icon="@Icons.Material.Filled.CheckCircle"> *@
+                                                @*     Pomyślnie *@
+                                                @* </MudChip> *@
+                                            }
+                                            else
+                                            {
+                                                @* <MudChip Color="Color.Error" Size="Size.Small" Icon="@Icons.Material.Filled.Cancel"> *@
+                                                @*     Nieudana próba *@
+                                                @* </MudChip> *@
+                                            }
+                                        </MudTd>
+                                        <MudTd DataLabel="Adres IP">
+                                            <MudText Typo="Typo.body2">
+                                                @(string.IsNullOrEmpty(loginEvent.IpAddress) ? "N/A" : loginEvent.IpAddress)
+                                            </MudText>
+                                        </MudTd>
+                                        <MudTd DataLabel="Urządzenie">
+                                            <MudText Typo="Typo.body2" Style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                                <MudTooltip Text="@(loginEvent.UserAgent ?? "N/A")">
+                                                    @(string.IsNullOrEmpty(loginEvent.UserAgent) ? "N/A" : GetBrowserInfo(loginEvent.UserAgent))
+                                                </MudTooltip>
+                                            </MudText>
+                                        </MudTd>
+                                    </RowTemplate>
+                                    <PagerContent>
+                                        <MudTablePager PageSizeOptions="new int[] { 5, 10, 25 }"/>
+                                    </PagerContent>
+                                </MudTable>
+                            }
+                            else
+                            {
+                                <MudAlert Severity="Severity.Info">Brak zarejestrowanych logowań</MudAlert>
+                            }
+                        }
+                    </div>
+                }
+                else
+                {
+                    <MudAlert Severity="Severity.Error">Nie udało się załadować danych logowania</MudAlert>
+                }
+            </MudCardContent>
+        </MudCard>
+    </Authorized>
+    <NotAuthorized>
+        <MudAlert Severity="Severity.Warning">Musisz być zalogowany, aby zobaczyć historię logowania</MudAlert>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private LoginEventDto _loginEventSummary;
+    private LoginEventDetailsDto _loginEventDetails;
+    private bool _isLoading = true;
+    private bool _showHistory = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadLoginEventData();
+        }
+    }
+
+    private async Task LoadLoginEventData()
+    {
+        try
+        {
+            _isLoading = true;
+            _loginEventSummary = await AccountService.GetLoginSummary();
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Błąd przy ładowaniu danych logowania: {ex.Message}", Severity.Error);
+            _loginEventSummary = null;
+        }
+        finally
+        {
+            _isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadLoginHistory()
+    {
+        try
+        {
+            _loginEventDetails = await AccountService.GetLoginHistory(limit: 10);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Błąd przy ładowaniu historii logowania: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task RefreshData()
+    {
+        await LoadLoginEventData();
+        if (_showHistory)
+        {
+            await LoadLoginHistory();
+        }
+    }
+
+    private async Task ToggleHistory()
+    {
+        _showHistory = !_showHistory;
+        if (_showHistory && _loginEventDetails == null)
+        {
+            await LoadLoginHistory();
+        }
+    }
+
+    private string GetRelativeTime(DateTime dateTime)
+    {
+        var now = DateTime.UtcNow;
+        var diff = now - dateTime;
+
+        if (diff.TotalSeconds < 60)
+            return "przed chwilą";
+        if (diff.TotalMinutes < 60)
+            return $"przed {(int)diff.TotalMinutes} minutami";
+        if (diff.TotalHours < 24)
+            return $"przed {(int)diff.TotalHours} godzinami";
+        if (diff.TotalDays < 7)
+            return $"przed {(int)diff.TotalDays} dniami";
+
+        return dateTime.ToString("yyyy-MM-dd");
+    }
+
+    private string GetBrowserInfo(string userAgent)
+    {
+        if (string.IsNullOrEmpty(userAgent))
+            return "N/A";
+
+        return userAgent.Length > 50 ? userAgent.Substring(0, 50) + "..." : userAgent;
+    }
+}
+

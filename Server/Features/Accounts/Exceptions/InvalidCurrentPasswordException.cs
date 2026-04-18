@@ -4,7 +4,7 @@ namespace OnlineStore.Server.Features.Accounts.Exceptions;
 
 public class InvalidCurrentPasswordException : BadRequestException
 {
-    public InvalidCurrentPasswordException() : base("Podane obecne hasło jest niepoprawne.")
+    public InvalidCurrentPasswordException() : base("Podane obecne dane logowania są niepoprawne.")
     {
     }
 }

@@ -11,4 +11,6 @@ public class ChangePreferencesModel
     public bool IsSubscribedToNewsLetter { get; set; }
     
     public int PageSize { get; set; }
+    
+    public bool IsPasswordManagerEnabled { get; set; } = true;
 }

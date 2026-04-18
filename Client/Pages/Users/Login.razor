@@ -1,8 +1,11 @@
 ﻿@page "/users/login"
 @using OnlineStore.Shared.Models
+@using Blazored.LocalStorage
+@using OnlineStore.Shared.Clients
 @inject IAccountService AccountService
 @inject NavigationManager NavManager
 @inject ISnackbar Snackbar
+@inject ILocalStorageService LocalStorageService
 
 <MudContainer MaxWidth="MaxWidth.Small">
     <MudPaper Class="p-5" Elevation="5">
@@ -10,10 +13,28 @@
         <EditForm Model="_authenticateUser" OnValidSubmit="HandleLogin">
             <DataAnnotationsValidator></DataAnnotationsValidator>
             <div class="form-group">
-                <MudTextField Variant="Variant.Outlined" @bind-Value="_authenticateUser.Email" Label="E-mail" Placeholder="Wpisz" Type="InputType.Email" Class="mb-4" id="email" For="@(() => _authenticateUser.Email)"/>
+                <MudTextField 
+                    id="@(_isPasswordManagerEnabled ? "email" : "email-new")" 
+                    @bind-Value="_authenticateUser.Email" 
+                    Class="mb-4" 
+                    For="@(() => _authenticateUser.Email)" 
+                    Label="E-mail" 
+                    Placeholder="Wpisz" 
+                    Type="InputType.Email" 
+                    Variant="Variant.Outlined" 
+                    />
             </div>
             <div class="form-group">
-                <MudTextField Variant="Variant.Outlined" @bind-Value="_authenticateUser.Password" Label="Hasło" Placeholder="Wpisz" InputType="InputType.Password" Class="mb-4" id="password" For="@(() => _authenticateUser.Password)"/>
+                <MudTextField 
+                    id="@(_isPasswordManagerEnabled ? "current-password" : "new-password")" 
+                    @bind-Value="_authenticateUser.Password" 
+                    Class="mb-4" 
+                    For="@(() => _authenticateUser.Password)" 
+                    InputType="InputType.Password" 
+                    Label="Hasło" 
+                    Placeholder="Wpisz" 
+                    Variant="Variant.Outlined" 
+                    />
             </div>
 
             <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Zaloguj</MudButton>
@@ -28,6 +49,16 @@
 @code
 {
     private readonly AuthenticateUser _authenticateUser = new();
+    private bool _isPasswordManagerEnabled = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var prefs = await LocalStorageService.GetItemAsync<UserPreferencesDto>(LocalStorageKeys.UserPreferences);
+        if (prefs != null)
+        {
+            _isPasswordManagerEnabled = prefs.IsPasswordManagerEnabled;
+        }
+    }
 
     private async void HandleLogin()
     {

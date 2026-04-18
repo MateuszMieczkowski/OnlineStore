@@ -36,6 +36,10 @@
                         <MudNumericField @bind-Value="@Model.PageSize" For="@(() => Model.PageSize)" Variant="Variant.Outlined" Min="1" Max="200" Step="1" Label="Liczba produktów na stronie:"/>
                     </div>
 
+                    <div class="form-group">
+                        <MudSwitch @bind-Value="@Model.IsPasswordManagerEnabled" Color="Color.Primary" Label="Manager haseł (autouzupełnianie)"/>
+                    </div>
+
                     <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Zapisz preferencje</MudButton>
                 </EditForm>
             </MudCardContent>
@@ -62,6 +66,7 @@
                 Model.DisplayedPrice = DisplayedPriceDto.Gross;
                 Model.IsSubscribedToNewsLetter = false;
                 Model.PageSize = 20;
+                Model.IsPasswordManagerEnabled = true;
             }
             else
             {
@@ -69,6 +74,7 @@
                 Model.DisplayedPrice = userPreferences.DisplayedPrice;
                 Model.IsSubscribedToNewsLetter = userPreferences.IsSubscribedToNewsletter;
                 Model.PageSize = userPreferences.PageSize;
+                Model.IsPasswordManagerEnabled = userPreferences.IsPasswordManagerEnabled;
             }
             StateHasChanged();
         }

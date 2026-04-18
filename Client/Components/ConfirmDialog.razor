@@ -1,0 +1,27 @@
+@* @using MudBlazor *@
+@* *@
+@* <MudDialog> *@
+@*     <DialogContent> *@
+@*         <MudText>@ContentText</MudText> *@
+@*     </DialogContent> *@
+@*     <DialogActions> *@
+@*         <MudButton OnClick="Cancel">Nie</MudButton> *@
+@*         <MudButton Color="Color.Error" Variant="Variant.Filled" OnClick="Confirm">Tak</MudButton> *@
+@*     </DialogActions> *@
+@* </MudDialog> *@
+@* *@
+@* @code { *@
+@*     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!; *@
+@*     [Parameter] public string ContentText { get; set; } = "Czy na pewno?"; *@
+@* *@
+@*     private void Confirm() *@
+@*     { *@
+@*         MudDialog.Close(DialogResult.Ok(true)); *@
+@*     } *@
+@* *@
+@*     private void Cancel() *@
+@*     { *@
+@*         MudDialog.Cancel(); *@
+@*     } *@
+@* } *@
+@* *@

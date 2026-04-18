@@ -1,4 +1,4 @@
-﻿using OnlineStore.Shared.Clients;
+﻿﻿using OnlineStore.Shared.Clients;
 
 namespace OnlineStore.Shared.Models;
 
@@ -9,4 +9,10 @@ public class AuthResponse
     public string Token { get; set; }
     
     public UserPreferencesDto? Preferences { get; set; }
+    
+    // Login event tracking
+    public DateTime? LastSuccessfulLoginAt { get; set; }
+    public DateTime? LastFailedLoginAt { get; set; }
+    public int FailedLoginAttemptsSinceLastSuccess { get; set; }
 }
+

@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿﻿using Newtonsoft.Json;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using OnlineStore.Client.Providers;
@@ -77,6 +77,21 @@ public partial class ApiBroker : IApiBroker
         var response = await _httpClient.DeleteAsync(relativeUrl);
 
         return await Validate(response);
+    }
+
+    public async Task<TDto> PatchAsync<TPatchDto, TDto>(string relativeUrl, TPatchDto content)
+    {
+        await IncludeAuthenticationToken();
+        var json = JsonConvert.SerializeObject(content);
+        var httpContent = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+        var request = new HttpRequestMessage(new HttpMethod("PATCH"), relativeUrl)
+        {
+            Content = httpContent
+        };
+        var response = await _httpClient.SendAsync(request);
+        await Validate(response);
+
+        return await response.Content.ReadFromJsonAsync<TDto>();
     }
 
     private async Task<bool> Validate(HttpResponseMessage? response)

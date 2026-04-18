@@ -1,4 +1,4 @@
-﻿using OnlineStore.Shared.Accounts;
+﻿﻿using OnlineStore.Shared.Accounts;
 using OnlineStore.Shared.Infrastructure;
 using OnlineStore.Shared.Models;
 
@@ -16,4 +16,8 @@ public partial interface IApiBroker
     Task ForgotUserPassword(ForgotPassword command);
 
     Task ResetUserPassword(ResetPassword command);
+
+    Task<LoginEventDto> GetLoginSummary();
+
+    Task<LoginEventDetailsDto> GetLoginHistory(int limit = 10);
 }
