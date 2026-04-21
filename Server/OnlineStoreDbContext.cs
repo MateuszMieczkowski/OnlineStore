@@ -1,4 +1,4 @@
-﻿﻿using System.Reflection;
+﻿using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using OnlineStore.Server.Entities;
 using OnlineStore.Server.Entities.Abstractions;
@@ -30,6 +30,7 @@ public class OnlineStoreDbContext : DbContext
     public DbSet<Message> Messages { get; set; } = null!;
     public DbSet<MessagePermission> MessagePermissions { get; set; } = null!;
     public DbSet<LoginEvent> LoginEvents { get; set; } = null!;
+    public DbSet<PartialPassword> PartialPasswords { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

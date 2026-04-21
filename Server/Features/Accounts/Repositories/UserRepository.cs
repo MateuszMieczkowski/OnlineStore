@@ -25,6 +25,8 @@ public class UserRepository : RepositoryBase<User>, IUserRepository
 
     public async Task<User?> FindUserByEmail(string email)
     {
-        return await _dbContext.Set<User>().FirstOrDefaultAsync(x => x.Email == email);
+        return await _dbContext.Set<User>()
+            .Include(u => u.PartialPasswords)
+            .FirstOrDefaultAsync(x => x.Email == email);
     }
 }

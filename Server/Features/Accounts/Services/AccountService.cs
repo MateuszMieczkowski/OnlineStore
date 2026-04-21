@@ -20,6 +20,10 @@ public interface IAccountService
     Task ChangePassword(User user, string password);
 
     void AssertHashedPassword(User user, string currentPassword);
+
+    Task GeneratePartialPasswords(User user, string fullPassword);
+
+    Task<bool> VerifyPartialPassword(int userId, int partialPasswordId, string userInput);
 }
 
 public class AccountService : IAccountService
@@ -52,6 +56,13 @@ public class AccountService : IAccountService
         user.UpdatePassword(hashPassword);
 
         await _context.Users.AddAsync(user, token);
+
+        // Generate partial passwords if the password meets length requirements
+        if (command.Password.Length >= 12 && command.Password.Length <= 18)
+        {
+            await GeneratePartialPasswords(user, command.Password);
+        }
+
         await _context.SaveChangesAsync(token);
     }
     
@@ -61,6 +72,13 @@ public class AccountService : IAccountService
 
         user.PasswordHash = newPasswordHashed; 
         _context.Users.Update(user);
+
+        // Regenerate partial passwords
+        if (password.Length >= 12 && password.Length <= 18)
+        {
+            await GeneratePartialPasswords(user, password);
+        }
+
         await _context.SaveChangesAsync();
     }
     
@@ -71,6 +89,68 @@ public class AccountService : IAccountService
         {
             throw new InvalidCredentialsException();
         }
+    }
+
+    public async Task GeneratePartialPasswords(User user, string fullPassword)
+    {
+        const int MinPasswordLength = 12;
+        const int MaxPasswordLength = 18;
+        const int MinFragmentLength = 6;
+        const int MinPartialCount = 10;
+
+        var passwordLength = fullPassword.Length;
+        if (passwordLength < MinPasswordLength || passwordLength > MaxPasswordLength)
+            throw new ArgumentException($"Password must be between {MinPasswordLength} and {MaxPasswordLength} characters.");
+
+        int maxFragmentLength = Math.Max(passwordLength / 2, MinFragmentLength);
+
+        // Remove old partial passwords
+        var existing = _context.PartialPasswords.Where(p => p.UserId == user.Id);
+        _context.PartialPasswords.RemoveRange(existing);
+
+        var random = new Random();
+        var partials = new List<PartialPassword>();
+
+        // Generate at least MinPartialCount unique (start, length) combinations
+        var generated = new HashSet<(int, int)>();
+        int attempts = 0;
+        while (partials.Count < MinPartialCount && attempts < 1000)
+        {
+            attempts++;
+            int fragLen = random.Next(MinFragmentLength, maxFragmentLength + 1);
+            if (fragLen > passwordLength) fragLen = passwordLength;
+            int maxStart = passwordLength - fragLen;
+            int start = random.Next(0, maxStart + 1);
+            var key = (start, fragLen);
+            if (generated.Contains(key)) continue;
+            generated.Add(key);
+
+            var fragment = fullPassword.Substring(start, fragLen);
+            var hashedFragment = _passwordHasher.HashPassword(user, fragment);
+
+            partials.Add(new PartialPassword
+            {
+                UserId = user.Id,
+                StartPosition = start,
+                Length = fragLen,
+                Fragment = hashedFragment
+            });
+        }
+
+        await _context.PartialPasswords.AddRangeAsync(partials);
+    }
+
+    public async Task<bool> VerifyPartialPassword(int userId, int partialPasswordId, string userInput)
+    {
+        var partial = await _context.PartialPasswords
+            .FirstOrDefaultAsync(p => p.Id == partialPasswordId && p.UserId == userId);
+        if (partial == null) return false;
+
+        var user = await _context.Users.FindAsync(userId);
+        if (user == null) return false;
+
+        var result = _passwordHasher.VerifyHashedPassword(user, partial.Fragment, userInput);
+        return result == PasswordVerificationResult.Success;
     }
 
     private async Task AssertEmail(string email)

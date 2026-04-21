@@ -121,4 +121,22 @@ public class AccountController : ControllerBase
     
         return Ok(summary);
     }
+
+    [HttpPost("request-partial-password")]
+    [AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<PartialPasswordResponse> RequestPartialPassword([FromBody] RequestPartialPassword request)
+    {
+        var response = await _mediator.Send(request);
+        return response;
+    }
+
+    [HttpPost("login-partial")]
+    [AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<AuthResponse> LoginWithPartialPassword([FromBody] AuthenticateWithPartialPassword request)
+    {
+        var response = await _mediator.Send(request);
+        return response;
+    }
 }

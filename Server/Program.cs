@@ -76,6 +76,7 @@ builder.Services.AddValidatorsFromAssembly(typeof(AbstractValidator<>).Assembly)
 
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ILoginEventService, LoginEventService>();
+builder.Services.AddSingleton<IPartialPasswordChallengeStore, PartialPasswordChallengeStore>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<IValidator<RegisterAdmin>, RegisterUserDtoValidator>();
 builder.Services.AddScoped<IValidator<CreateProductsBatch>, CreateProductsBatchValidator>();

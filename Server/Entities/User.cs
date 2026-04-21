@@ -23,6 +23,8 @@ public class User
     
     public virtual ICollection<LoginEvent> LoginEvents { get; set; } = new List<LoginEvent>();
 
+    public virtual ICollection<PartialPassword> PartialPasswords { get; set; } = new List<PartialPassword>();
+
     public void UpdatePassword(string passwordHash)
     {
         PasswordHash = passwordHash;
