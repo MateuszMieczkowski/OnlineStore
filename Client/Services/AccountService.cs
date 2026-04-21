@@ -30,6 +30,10 @@ public interface IAccountService
     Task<LoginEventDto> GetLoginSummary();
 
     Task<LoginEventDetailsDto> GetLoginHistory(int limit = 10);
+
+    Task<PartialPasswordResponse> RequestPartialPasswordAsync(RequestPartialPassword request);
+
+    Task<bool> AuthenticateWithPartialPasswordAsync(AuthenticateWithPartialPassword request);
 }
 
 public class AccountService : IAccountService
@@ -115,5 +119,23 @@ public class AccountService : IAccountService
     public async Task<LoginEventDetailsDto> GetLoginHistory(int limit = 10)
     {
         return await _broker.GetLoginHistory(limit);
+    }
+
+    public async Task<PartialPasswordResponse> RequestPartialPasswordAsync(RequestPartialPassword request)
+    {
+        return await _broker.RequestPartialPasswordAsync(request);
+    }
+
+    public async Task<bool> AuthenticateWithPartialPasswordAsync(AuthenticateWithPartialPassword request)
+    {
+        var response = await _broker.LoginWithPartialPasswordAsync(request);
+
+        await _localStorage.SetItemAsync("accessToken", response.Token);
+        await _localStorage.SetItemAsync("email", response.Email);
+        await _localStorage.SetItemAsync("preferences", response.Preferences);
+        await _shoppingCartService.LoadCartFromServer();
+
+        await ((ApiAuthenticationStateProvider)_authenticationStateProvider).LoggedIn();
+        return true;
     }
 }

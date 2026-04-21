@@ -8,6 +8,8 @@ public class ChangePasswordModel
     public string CurrentPassword { get; set; } = "";
 
     [Required(ErrorMessage = "Nowe hasło musi być wypełnione")]
+    [MinLength(12, ErrorMessage = "Nowe hasło musi mieć co najmniej 12 znaków.")]
+    [MaxLength(18, ErrorMessage = "Nowe hasło może mieć maksymalnie 18 znaków.")]
     public string NewPassword { get; set; } = "";
 
     [Required(ErrorMessage = "Nowe hasło musi być potwierdzone")]

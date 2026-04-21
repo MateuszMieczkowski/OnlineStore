@@ -10,7 +10,13 @@ public class RequestPartialPassword : IQuery<PartialPasswordResponse>
 
 public class PartialPasswordResponse
 {
-    public string Fragment { get; set; } = string.Empty;
+    /// <summary>
+    /// 1-based start position (for display to user)
+    /// </summary>
     public int StartPosition { get; set; }
     public int Length { get; set; }
+    /// <summary>
+    /// An opaque token that the server uses to identify which partial password challenge was issued.
+    /// </summary>
+    public string ChallengeToken { get; set; } = string.Empty;
 }

@@ -20,4 +20,8 @@ public partial interface IApiBroker
     Task<LoginEventDto> GetLoginSummary();
 
     Task<LoginEventDetailsDto> GetLoginHistory(int limit = 10);
+
+    Task<PartialPasswordResponse> RequestPartialPasswordAsync(RequestPartialPassword requestPartialPassword);
+
+    Task<AuthResponse> LoginWithPartialPasswordAsync(AuthenticateWithPartialPassword authenticateWithPartialPassword);
 }

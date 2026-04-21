@@ -50,4 +50,16 @@ public partial class ApiBroker
         var requestUrl = $"{AccountRelativeUrl}/login-events?limit={limit}";
         return await GetAsync<LoginEventDetailsDto>(requestUrl);
     }
+
+    public async Task<PartialPasswordResponse> RequestPartialPasswordAsync(RequestPartialPassword requestPartialPassword)
+    {
+        var response = await PostAsync<RequestPartialPassword, PartialPasswordResponse>(AccountRelativeUrl + "/request-partial-password", requestPartialPassword);
+        return response;
+    }
+
+    public async Task<AuthResponse> LoginWithPartialPasswordAsync(AuthenticateWithPartialPassword authenticateWithPartialPassword)
+    {
+        var response = await PostAsync<AuthenticateWithPartialPassword, AuthResponse>(AccountRelativeUrl + "/login-partial", authenticateWithPartialPassword);
+        return response;
+    }
 }

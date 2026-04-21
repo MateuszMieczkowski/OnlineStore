@@ -2,6 +2,7 @@
 @using OnlineStore.Shared.Models
 @using Blazored.LocalStorage
 @using OnlineStore.Shared.Clients
+@using OnlineStore.Shared.Accounts
 @inject IAccountService AccountService
 @inject NavigationManager NavManager
 @inject ISnackbar Snackbar
@@ -10,39 +11,80 @@
 <MudContainer MaxWidth="MaxWidth.Small">
     <MudPaper Class="p-5" Elevation="5">
         <MudText Typo="Typo.h5">Zaloguj się</MudText>
-        <EditForm Model="_authenticateUser" OnValidSubmit="HandleLogin">
-            <DataAnnotationsValidator></DataAnnotationsValidator>
-            <div class="form-group">
-                <MudTextField 
-                    id="@(_isPasswordManagerEnabled ? "email" : "email-new")" 
-                    @bind-Value="_authenticateUser.Email" 
-                    Class="mb-4" 
-                    For="@(() => _authenticateUser.Email)" 
-                    Label="E-mail" 
-                    Placeholder="Wpisz" 
-                    Type="InputType.Email" 
-                    Variant="Variant.Outlined" 
-                    />
-            </div>
-            <div class="form-group">
-                <MudTextField 
-                    id="@(_isPasswordManagerEnabled ? "current-password" : "new-password")" 
-                    @bind-Value="_authenticateUser.Password" 
-                    Class="mb-4" 
-                    For="@(() => _authenticateUser.Password)" 
-                    InputType="InputType.Password" 
-                    Label="Hasło" 
-                    Placeholder="Wpisz" 
-                    Variant="Variant.Outlined" 
-                    />
+
+        @if (!_usePartialPassword)
+        {
+            <EditForm Model="_authenticateUser" OnValidSubmit="HandleLogin">
+                <DataAnnotationsValidator></DataAnnotationsValidator>
+                <div class="form-group">
+                    <MudTextField
+                        id="@(_isPasswordManagerEnabled ? "email" : "email-new")"
+                        @bind-Value="_authenticateUser.Email"
+                        Class="mb-4"
+                        For="@(() => _authenticateUser.Email)"
+                        Label="E-mail"
+                        Placeholder="Wpisz"
+                        Type="InputType.Email"
+                        Variant="Variant.Outlined" />
+                </div>
+                <div class="form-group">
+                    <MudTextField
+                        id="@(_isPasswordManagerEnabled ? "current-password" : "new-password")"
+                        @bind-Value="_authenticateUser.Password"
+                        Class="mb-4"
+                        For="@(() => _authenticateUser.Password)"
+                        InputType="InputType.Password"
+                        Label="Hasło"
+                        Placeholder="Wpisz"
+                        Variant="Variant.Outlined" />
+                </div>
+
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Zaloguj</MudButton>
+                <MudButton Class="ml-2" Variant="Variant.Outlined" Color="Color.Secondary" OnClick="SwitchToPartialPassword">Zaloguj fragmentem hasła</MudButton>
+
+                <div class="form-group mt-4">
+                    <NavLink href="users/forgot-password">Nie pamiętasz hasła?</NavLink>
+                </div>
+            </EditForm>
+        }
+        else
+        {
+            <div class="form-group mb-3">
+                <MudTextField
+                    @bind-Value="_emailForPartial"
+                    Class="mb-4"
+                    Label="E-mail"
+                    Placeholder="Wpisz"
+                    Type="InputType.Email"
+                    Variant="Variant.Outlined" />
             </div>
 
-            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Zaloguj</MudButton>
+            @if (_currentPartial == null)
+            {
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="RequestPartialPassword">Pobierz fragment hasła</MudButton>
+            }
+            else
+            {
+                <MudAlert Severity="Severity.Info" Class="mb-3">
+                    Podaj znaki hasła od pozycji <strong>@(_currentPartial.StartPosition + 1)</strong> do <strong>@(_currentPartial.StartPosition + _currentPartial.Length)</strong> (łącznie @_currentPartial.Length znaków).
+                </MudAlert>
+                <div class="form-group">
+                    <MudTextField
+                        @bind-Value="_userInput"
+                        Class="mb-4"
+                        InputType="InputType.Password"
+                        Label="Fragment hasła"
+                        Placeholder="Wpisz fragment"
+                        Variant="Variant.Outlined" />
+                </div>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="HandlePartialLogin">Zaloguj</MudButton>
+                <MudButton Class="ml-2" Variant="Variant.Outlined" OnClick="RequestPartialPassword">Nowy fragment</MudButton>
+            }
 
-            <div class="form-group mt-4">
-                <NavLink href="users/forgot-password">Nie pamiętasz hasła?</NavLink>
+            <div class="mt-3">
+                <MudButton Variant="Variant.Text" OnClick="SwitchToFullPassword">Wróć do logowania hasłem</MudButton>
             </div>
-        </EditForm>
+        }
     </MudPaper>
 </MudContainer>
 
@@ -50,6 +92,10 @@
 {
     private readonly AuthenticateUser _authenticateUser = new();
     private bool _isPasswordManagerEnabled = true;
+    private bool _usePartialPassword = false;
+    private PartialPasswordResponse? _currentPartial;
+    private string _emailForPartial = string.Empty;
+    private string _userInput = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -62,25 +108,85 @@
 
     private async void HandleLogin()
     {
-        var loginFailedMessage = "Nie udało się zalogować. Spróbuj ponownie";
-        var loginSuccessMessage = "Zalogowano pomyślnie.";
-
         try
         {
             var isAuthenticated = await AccountService.AuthenticateAsync(_authenticateUser);
             if (isAuthenticated)
             {
-                Snackbar.Add(loginSuccessMessage, Severity.Success);
+                Snackbar.Add("Zalogowano pomyślnie.", Severity.Success);
                 NavManager.NavigateTo("");
             }
             else
             {
-                Snackbar.Add(loginFailedMessage, Severity.Error);
+                Snackbar.Add("Nie udało się zalogować. Spróbuj ponownie", Severity.Error);
             }
         }
         catch (Exception ex)
         {
             Snackbar.Add(ex.Message, Severity.Error);
         }
+    }
+
+    private async Task RequestPartialPassword()
+    {
+        if (string.IsNullOrWhiteSpace(_emailForPartial))
+        {
+            Snackbar.Add("Podaj adres e-mail.", Severity.Warning);
+            return;
+        }
+        try
+        {
+            var request = new RequestPartialPassword { Email = _emailForPartial };
+            _currentPartial = await AccountService.RequestPartialPasswordAsync(request);
+            _userInput = string.Empty;
+            Snackbar.Add("Pobrano fragment hasła.", Severity.Info);
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add("Błąd: " + ex.Message, Severity.Error);
+        }
+    }
+
+    private async Task HandlePartialLogin()
+    {
+        if (_currentPartial == null) return;
+        try
+        {
+            var request = new AuthenticateWithPartialPassword
+            {
+                Email = _emailForPartial,
+                ChallengeToken = _currentPartial.ChallengeToken,
+                UserInput = _userInput
+            };
+            var isAuthenticated = await AccountService.AuthenticateWithPartialPasswordAsync(request);
+            if (isAuthenticated)
+            {
+                Snackbar.Add("Zalogowano pomyślnie.", Severity.Success);
+                NavManager.NavigateTo("");
+            }
+            else
+            {
+                Snackbar.Add("Nieprawidłowy fragment hasła.", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+    }
+
+    private void SwitchToPartialPassword()
+    {
+        _emailForPartial = _authenticateUser.Email ?? string.Empty;
+        _usePartialPassword = true;
+        _currentPartial = null;
+        _userInput = string.Empty;
+    }
+
+    private void SwitchToFullPassword()
+    {
+        _usePartialPassword = false;
+        _currentPartial = null;
     }
 }
